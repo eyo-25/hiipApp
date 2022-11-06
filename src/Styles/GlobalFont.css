@@ -1,0 +1,30 @@
+@font-face {
+    font-family: "NotoSansKR";
+    src: url("../Assets/Fonts/NotoSansKR-Black.woff");
+    font-weight: 900;
+}
+@font-face {
+    font-family: "NotoSansKR";
+    src: url("../Assets/Fonts/NotoSansKR-Bold.woff");
+    font-weight: 700;
+}
+@font-face {
+    font-family: "NotoSansKR";
+    src: url("../Assets/Fonts/NotoSansKR-Medium.woff");
+    font-weight: 400;
+}
+@font-face {
+    font-family: "NotoSansKR";
+    src: url( "../Assets/Fonts/NotoSansKR-Regular.woff");
+    font-weight: 300;
+}
+@font-face {
+    font-family: "NotoSansKR";
+    src: url("../Assets/Fonts/NotoSansKR-Thin.woff");
+    font-weight: 100;
+}
+@font-face {
+    font-family: "Roboto";
+    src: url("../Assets/Fonts/Roboto-BlackItalic.woff");
+    font-weight: 900;
+}
