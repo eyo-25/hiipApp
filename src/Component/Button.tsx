@@ -1,19 +1,23 @@
 import styled from "styled-components";
 import { IoPlaySharp } from "react-icons/io5";
 import { ReactComponent as PlusIcon } from "../Assets/Icons/plus.svg";
-import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 
-function Button() {
+const boxVarients = {
+  click: { scale: 0.9 },
+};
+
+function Button({ isPlay }: { isPlay: boolean }) {
   return (
-    <BtnBox>
-      <PlayBtn />
+    <BtnBox variants={boxVarients} whileTap="click">
+      {isPlay ? <PlayBtn /> : <PlusBtn />}
     </BtnBox>
   );
 }
 
 export default Button;
 
-const BtnBox = styled.button`
+const BtnBox = styled(motion.div)`
   position: fixed;
   left: 0;
   right: 0;
