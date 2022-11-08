@@ -8,6 +8,7 @@ import Background from "../../Assets/image/start_background2.png";
 import TodoBord from "./Home/TodoBord";
 import { useRecoilState } from "recoil";
 import { toDoState } from "../../Recoil/atoms";
+import ProjectInfo from "./Home/ProjectInfo";
 
 function Home() {
   const [toDos, setToDos] = useRecoilState(toDoState);
@@ -15,14 +16,14 @@ function Home() {
   const [isFadeout, setIsFadeout] = useState(false);
   const btnVariants = {
     normal: {
-      scale: 0,
       opacity: 0,
+      scale: 0,
     },
     animate: {
       opacity: 1,
       scale: 1,
       transition: {
-        duration: 0.5,
+        duration: 1,
         type: "linear",
       },
     },
@@ -36,13 +37,28 @@ function Home() {
       },
     },
     animate: {
-      height: isReady && toDos.length > 0 ? "59vh" : "23vh",
+      height: isReady && toDos.length > 0 ? "57vh" : "23vh",
+      transition: {
+        duration: 0.8,
+        type: "linear",
+      },
+    },
+  };
+  const bgVariants = {
+    normal: {
+      background: "linear-gradient(rgba(0, 0, 0, 0), 40%, rgba(0, 0, 0, 0.4))",
+    },
+    animate: {
+      background: isFadeout
+        ? "linear-gradient(rgba(0, 0, 0, 0.5), 40%, rgba(0, 0, 0, 0.9))"
+        : "linear-gradient(rgba(0, 0, 0, 0), 40%, rgba(0, 0, 0, 0.4))",
       transition: {
         duration: 0.5,
         type: "linear",
       },
     },
   };
+
   const onPlayClick = () => {
     if (toDos.length <= 0) return;
     setIsReady(true);
@@ -59,9 +75,16 @@ function Home() {
 
   return (
     <Applayout>
-      <BackgroundBox onClick={onBackClick}>
-        <BackgroundImg isFadeout={isFadeout && toDos.length > 0} />
-      </BackgroundBox>
+      <InfoContainer isFadeout={isFadeout && toDos.length > 0}>
+        <ProjectInfo isReady={isReady} onBackClick={onBackClick} />
+        <BackgroundImg />
+      </InfoContainer>
+      <BackgroundCover
+        onClick={onBackClick}
+        variants={bgVariants}
+        initial="normal"
+        animate="animate"
+      />
       <TodoBox variants={bottomVariants} initial="normal" animate="animate">
         <TodoBord isReady={isReady} />
       </TodoBox>
@@ -79,36 +102,33 @@ function Home() {
 
 export default Home;
 
-const BackgroundBox = styled.div`
+const InfoContainer = styled.div<{ isFadeout: boolean }>`
+  cursor: ${(props) => (props.isFadeout ? "pointer" : null)};
   position: absolute;
   display: flex;
   justify-content: center;
   align-items: center;
   width: 100%;
   height: 100%;
-  background-color: powderblue;
 `;
-
-const BackgroundImg = styled.div<{ isFadeout: boolean }>`
-  cursor: ${(props) => (props.isFadeout ? "pointer" : null)};
+const BackgroundCover = styled(motion.div)`
+  position: absolute;
+  top: 0;
   width: 100%;
   height: 100%;
-  justify-content: center;
-  background-image: ${(props) =>
-      props.isFadeout
-        ? "linear-gradient(rgba(0, 0, 0, 0.5), 40%, rgba(0, 0, 0, 0.9)),"
-        : "linear-gradient(rgba(0, 0, 0, 0), 40%, rgba(0, 0, 0, 0.4)),"}
-    url(${Background});
+`;
+const BackgroundImg = styled.div`
+  width: 100%;
+  height: 100%;
+  background-image: url(${Background});
   background-repeat: no-repeat;
   background-size: cover;
   background-position: 65%;
-  transition: all linear 5s;
 `;
-
 const TodoBox = styled(motion.div)`
   border-top-right-radius: 2vh;
   border-top-left-radius: 2vh;
-  z-index: 1;
+  z-index: 2;
   display: flex;
   width: 100%;
   padding: 3vh 2.5vh;
@@ -116,5 +136,4 @@ const TodoBox = styled(motion.div)`
   background-color: ${Normal_Gray};
   overflow: hidden;
 `;
-
 const ButtonContainer = styled(motion.div)``;

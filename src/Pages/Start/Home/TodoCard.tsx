@@ -42,7 +42,6 @@ const DragBox = styled.div`
     height: 80px;
   }
 `;
-
 const TextBox = styled.div`
   display: flex;
   flex-direction: column;
@@ -51,7 +50,6 @@ const TextBox = styled.div`
     font-size: 14px;
   }
 `;
-
 const TitleBox = styled.div`
   display: flex;
   margin-bottom: 10px;
@@ -61,7 +59,6 @@ const TitleBox = styled.div`
     margin-right: 8px;
   }
 `;
-
 const StatusBox = styled.div`
   display: flex;
   justify-content: center;
@@ -75,7 +72,6 @@ const StatusBox = styled.div`
     font-weight: 600;
   }
 `;
-
 const IntervalBox = styled.div`
   display: flex;
   h4 {
@@ -85,12 +81,10 @@ const IntervalBox = styled.div`
     color: #9d9d9d;
   }
 `;
-
 const StartBtn = styled(IoPlaySharp)`
   color: #9d9d9d;
-  margin-left: 15px;
+  margin-left: 1.3vh;
 `;
-
 const IntervalBarBox = styled.div`
   display: flex;
   position: absolute;
@@ -98,7 +92,6 @@ const IntervalBarBox = styled.div`
   width: 310px;
   height: 4px;
 `;
-
 const IntervalBar = styled.div<{ isReadyCard: boolean }>`
   display: flex;
   background-color: ${(props) => (props.isReadyCard ? "black" : "#cccccc")};

@@ -59,6 +59,7 @@ const NavWrapper = styled.div`
   width: 100%;
   position: fixed;
   bottom: 0;
+  z-index: 12;
 `;
 
 const NavContainer = styled.div`
@@ -70,7 +71,6 @@ const NavContainer = styled.div`
   max-width: 414px;
   background-color: white;
   border-top: 1px solid ${Dark_Gray};
-  z-index: 12;
 `;
 
 const Nav = styled.nav`

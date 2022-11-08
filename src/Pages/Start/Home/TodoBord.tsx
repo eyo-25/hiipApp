@@ -9,11 +9,11 @@ import { motion } from "framer-motion";
 const bottomVariants = {
   normal: {
     opacity: 0,
-    y: -5,
+    height: "0vh",
   },
   animate: {
     opacity: 1,
-    y: 0,
+    height: "7vh",
     transition: {
       delay: 0.5,
       duration: 0.5,
@@ -81,11 +81,9 @@ const CardWrapper = styled.div`
   width: 95%;
   margin: 0 0.5vh;
 `;
-
 const BottomGradient = styled(motion.div)`
   position: absolute;
   bottom: 0;
-  height: 7vh;
   width: 100%;
   background: linear-gradient(to top, white, 80%, rgba(0, 0, 0, 0));
   @media screen and (max-height: 800px) {
