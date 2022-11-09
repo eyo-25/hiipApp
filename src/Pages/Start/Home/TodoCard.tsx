@@ -1,7 +1,14 @@
 import { IoPlaySharp } from "react-icons/io5";
 import styled from "styled-components";
+import {
+  Blue,
+  Dark_Gray2,
+  Normal_Gray2,
+  Normal_Gray3,
+} from "../../../Styles/Colors";
 
 function TodoCard() {
+  const intervalArray = [3, 2, 1];
   return (
     <DragBox>
       <TextBox>
@@ -15,10 +22,14 @@ function TodoCard() {
       </TextBox>
       <IntervalBox>
         <h4>0</h4>
-        <span>SET</span>
+        <p>SET</p>
         <StartBtn />
       </IntervalBox>
-      <IntervalBarBox></IntervalBarBox>
+      <IntervalBarBox>
+        {intervalArray.map((index) => (
+          <IntervalBar key={index} />
+        ))}
+      </IntervalBarBox>
     </DragBox>
   );
 }
@@ -35,8 +46,7 @@ const DragBox = styled.div`
   width: 100%;
   border-radius: 10px;
   margin-bottom: 15px;
-  background: #f2f2f2;
-  box-shadow: 0.5px 4px 8px rgba(0, 0, 0, 0.1);
+  background-color: ${Normal_Gray2};
   cursor: pointer;
   @media screen and (max-height: 800px) {
     height: 80px;
@@ -46,7 +56,7 @@ const TextBox = styled.div`
   display: flex;
   flex-direction: column;
   p {
-    color: #9d9d9d;
+    color: ${Dark_Gray2};
     font-size: 14px;
   }
 `;
@@ -59,11 +69,11 @@ const TitleBox = styled.div`
     margin-right: 8px;
   }
 `;
-const StatusBox = styled.div`
+const StatusBox = styled.span`
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #1012ff;
+  background-color: ${Blue};
   border-radius: 10px;
   h5 {
     padding: 3px 5px;
@@ -77,24 +87,25 @@ const IntervalBox = styled.div`
   h4 {
     margin-right: 5px;
   }
-  span {
-    color: #9d9d9d;
+  p {
+    color: ${Dark_Gray2};
   }
 `;
 const StartBtn = styled(IoPlaySharp)`
-  color: #9d9d9d;
+  color: ${Dark_Gray2};
   margin-left: 1.3vh;
 `;
-const IntervalBarBox = styled.div`
-  display: flex;
+const IntervalBarBox = styled.ul`
   position: absolute;
+  display: flex;
   bottom: 0;
-  width: 310px;
+  padding-right: 5px;
+  width: 80%;
   height: 4px;
 `;
-const IntervalBar = styled.div<{ isReadyCard: boolean }>`
+const IntervalBar = styled.li`
   display: flex;
-  background-color: ${(props) => (props.isReadyCard ? "black" : "#cccccc")};
+  background-color: ${Normal_Gray3};
   height: 100%;
   width: 100%;
   margin: 0 3px;

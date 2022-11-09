@@ -32,8 +32,10 @@ function TodoBord({ isReady }: { isReady: boolean }) {
   };
   useEffect(() => {
     if (!isReady) {
-      smoothscroll.polyfill();
-      topRef.current?.scrollIntoView({ behavior: "smooth" });
+      setTimeout(() => {
+        smoothscroll.polyfill();
+        topRef.current?.scrollIntoView({ behavior: "smooth" });
+      }, 500);
     }
   }, [isReady]);
   return (
@@ -80,6 +82,18 @@ const CardWrapper = styled.div`
   display: flex;
   width: 95%;
   margin: 0 0.5vh;
+  &:first-child {
+    div:first-child {
+      background-color: white;
+      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.07);
+      div {
+        box-shadow: none;
+      }
+    }
+    li {
+      background-color: black;
+    }
+  }
 `;
 const BottomGradient = styled(motion.div)`
   position: absolute;

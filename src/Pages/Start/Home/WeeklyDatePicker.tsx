@@ -15,15 +15,6 @@ function WeeklyDatePicker() {
   useEffect(() => {
     setWeekArray((prev) => {
       const copy = [...prev];
-      // 3,4,5 배열 채우기
-      for (let i = 3; i < 7; i++) {
-        copy[i] = new Date(
-          Moment(clickDate).year(),
-          Moment(clickDate).month(),
-          Moment(clickDate).date() + addDay1
-        );
-        addDay1++;
-      }
       // 0,1,2 배열 채우기
       for (let i = 2; i >= 0; i--) {
         addDay2--;
@@ -33,57 +24,60 @@ function WeeklyDatePicker() {
           Moment(clickDate).date() + addDay2
         );
       }
+      // 3,4,5 배열 채우기
+      for (let i = 3; i < 7; i++) {
+        copy[i] = new Date(
+          Moment(clickDate).year(),
+          Moment(clickDate).month(),
+          Moment(clickDate).date() + addDay1
+        );
+        addDay1++;
+      }
       return [...copy];
     });
   }, [clickDate]);
-
   useEffect(() => {
     setClickDate(Moment().format("YYYY-MM-DD"));
   }, []);
-
   const onPrevClick = () => {
     setClickDate(() => {
       const copy = Moment(clickDate);
       return copy.subtract(1, "days");
     });
   };
-
   const onNextClick = () => {
     setClickDate(() => {
       const copy = Moment(clickDate);
       return copy.add(1, "days");
     });
   };
-
   const onTodayClick = () => {
     setClickDate(Moment().format("YYYY-MM-DD"));
   };
-
-  const onDateClick = (date: string) => {
+  const onDateClick = (date: any) => {
     setClickDate(Moment(date).format("YYYY-MM-DD"));
   };
-
   return (
-    <Wrapper variants={fadeinVariants} initial="normal" animate="animate">
-      <Container>
-        <MonthBox>
-          <PrevBtn onClick={onPrevClick} />
-          <MonthText onClick={onTodayClick}>
-            {Moment(clickDate).month() + 1}월
-          </MonthText>
-          <NextBtn onClick={onNextClick} />
-        </MonthBox>
-        {weekArray.length > 0 && (
+    <>
+      <Wrapper variants={fadeinVariants} initial="normal" animate="animate">
+        <Container>
+          <MonthBox>
+            <PrevBtn onClick={onPrevClick} />
+            <MonthText onClick={onTodayClick}>
+              {Moment(clickDate).month() + 1}월
+            </MonthText>
+            <NextBtn onClick={onNextClick} />
+          </MonthBox>
           <DateContainer>
             {weekArray.map((date: any, index: number) => (
               <DateBox key={index} onClick={() => onDateClick(date)}>
-                <DateText>{date.getDate()}</DateText>
+                <DateText>{date.getDate() + ""}</DateText>
               </DateBox>
             ))}
           </DateContainer>
-        )}
-      </Container>
-    </Wrapper>
+        </Container>
+      </Wrapper>
+    </>
   );
 }
 

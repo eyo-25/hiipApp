@@ -17,12 +17,11 @@ function Home() {
   const btnVariants = {
     normal: {
       opacity: 0,
-      scale: 0,
     },
     animate: {
       opacity: 1,
-      scale: 1,
       transition: {
+        delay: 0.5,
         duration: 1,
         type: "linear",
       },
@@ -30,7 +29,7 @@ function Home() {
   };
   const bottomVariants = {
     normal: {
-      height: "-1vh",
+      height: "0vh",
       transition: {
         duration: 0.3,
         type: "linear",
@@ -39,7 +38,7 @@ function Home() {
     animate: {
       height: isReady && toDos.length > 0 ? "57vh" : "23vh",
       transition: {
-        duration: 0.8,
+        duration: 1,
         type: "linear",
       },
     },
@@ -75,33 +74,43 @@ function Home() {
 
   return (
     <Applayout>
-      <InfoContainer isFadeout={isFadeout && toDos.length > 0}>
-        <ProjectInfo isReady={isReady} onBackClick={onBackClick} />
-        <BackgroundImg />
-      </InfoContainer>
-      <BackgroundCover
-        onClick={onBackClick}
-        variants={bgVariants}
-        initial="normal"
-        animate="animate"
-      />
-      <TodoBox variants={bottomVariants} initial="normal" animate="animate">
-        <TodoBord isReady={isReady} />
-      </TodoBox>
-      <ButtonContainer
-        variants={btnVariants}
-        initial="normal"
-        animate="animate"
-        onClick={onPlayClick}
-      >
-        <Button isPlay={toDos.length > 0 ? true : false} />
-      </ButtonContainer>
+      <ContentContainer>
+        <InfoContainer isFadeout={isFadeout && toDos.length > 0}>
+          <ProjectInfo isReady={isReady} onBackClick={onBackClick} />
+          <BackgroundImg />
+        </InfoContainer>
+        <BackgroundCover
+          onClick={onBackClick}
+          variants={bgVariants}
+          initial="normal"
+          animate="animate"
+        />
+        <TodoBox variants={bottomVariants} initial="normal" animate="animate">
+          <TodoBord isReady={isReady} />
+        </TodoBox>
+        <ButtonContainer
+          variants={btnVariants}
+          initial="normal"
+          animate="animate"
+          onClick={onPlayClick}
+        >
+          <Button isPlay={toDos.length > 0 ? true : false} />
+        </ButtonContainer>
+      </ContentContainer>
     </Applayout>
   );
 }
 
 export default Home;
 
+const ContentContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  width: 100%;
+  height: 90vh;
+  overflow: hidden;
+`;
 const InfoContainer = styled.div<{ isFadeout: boolean }>`
   cursor: ${(props) => (props.isFadeout ? "pointer" : null)};
   position: absolute;
@@ -136,4 +145,6 @@ const TodoBox = styled(motion.div)`
   background-color: ${Normal_Gray};
   overflow: hidden;
 `;
-const ButtonContainer = styled(motion.div)``;
+const ButtonContainer = styled(motion.div)`
+  z-index: 13;
+`;

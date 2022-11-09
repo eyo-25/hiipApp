@@ -1,5 +1,7 @@
 import { motion } from "framer-motion";
+import { useRecoilState } from "recoil";
 import styled from "styled-components";
+import { toDoState } from "../../../Recoil/atoms";
 import DetailInfo from "./DetailInfo";
 import WeeklyDatePicker from "./WeeklyDatePicker";
 
@@ -24,6 +26,7 @@ function ProjectInfo({
   isReady: boolean;
   onBackClick: () => void;
 }) {
+  const [toDos, setToDos] = useRecoilState(toDoState);
   return (
     <InfoBox>
       <WeeklyDatePicker />
@@ -36,9 +39,16 @@ function ProjectInfo({
             initial="normal"
             animate="animate"
           >
-            <h4>
-              이대론 <br /> 가망이 없다
-            </h4>
+            {toDos.length > 0 ? (
+              <h4>
+                이대론 <br /> 가망이 없다
+              </h4>
+            ) : (
+              <h4>
+                D-DAY를 설정하고 <br />
+                TO-DO를 추가하세요
+              </h4>
+            )}
           </MessageBox>
           <DdayBox variants={fadeinVariants} initial="normal" animate="animate">
             <p>12</p>
@@ -73,10 +83,9 @@ const MessageBox = styled(motion.div)`
   color: white;
   h4 {
     text-align: center;
-    line-height: 1.3;
-    letter-spacing: -0.5px;
+    line-height: 1.5;
     color: white;
-    font-size: 3.5vh;
+    font-size: 3vh;
     font-weight: 400;
   }
 `;
