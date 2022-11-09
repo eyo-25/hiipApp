@@ -16,7 +16,7 @@ const bottomVariants = {
     height: "7vh",
     transition: {
       delay: 0.5,
-      duration: 0.5,
+      duration: 0.8,
       type: "linear",
     },
   },
@@ -35,7 +35,7 @@ function TodoBord({ isReady }: { isReady: boolean }) {
       setTimeout(() => {
         smoothscroll.polyfill();
         topRef.current?.scrollIntoView({ behavior: "smooth" });
-      }, 500);
+      }, 600);
     }
   }, [isReady]);
   return (

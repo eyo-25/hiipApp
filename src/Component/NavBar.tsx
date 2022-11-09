@@ -5,6 +5,7 @@ import { ReactComponent as Icon2 } from "../Assets/Icons/start.svg";
 import { ReactComponent as Icon3 } from "../Assets/Icons/peedback.svg";
 import { ReactComponent as Icon4 } from "../Assets/Icons/mypage.svg";
 import { Dark_Gray } from "../Styles/Colors";
+import TabBar from "./TabBar";
 
 function NavBar() {
   const navigate = useNavigate();
@@ -15,9 +16,12 @@ function NavBar() {
   const startMatch = useMatch("/");
   const feedbackMatch = useMatch("/feedback/*");
   const mypageMatch = useMatch("/mypage/*");
+
+  const isTab = planMatch !== null;
   return (
-    <NavWrapper>
-      <NavContainer>
+    <Wrapper>
+      {isTab ? <TabBar /> : null}
+      <NavContainer isTab={isTab}>
         <Nav>
           <Items>
             <Item
@@ -36,7 +40,7 @@ function NavBar() {
               onClick={() => onClick("/feedback")}
             >
               <Icon3 />
-              <Link to="/feedback">피드백</Link>
+              <Link to="/feedBack">피드백</Link>
             </Item>
             <Item
               isActive={mypageMatch !== null}
@@ -48,45 +52,43 @@ function NavBar() {
           </Items>
         </Nav>
       </NavContainer>
-    </NavWrapper>
+    </Wrapper>
   );
 }
 
 export default NavBar;
 
-const NavWrapper = styled.div`
+const Wrapper = styled.div`
   position: relative;
   width: 100%;
   position: fixed;
   bottom: 0;
   z-index: 12;
 `;
-
-const NavContainer = styled.div`
+const NavContainer = styled.div<{ isTab: boolean }>`
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-
   height: 10vh;
   max-width: 414px;
+  padding-bottom: 2%;
   background-color: white;
-  border-top: 1px solid ${Dark_Gray};
+  border-top: ${(props) =>
+    props.isTab ? "1px solid white" : `1px solid ${Dark_Gray}`};
+  z-index: 12;
 `;
-
 const Nav = styled.nav`
   display: flex;
   flex-direction: column;
-  max-width: 375px;
   width: 85%;
   margin: 0 auto;
 `;
-
 const Items = styled.ul`
   display: flex;
   align-items: center;
   justify-content: space-between;
 `;
-
 const Item = styled.li<{ isActive: boolean }>`
   display: flex;
   flex-direction: column;

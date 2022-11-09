@@ -21,7 +21,7 @@ function Home() {
     animate: {
       opacity: 1,
       transition: {
-        delay: 0.5,
+        delay: 1,
         duration: 1,
         type: "linear",
       },
@@ -38,7 +38,7 @@ function Home() {
     animate: {
       height: isReady && toDos.length > 0 ? "57vh" : "23vh",
       transition: {
-        duration: 1,
+        duration: 0.8,
         type: "linear",
       },
     },

@@ -12,7 +12,7 @@ export const fadeinVariants = {
   animate: {
     opacity: 1,
     transition: {
-      delay: 0.5,
+      delay: 0.6,
       duration: 0.6,
       type: "linear",
     },

@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 function Plan() {
   return (
     <Applayout>
+      <Header />
       <></>
     </Applayout>
   );
