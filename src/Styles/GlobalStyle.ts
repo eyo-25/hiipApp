@@ -2,6 +2,9 @@ import { createGlobalStyle } from "styled-components";
 import { Dark_Gray } from "./Colors";
 
 const GlobalStyle = createGlobalStyle`
+:root {
+  --vh: 100%;
+}
 html, body, div, span, applet, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
 a, abbr, acronym, address, big, cite, code,
@@ -40,9 +43,10 @@ body {
   max-width: 414px;
   
   // 스크롤바 영역차지 막기
-  overflow: overlay;
+  /* overflow: overlay; */
   // 스크롤 막기
-  /* overflow: hidden; */
+  overflow: hidden;
+  touch-action: none;
   height: 100%;
 }
 menu, ol, ul {

@@ -70,9 +70,9 @@ const NavContainer = styled.div<{ isTab: boolean }>`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 10vh;
+  height: calc(var(--vh, 1vh) * 10);
   max-width: 414px;
-  padding-bottom: 2%;
+  padding-bottom: 1%;
   background-color: white;
   border-top: ${(props) =>
     props.isTab ? "1px solid white" : `1px solid ${Dark_Gray}`};

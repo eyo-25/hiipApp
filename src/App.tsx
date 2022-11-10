@@ -10,6 +10,13 @@ export interface IUserObjProps {
 
 function App() {
   const [userObj, setUserObj] = useState<IUserObjProps | null>(null);
+  function setScreenSize() {
+    let vh = window.innerHeight * 0.01;
+    document.documentElement.style.setProperty("--vh", `${vh}px`);
+  }
+  useEffect(() => {
+    setScreenSize();
+  });
   useEffect(() => {
     authService.onAuthStateChanged(async (user: any) => {
       if (user) {

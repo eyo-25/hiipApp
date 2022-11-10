@@ -13,7 +13,8 @@ function Applayout({ children }: { children: any }) {
 export default Applayout;
 
 const Container = styled.div`
+  position: relative;
   margin: 0 auto;
   width: 100%;
-  height: 100%;
+  height: calc(var(--vh, 1vh) * 100);
 `;

@@ -13,6 +13,7 @@
     "@types/react-dom": "^18.0.8",
     "firebase": "^9.6.1",
     "framer-motion": "^7.6.4",
+    "gh-pages": "^4.0.0",
     "lottie-react": "^2.3.1",
     "lottie-web": "^5.9.6",
     "moment": "^2.29.4",
@@ -35,7 +36,9 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
     "extends": [
@@ -60,5 +63,6 @@
     "@types/react-router-dom": "^5.3.3",
     "@types/smoothscroll-polyfill": "^0.3.1",
     "@types/styled-components": "^5.1.26"
-  }
+  },
+  "homepage": "https://eyo-25.github.io/hiipApp"
 }

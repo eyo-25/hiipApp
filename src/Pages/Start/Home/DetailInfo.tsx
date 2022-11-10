@@ -58,7 +58,7 @@ export default DetailInfo;
 const DetailBox = styled(motion.div)`
   display: flex;
   width: 100%;
-  height: 8.5%;
+  height: 12.5%;
   padding: 0 2.5vh;
 `;
 

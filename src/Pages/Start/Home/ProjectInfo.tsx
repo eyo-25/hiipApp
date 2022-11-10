@@ -63,12 +63,11 @@ function ProjectInfo({
 export default ProjectInfo;
 
 const InfoBox = styled(motion.div)`
-  position: absolute;
-  top: 0;
-  width: 100%;
-  height: 100%;
+  position: relative;
   display: flex;
   flex-direction: column;
+  width: 100%;
+  height: 100%;
   z-index: 1;
 `;
 const MessageBox = styled(motion.div)`
@@ -77,7 +76,7 @@ const MessageBox = styled(motion.div)`
   justify-content: center;
   align-items: center;
   width: 100%;
-  height: 47%;
+  height: 64%;
   margin: 0 auto;
   padding-top: 8vh;
   color: white;
@@ -95,7 +94,7 @@ export const DdayBox = styled(motion.div)`
   align-items: flex-end;
   color: white;
   width: 100%;
-  height: 14%;
+  height: 19.5%;
   font-family: "Roboto";
   font-weight: 900;
   span {

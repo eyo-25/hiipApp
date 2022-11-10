@@ -58,26 +58,24 @@ function WeeklyDatePicker() {
     setClickDate(Moment(date).format("YYYY-MM-DD"));
   };
   return (
-    <>
-      <Wrapper variants={fadeinVariants} initial="normal" animate="animate">
-        <Container>
-          <MonthBox>
-            <PrevBtn onClick={onPrevClick} />
-            <MonthText onClick={onTodayClick}>
-              {Moment(clickDate).month() + 1}월
-            </MonthText>
-            <NextBtn onClick={onNextClick} />
-          </MonthBox>
-          <DateContainer>
-            {weekArray.map((date: any, index: number) => (
-              <DateBox key={index} onClick={() => onDateClick(date)}>
-                <DateText>{date.getDate() + ""}</DateText>
-              </DateBox>
-            ))}
-          </DateContainer>
-        </Container>
-      </Wrapper>
-    </>
+    <Wrapper variants={fadeinVariants} initial="normal" animate="animate">
+      <Container>
+        <MonthBox>
+          <PrevBtn onClick={onPrevClick} />
+          <MonthText onClick={onTodayClick}>
+            {Moment(clickDate).month() + 1}월
+          </MonthText>
+          <NextBtn onClick={onNextClick} />
+        </MonthBox>
+        <DateContainer>
+          {weekArray.map((date: any, index: number) => (
+            <DateBox key={index} onClick={() => onDateClick(date)}>
+              <DateText>{date.getDate() + ""}</DateText>
+            </DateBox>
+          ))}
+        </DateContainer>
+      </Container>
+    </Wrapper>
   );
 }
 
@@ -86,15 +84,14 @@ export default React.memo(WeeklyDatePicker);
 const Wrapper = styled(motion.div)`
   display: flex;
   width: 100%;
-  height: 12%;
-  margin-bottom: 1%;
-  z-index: 12;
+  height: 16%;
 `;
 const Container = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
   align-items: center;
+  height: 100%;
   width: 95%;
   margin: 0 auto;
   color: white;

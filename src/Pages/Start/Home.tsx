@@ -36,7 +36,7 @@ function Home() {
       },
     },
     animate: {
-      height: isReady && toDos.length > 0 ? "57vh" : "23vh",
+      height: isReady && toDos.length > 0 ? "57%" : "23%",
       transition: {
         duration: 0.8,
         type: "linear",
@@ -75,10 +75,12 @@ function Home() {
   return (
     <Applayout>
       <ContentContainer>
-        <InfoContainer isFadeout={isFadeout && toDos.length > 0}>
-          <ProjectInfo isReady={isReady} onBackClick={onBackClick} />
+        <BackContainer isFadeout={isFadeout && toDos.length > 0}>
+          <ProjectContainer>
+            <ProjectInfo isReady={isReady} onBackClick={onBackClick} />
+          </ProjectContainer>
           <BackgroundImg />
-        </InfoContainer>
+        </BackContainer>
         <BackgroundCover
           onClick={onBackClick}
           variants={bgVariants}
@@ -104,21 +106,41 @@ function Home() {
 export default Home;
 
 const ContentContainer = styled.div`
+  position: relative;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
   width: 100%;
-  height: 90vh;
+  height: 100%;
   overflow: hidden;
 `;
-const InfoContainer = styled.div<{ isFadeout: boolean }>`
+const BackContainer = styled.div<{ isFadeout: boolean }>`
   cursor: ${(props) => (props.isFadeout ? "pointer" : null)};
-  position: absolute;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   width: 100%;
   height: 100%;
+`;
+const ProjectContainer = styled.div`
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 67%;
+  display: flex;
+`;
+const TodoBox = styled(motion.div)`
+  position: absolute;
+  bottom: 9.9%;
+  border-top-right-radius: 2vh;
+  border-top-left-radius: 2vh;
+  z-index: 2;
+  display: flex;
+  width: 100%;
+  padding: 3vh 2.5vh;
+  padding-bottom: 0;
+  background-color: ${Normal_Gray};
+  overflow: hidden;
 `;
 const BackgroundCover = styled(motion.div)`
   position: absolute;
@@ -133,17 +155,6 @@ const BackgroundImg = styled.div`
   background-repeat: no-repeat;
   background-size: cover;
   background-position: 65%;
-`;
-const TodoBox = styled(motion.div)`
-  border-top-right-radius: 2vh;
-  border-top-left-radius: 2vh;
-  z-index: 2;
-  display: flex;
-  width: 100%;
-  padding: 3vh 2.5vh;
-  padding-bottom: 0;
-  background-color: ${Normal_Gray};
-  overflow: hidden;
 `;
 const ButtonContainer = styled(motion.div)`
   z-index: 13;
