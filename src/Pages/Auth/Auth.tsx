@@ -1,9 +1,12 @@
-import { useState } from "react";
+import { useState, Suspense, lazy, MouseEvent } from "react";
 import styled from "styled-components";
 import { ReactComponent as HiipIcon } from "../../Assets/Icons/HIIPLogo.svg";
 import { Dark_Gray, Dark_Gray2 } from "../../Styles/Colors";
 import AuthSocialLogin from "./AuthForm/AuthSocialLogin";
-import AuthForm from "./AuthForm/AuthForm";
+// import AuthForm from "./AuthForm/AuthForm";
+
+//Lazy Loading
+const AuthForm = lazy(() => import("./AuthForm/AuthForm"));
 
 function Auth() {
   const [isCreate, setIsCreate] = useState(false);
@@ -14,20 +17,29 @@ function Auth() {
   const onLoginClick = () => {
     setIsLogin((prev) => !prev);
   };
+  const LazyModalPreload = () => {
+    import("./AuthForm/AuthForm");
+  };
   return (
     <Container>
-      {isCreate && <AuthForm close={setIsCreate} newCount={true} />}
-      {isLogin && <AuthForm close={setIsLogin} newCount={false} />}
+      <Suspense fallback={null}>
+        {isCreate && <AuthForm close={setIsCreate} newCount={true} />}
+        {isLogin && <AuthForm close={setIsLogin} newCount={false} />}
+      </Suspense>
       <AuthBox>
         <HiipLogo />
         <AuthSocialLogin />
         <BtnBox>
           <SubText>또는</SubText>
-          <LoginBtn1 onClick={onCreateClick}>이메일 주소로 가입하기</LoginBtn1>
+          <LoginBtn1 onMouseEnter={LazyModalPreload} onClick={onCreateClick}>
+            이메일 주소로 가입하기
+          </LoginBtn1>
         </BtnBox>
         <BtnBox>
           <SubText>이미 HIIP 회원이 신가요?</SubText>
-          <LoginBtn2 onClick={onLoginClick}>로그인</LoginBtn2>
+          <LoginBtn2 onMouseEnter={LazyModalPreload} onClick={onLoginClick}>
+            로그인
+          </LoginBtn2>
         </BtnBox>
       </AuthBox>
     </Container>
@@ -44,7 +56,6 @@ export const Container = styled.div`
   height: 100vh;
   margin: 0 auto;
 `;
-
 const AuthBox = styled.div`
   display: flex;
   flex-direction: column;
@@ -53,7 +64,6 @@ const AuthBox = styled.div`
   justify-content: center;
   align-items: center;
 `;
-
 const BtnBox = styled.div`
   display: flex;
   flex-direction: column;
@@ -71,7 +81,6 @@ const BtnBox = styled.div`
     margin: 10px 0;
   }
 `;
-
 const LoginBtn1 = styled.button`
   background-color: black;
   color: white;
@@ -80,7 +89,6 @@ const LoginBtn1 = styled.button`
     color: ${Dark_Gray2};
   }
 `;
-
 const LoginBtn2 = styled.button`
   font-weight: 600;
   background-color: inherit;
@@ -89,13 +97,11 @@ const LoginBtn2 = styled.button`
     background-color: rgba(0, 0, 0, 0.1);
   }
 `;
-
 const HiipLogo = styled(HiipIcon)`
   display: flex;
   width: 80px;
   margin-bottom: 5px;
 `;
-
 const SubText = styled.div`
   font-size: 14px;
   color: ${Dark_Gray2};

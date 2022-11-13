@@ -80,6 +80,9 @@ const StatusBox = styled.span`
     color: white;
     font-size: 10px;
     font-weight: 600;
+    @media screen and (max-height: 800px) {
+      font-size: 8px;
+    }
   }
 `;
 const IntervalBox = styled.div`

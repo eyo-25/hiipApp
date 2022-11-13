@@ -140,6 +140,10 @@ const DateText = styled.div`
   width: 3vh;
   height: 3vh;
   border-radius: 50%;
+  @media screen and (max-height: 800px) {
+    padding-bottom: 2px;
+    padding-bottom: 0px;
+  }
 `;
 const PrevBtn = styled(IoChevronBack)`
   width: 20px;

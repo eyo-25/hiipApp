@@ -4,8 +4,10 @@ import styled from "styled-components";
 import Applayout from "../../Component/Applayout";
 import Header from "../../Component/Header";
 import { authService } from "../../firebase";
+import { IUserObjProps } from "../../Utils/interface";
+import EditProfile from "./MyPage/EditProfile";
 
-function MyPage() {
+function MyPage({ userObj }: any) {
   const localPhotoURL = JSON.parse(
     localStorage.getItem("user") as any
   ).photoURL;
@@ -17,6 +19,7 @@ function MyPage() {
   const editMatch = useMatch(`/mypage/editprofile`);
   const onLogOutClick = () => {
     authService.signOut();
+    window.localStorage.removeItem("user");
     navigate(`/`);
   };
   const onEditClick = () => {
@@ -71,7 +74,7 @@ function MyPage() {
             <IoChevronForward />
           </Item>
         </Items>
-        {/* {editMatch && <EditProfile userObj={userObj}></EditProfile>} */}
+        {editMatch && <EditProfile userObj={userObj} />}
       </Container>
     </Applayout>
   );

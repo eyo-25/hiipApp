@@ -20,15 +20,14 @@ const AuthSocialLogin = () => {
     } else if (name === "github") {
       provider = new GithubAuthProvider();
     }
-    provider &&
-      (await signInWithPopup(authService, provider).then((result) => {
-        dbService.collection("user").doc(result.user.uid).set({
-          email: result.user.email,
-          nickname: result.user.displayName,
-          photoURL: result.user.photoURL,
-          uid: result.user.uid,
-        });
-      }));
+    await signInWithPopup(authService, provider).then((result) => {
+      dbService.collection("user").doc(result.user.uid).set({
+        email: result.user.email,
+        nickname: result.user.displayName,
+        photoURL: result.user.photoURL,
+        uid: result.user.uid,
+      });
+    });
   };
   return (
     <>

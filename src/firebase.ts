@@ -13,9 +13,7 @@ const firebaseConfig = {
 };
 
 firebase.initializeApp(firebaseConfig);
-// 소셜로그인에 필요한 provider가 들어있는 firebase를 firebaseInstance라는 이름으로 export함
 export const firebaseInstance = firebase;
 export const authService = firebase.auth();
-// Initialize Cloud Firestore and get a reference to the service
 export const dbService = firebase.firestore();
 export const storageService = getStorage();

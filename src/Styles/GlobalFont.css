@@ -28,3 +28,8 @@
     src: url("../Assets/Fonts/Roboto-BlackItalic.woff");
     font-weight: 900;
 }
+@font-face {
+    font-family: "RobotoBold";
+    src: url("../Assets/Fonts/Roboto-Bold.woff");
+    font-weight: 900;
+}

@@ -63,7 +63,7 @@ const Wrapper = styled.div`
   width: 100%;
   position: fixed;
   bottom: 0;
-  z-index: 12;
+  z-index: 15;
 `;
 const NavContainer = styled.div<{ isTab: boolean }>`
   display: flex;
@@ -76,7 +76,7 @@ const NavContainer = styled.div<{ isTab: boolean }>`
   background-color: white;
   border-top: ${(props) =>
     props.isTab ? "1px solid white" : `1px solid ${Dark_Gray}`};
-  z-index: 12;
+  z-index: 15;
 `;
 const Nav = styled.nav`
   display: flex;
@@ -91,6 +91,8 @@ const Items = styled.ul`
 `;
 const Item = styled.li<{ isActive: boolean }>`
   display: flex;
+  justify-content: center;
+  align-items: center;
   flex-direction: column;
   cursor: pointer;
   svg {
@@ -105,9 +107,11 @@ const Item = styled.li<{ isActive: boolean }>`
     }
   }
   a {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     font-size: 1vh;
     font-weight: 400;
-    text-align: center;
     color: ${(props) => (props.isActive ? "#000000" : Dark_Gray)};
   }
 `;

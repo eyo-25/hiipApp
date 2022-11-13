@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styled from "styled-components";
 import Applayout from "../../Component/Applayout";
 import Button from "../../Component/Button";
@@ -7,10 +7,12 @@ import { motion } from "framer-motion";
 import Background from "../../Assets/image/start_background2.png";
 import TodoBord from "./Home/TodoBord";
 import { useRecoilState } from "recoil";
-import { toDoState } from "../../Recoil/atoms";
+import { homeSplashState, toDoState } from "../../Recoil/atoms";
 import ProjectInfo from "./Home/ProjectInfo";
+import HomeSplash from "../../Component/HomeSplash";
 
 function Home() {
+  const [isSplash, setIsSplash] = useRecoilState(homeSplashState);
   const [toDos, setToDos] = useRecoilState(toDoState);
   const [isReady, setIsReady] = useState(false);
   const [isFadeout, setIsFadeout] = useState(false);
@@ -58,6 +60,11 @@ function Home() {
     },
   };
 
+  useEffect(() => {
+    setTimeout(() => {
+      setIsSplash(false);
+    }, 1500);
+  }, []);
   const onPlayClick = () => {
     if (toDos.length <= 0) return;
     setIsReady(true);
@@ -71,7 +78,9 @@ function Home() {
       setIsFadeout(false);
     }, 400);
   };
-
+  if (isSplash) {
+    return <HomeSplash />;
+  }
   return (
     <Applayout>
       <ContentContainer>
@@ -137,7 +146,7 @@ const TodoBox = styled(motion.div)`
   z-index: 2;
   display: flex;
   width: 100%;
-  padding: 3vh 2.5vh;
+  padding: 3.5vh 2.5vh;
   padding-bottom: 0;
   background-color: ${Normal_Gray};
   overflow: hidden;

@@ -47,7 +47,6 @@ body {
   // 스크롤 막기
   overflow: hidden;
   touch-action: none;
-  height: 100%;
 }
 menu, ol, ul {
   list-style: none;

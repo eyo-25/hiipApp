@@ -1,10 +1,10 @@
 import { useEffect, useRef } from "react";
 import styled from "styled-components";
 import TodoCard from "./TodoCard";
-import smoothscroll from "smoothscroll-polyfill";
 import { toDoState } from "../../../Recoil/atoms";
 import { useRecoilState } from "recoil";
 import { motion } from "framer-motion";
+import { scrollIntoView } from "seamless-scroll-polyfill";
 
 const bottomVariants = {
   normal: {
@@ -27,20 +27,20 @@ function TodoBord({ isReady }: { isReady: boolean }) {
   const topRef = useRef<HTMLDivElement>(null);
   //클릭이벤트시 사용
   const topClick = () => {
-    smoothscroll.polyfill();
     topRef.current?.scrollIntoView({ behavior: "smooth" });
   };
   useEffect(() => {
     if (!isReady) {
       setTimeout(() => {
-        smoothscroll.polyfill();
-        topRef.current?.scrollIntoView({ behavior: "smooth" });
+        scrollIntoView(topRef.current as any, {
+          behavior: "smooth",
+        });
       }, 600);
     }
   }, [isReady]);
   return (
     <Wrapper isReady={isReady}>
-      <Container ref={topRef}>
+      <Container ref={topRef} id="target">
         {toDos?.map((toDo, index) => (
           <CardWrapper key={index}>
             <TodoCard />
