@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { useEffect } from "react";
 import styled from "styled-components";
 import Background from "../Assets/image/start_background2.png";
 import NavBar from "./NavBar";
@@ -50,7 +51,16 @@ const textVariants = {
   },
 };
 
-function HomeSplash() {
+function HomeSplash({
+  setHomeSplash,
+}: {
+  setHomeSplash: React.Dispatch<React.SetStateAction<boolean>>;
+}) {
+  useEffect(() => {
+    setTimeout(() => {
+      setHomeSplash(false);
+    }, 2000);
+  }, []);
   return (
     <Container>
       <BackgroundImg />

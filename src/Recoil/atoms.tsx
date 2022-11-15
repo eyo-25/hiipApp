@@ -5,17 +5,14 @@ export const toDoState = atom<number[]>({
   default: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   // default: [],
 });
-
 export const homeSplashState = atom<boolean>({
   key: "homeSplash",
   default: true,
 });
 
-export interface IUserObjProps {
-  userObj: any;
-}
+const Moment = require("moment");
 
-export const userObjState = atom<IUserObjProps | null>({
-  key: "userObjState",
-  default: null,
+export const clickDateState = atom({
+  key: "clickDateState",
+  default: Moment().format("YYYY-MM-DD"),
 });

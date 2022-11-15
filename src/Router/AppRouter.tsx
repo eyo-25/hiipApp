@@ -1,5 +1,6 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { BrowserRouter, Route, Routes, useNavigate } from "react-router-dom";
+import HomeSplash from "../Component/HomeSplash";
 import Auth from "../Pages/Auth/Auth";
 import FeedBack from "../Pages/FeedBack/FeedBack";
 import MyPage from "../Pages/MyPage/MyPage";
@@ -12,11 +13,24 @@ interface AppRouterProps {
 }
 
 export default function AppRouter({ isLoggedIn, userObj }: AppRouterProps) {
+  const [isHomeSplash, setHomeSplash] = useState(true);
   if (!isLoggedIn) {
     return (
       <BrowserRouter basename={process.env.PUBLIC_URL}>
         <Routes>
           <Route path={"/"} element={<Auth />} />
+        </Routes>
+      </BrowserRouter>
+    );
+  }
+  if (isHomeSplash) {
+    return (
+      <BrowserRouter basename={process.env.PUBLIC_URL}>
+        <Routes>
+          <Route
+            path={"/"}
+            element={<HomeSplash setHomeSplash={setHomeSplash} />}
+          />
         </Routes>
       </BrowserRouter>
     );

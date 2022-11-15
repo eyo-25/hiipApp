@@ -52,9 +52,10 @@ export const Container = styled.div`
   display: flex;
   position: relative;
   justify-content: center;
-  max-width: 375px;
   height: 100vh;
+  width: 100%;
   margin: 0 auto;
+  background-color: white;
 `;
 const AuthBox = styled.div`
   display: flex;

@@ -1,8 +1,7 @@
-import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
+import "./Styles/GlobalFont.css";
 import { RecoilRoot } from "recoil";
-import { ThemeProvider } from "styled-components";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import GlobalStyle from "./Styles/GlobalStyle";
 

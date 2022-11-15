@@ -8,7 +8,7 @@ function WeeklyDatePicker() {
   const Moment = require("moment");
   const [clickDate, setClickDate] = useState("");
   //주간배열
-  const [weekArray, setWeekArray] = useState<any[]>([]);
+  const [weekArray, setWeekArray] = useState<Date[]>([]);
   let addDay1 = 0;
   let addDay2 = 0;
 
@@ -141,6 +141,8 @@ const DateText = styled.div`
   height: 3vh;
   border-radius: 50%;
   @media screen and (max-height: 800px) {
+    width: 3.2vh;
+    height: 3.2vh;
     padding-bottom: 2px;
     padding-bottom: 0px;
   }

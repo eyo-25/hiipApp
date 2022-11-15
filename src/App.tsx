@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { authService, dbService } from "./firebase";
 import AppRouter from "./Router/AppRouter";
-import "./Styles/GlobalFont.css";
 import Splash from "./Component/Splash";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
+import HomeSplash from "./Component/HomeSplash";
 
 export interface IUserObjProps {
   userObj: any;
@@ -11,8 +11,9 @@ export interface IUserObjProps {
 
 function App() {
   const [userObj, setUserObj] = useState<IUserObjProps | null>(null);
-  console.log(userObj);
   const [isSplash, setIsSplash] = useState(true);
+  const isLoggedIn = Boolean(userObj);
+  console.log(isLoggedIn);
   function setScreenSize() {
     let vh = window.innerHeight * 0.01;
     document.documentElement.style.setProperty("--vh", `${vh}px`);
@@ -38,22 +39,21 @@ function App() {
         setUserObj(null);
       }
     });
-    setTimeout(() => {
-      setIsSplash(false);
-    }, 2000);
   }, []);
   if (isSplash) {
     return (
       <BrowserRouter basename={process.env.PUBLIC_URL}>
         <Routes>
-          <Route path={"/"} element={<Splash />} />
+          {isSplash && (
+            <Route path={"/"} element={<Splash setIsSplash={setIsSplash} />} />
+          )}
         </Routes>
       </BrowserRouter>
     );
   }
   return (
     <>
-      <AppRouter isLoggedIn={Boolean(userObj)} userObj={userObj} />
+      <AppRouter isLoggedIn={isLoggedIn} userObj={userObj} />
     </>
   );
 }

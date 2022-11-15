@@ -41,7 +41,8 @@ body {
   position: relative;
   margin: 0 auto;
   max-width: 414px;
-  
+  width: 100%;
+  background: rgba(0, 0, 0, 0.1);
   // 스크롤바 영역차지 막기
   /* overflow: overlay; */
   // 스크롤 막기

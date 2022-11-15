@@ -92,7 +92,7 @@ const Container = styled.div`
 `;
 
 const ProfileBox = styled.div`
-  height: 100px;
+  height: 10vh;
   display: flex;
   align-items: center;
   margin-bottom: 15px;
@@ -139,6 +139,9 @@ const UserRank = styled.div`
   font-size: 12px;
   padding-bottom: 2px;
   margin-left: 10px;
+  @media screen and (max-height: 800px) {
+    padding-bottom: 0;
+  }
 `;
 
 const Items = styled.ul`
@@ -153,6 +156,13 @@ const Item = styled.li`
   justify-content: space-between;
   margin-bottom: 20px;
   letter-spacing: -1px;
+  @media screen and (max-height: 700px) {
+    font-size: 14px;
+  }
+  /* font-size: 2vh;
+  @media screen and (max-height: 700px) {
+    font-size: 2.3vh;
+  } */
   cursor: pointer;
   div {
     font-weight: 600;

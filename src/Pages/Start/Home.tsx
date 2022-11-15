@@ -7,12 +7,10 @@ import { motion } from "framer-motion";
 import Background from "../../Assets/image/start_background2.png";
 import TodoBord from "./Home/TodoBord";
 import { useRecoilState } from "recoil";
-import { homeSplashState, toDoState } from "../../Recoil/atoms";
+import { toDoState } from "../../Recoil/atoms";
 import ProjectInfo from "./Home/ProjectInfo";
-import HomeSplash from "../../Component/HomeSplash";
 
 function Home() {
-  const [isSplash, setIsSplash] = useRecoilState(homeSplashState);
   const [toDos, setToDos] = useRecoilState(toDoState);
   const [isReady, setIsReady] = useState(false);
   const [isFadeout, setIsFadeout] = useState(false);
@@ -32,15 +30,17 @@ function Home() {
   const bottomVariants = {
     normal: {
       height: "0vh",
+      opacity: 0,
       transition: {
-        duration: 0.3,
+        duration: 0.8,
         type: "linear",
       },
     },
     animate: {
       height: isReady && toDos.length > 0 ? "57%" : "23%",
+      opacity: 1,
       transition: {
-        duration: 0.8,
+        duration: 0.9,
         type: "linear",
       },
     },
@@ -59,12 +59,6 @@ function Home() {
       },
     },
   };
-
-  useEffect(() => {
-    setTimeout(() => {
-      setIsSplash(false);
-    }, 1500);
-  }, []);
   const onPlayClick = () => {
     if (toDos.length <= 0) return;
     setIsReady(true);
@@ -78,27 +72,27 @@ function Home() {
       setIsFadeout(false);
     }, 400);
   };
-  if (isSplash) {
-    return <HomeSplash />;
-  }
   return (
     <Applayout>
       <ContentContainer>
+        <BackgroundImg />
         <BackContainer isFadeout={isFadeout && toDos.length > 0}>
           <ProjectContainer>
             <ProjectInfo isReady={isReady} onBackClick={onBackClick} />
           </ProjectContainer>
-          <BackgroundImg />
         </BackContainer>
         <BackgroundCover
-          onClick={onBackClick}
           variants={bgVariants}
           initial="normal"
           animate="animate"
         />
-        <TodoBox variants={bottomVariants} initial="normal" animate="animate">
+        <TodoContainer
+          variants={bottomVariants}
+          initial="normal"
+          animate="animate"
+        >
           <TodoBord isReady={isReady} />
-        </TodoBox>
+        </TodoContainer>
         <ButtonContainer
           variants={btnVariants}
           initial="normal"
@@ -138,7 +132,7 @@ const ProjectContainer = styled.div`
   height: 67%;
   display: flex;
 `;
-const TodoBox = styled(motion.div)`
+const TodoContainer = styled(motion.div)`
   position: absolute;
   bottom: 9.9%;
   border-top-right-radius: 2vh;
@@ -158,6 +152,8 @@ const BackgroundCover = styled(motion.div)`
   height: 100%;
 `;
 const BackgroundImg = styled.div`
+  position: absolute;
+  top: 0;
   width: 100%;
   height: 100%;
   background-image: url(${Background});

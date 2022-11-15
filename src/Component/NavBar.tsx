@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Link, useMatch, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { ReactComponent as Icon1 } from "../Assets/Icons/planing.svg";
@@ -8,6 +9,7 @@ import { Dark_Gray } from "../Styles/Colors";
 import TabBar from "./TabBar";
 
 function NavBar() {
+  const [istab, setIstab] = useState(false);
   const navigate = useNavigate();
   const onClick = (address: string) => {
     navigate(address);
@@ -16,12 +18,15 @@ function NavBar() {
   const startMatch = useMatch("/");
   const feedbackMatch = useMatch("/feedback/*");
   const mypageMatch = useMatch("/mypage/*");
-
-  const isTab = planMatch !== null;
+  useEffect(() => {
+    if (planMatch !== null) {
+      setIstab(true);
+    }
+  }, []);
   return (
     <Wrapper>
-      {isTab ? <TabBar /> : null}
-      <NavContainer isTab={isTab}>
+      {istab ? <TabBar /> : null}
+      <NavContainer istab={istab}>
         <Nav>
           <Items>
             <Item
@@ -65,17 +70,16 @@ const Wrapper = styled.div`
   bottom: 0;
   z-index: 15;
 `;
-const NavContainer = styled.div<{ isTab: boolean }>`
+const NavContainer = styled.div<{ istab: boolean }>`
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   height: calc(var(--vh, 1vh) * 10);
   max-width: 414px;
-  padding-bottom: 1%;
   background-color: white;
   border-top: ${(props) =>
-    props.isTab ? "1px solid white" : `1px solid ${Dark_Gray}`};
+    props.istab ? "1px solid white" : `1px solid ${Dark_Gray}`};
   z-index: 15;
 `;
 const Nav = styled.nav`

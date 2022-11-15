@@ -22,24 +22,18 @@ const bottomVariants = {
   },
 };
 
-function TodoBord({ isReady }: { isReady: boolean }) {
+function TodoBord({ isWeek }: { isWeek: boolean }) {
   const [toDos, setToDos] = useRecoilState(toDoState);
   const topRef = useRef<any>(null);
-  //클릭이벤트시 사용
-  // const topClick = () => {
-  //   topRef.current?.scrollIntoView({ behavior: "smooth" });
-  // };
   useEffect(() => {
-    if (!isReady) {
-      setTimeout(() => {
-        scrollIntoView(topRef.current as any, {
-          behavior: "smooth",
-        });
-      }, 600);
-    }
-  }, [isReady]);
+    setTimeout(() => {
+      scrollIntoView(topRef.current as any, {
+        behavior: "smooth",
+      });
+    }, 1000);
+  }, [isWeek]);
   return (
-    <Wrapper isReady={isReady}>
+    <Wrapper>
       <Container ref={topRef} id="target">
         {toDos?.map((toDo, index) => (
           <CardWrapper key={index}>
@@ -58,13 +52,13 @@ function TodoBord({ isReady }: { isReady: boolean }) {
 
 export default TodoBord;
 
-const Wrapper = styled.div<{ isReady: boolean }>`
+const Wrapper = styled.div`
   display: flex;
   justify-content: center;
   align-items: flex-start;
   width: 100%;
   height: 100%;
-  overflow-y: ${(props) => (props.isReady ? "scroll" : "hidden")};
+  overflow-y: scroll;
   overflow-x: hidden;
   &::-webkit-scrollbar {
     width: 0;
@@ -82,8 +76,8 @@ const CardWrapper = styled.div`
   display: flex;
   width: 95%;
   margin: 0 0.5vh;
-  &:first-child {
-    div:first-child {
+  & {
+    div {
       background-color: white;
       box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.07);
       div {

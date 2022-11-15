@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { useEffect } from "react";
 import styled from "styled-components";
 import { ReactComponent as HiipIcon } from "../Assets/Icons/HIIPLogo.svg";
 const textVariants = {
@@ -15,7 +16,16 @@ const textVariants = {
   },
 };
 
-function Splash() {
+function Splash({
+  setIsSplash,
+}: {
+  setIsSplash: React.Dispatch<React.SetStateAction<boolean>>;
+}) {
+  useEffect(() => {
+    setTimeout(() => {
+      setIsSplash(false);
+    }, 2000);
+  }, []);
   return (
     <Container>
       <LogoBox variants={textVariants} initial="normal" animate="animate">
