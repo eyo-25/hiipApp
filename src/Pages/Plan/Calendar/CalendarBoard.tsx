@@ -21,56 +21,65 @@ const calendarVariants = {
   },
 };
 
-const CalendarBoard = ({ isWeek }: { isWeek: boolean }) => {
+const CalendarBoard = ({
+  isWeek,
+  setIsWeek,
+}: {
+  isWeek: boolean;
+  setIsWeek: React.Dispatch<React.SetStateAction<boolean>>;
+}) => {
   const Moment = require("moment");
+  const today = new Date();
   let calendarDays = ["일", "월", "화", "수", "목", "금", "토"];
-  const [date, setDate] = useState(new Date());
+  const [date, setDate] = useState(
+    new Date(today.getFullYear(), today.getMonth() + 1, 0)
+  );
   const [clickDate, setClickDate] = useRecoilState(clickDateState);
 
   const onPrevClick = () => {
+    const clickDateNow = new Date(clickDate.split("-"));
     if (isWeek) {
       const nowDate = new Date(
-        date.getFullYear(),
-        date.getMonth(),
-        date.getDate() - 7
+        clickDateNow.getFullYear(),
+        clickDateNow.getMonth(),
+        clickDateNow.getDate() - (7 + clickDateNow.getDay())
       );
       setDate(nowDate);
       setClickDate(Moment(nowDate).format("YYYY-MM-DD"));
     } else {
-      setDate((date) => new Date(date.getFullYear(), date.getMonth(), 0));
       const nowDate = new Date(date.getFullYear(), date.getMonth() - 1, 1);
       setClickDate(Moment(nowDate).format("YYYY-MM-DD"));
+      setDate((date) => new Date(date.getFullYear(), date.getMonth(), 0));
     }
   };
-
   const onNextClick = () => {
+    const clickDateNow = new Date(clickDate.split("-"));
     if (isWeek) {
       const nowDate = new Date(
-        date.getFullYear(),
-        date.getMonth(),
-        date.getDate() + 7
+        clickDateNow.getFullYear(),
+        clickDateNow.getMonth(),
+        clickDateNow.getDate() + (7 - clickDateNow.getDay())
       );
       setDate(nowDate);
       setClickDate(Moment(nowDate).format("YYYY-MM-DD"));
     } else {
-      setDate((date) => new Date(date.getFullYear(), date.getMonth() + 2, 0));
       const nowDate = new Date(date.getFullYear(), date.getMonth() + 1, 1);
       setClickDate(Moment(nowDate).format("YYYY-MM-DD"));
+      setDate((date) => new Date(date.getFullYear(), date.getMonth() + 2, 0));
     }
   };
   const onTodayClick = () => {
     setClickDate(Moment().format("YYYY-MM-DD"));
-    setDate(new Date());
+    setDate(() => new Date(today.getFullYear(), today.getMonth() + 1, 0));
   };
 
   useEffect(() => {
     setClickDate(Moment().format("YYYY-MM-DD"));
-    setDate(new Date());
   }, []);
 
   return (
-    <Wrapper variants={calendarVariants} initial="normal" animate="animate">
-      <Container>
+    <Wrapper>
+      <Container variants={calendarVariants} initial="normal" animate="animate">
         <MonthBox>
           <PrevBtn onClick={onPrevClick} />
           <MonthText onClick={onTodayClick}>
@@ -88,8 +97,8 @@ const CalendarBoard = ({ isWeek }: { isWeek: boolean }) => {
             </DayBox>
           ))}
         </DayContainer>
-        {isWeek && <WeeklyDatePicker date={date} />}
-        {!isWeek && <MonthDatePicker date={date} />}
+        {isWeek && <WeeklyDatePicker date={date} setDate={setDate} />}
+        {!isWeek && <MonthDatePicker date={date} setDate={setDate} />}
       </Container>
     </Wrapper>
   );
@@ -97,17 +106,18 @@ const CalendarBoard = ({ isWeek }: { isWeek: boolean }) => {
 
 export default React.memo(CalendarBoard);
 
-const Wrapper = styled(motion.div)`
+const Wrapper = styled.div`
   width: 100%;
   background-color: white;
+  cursor: pointer;
 `;
-const Container = styled.div`
+const Container = styled(motion.div)`
   display: flex;
   flex-direction: column;
   align-items: center;
   padding-top: 2.2vh;
   max-width: 400px;
-  height: 14vh;
+  height: 13vh;
   margin: 0 auto;
   position: relative;
   @media screen and (max-height: 800px) {
@@ -128,7 +138,6 @@ const MonthText = styled.div`
   align-items: center;
   padding-bottom: 2px;
   border-radius: 50%;
-  cursor: pointer;
   @media screen and (max-height: 800px) {
     font-size: 14px;
   }
@@ -144,7 +153,7 @@ const DayBox = styled.div<{ isWeek: boolean }>`
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-bottom: ${(props) => (props.isWeek ? "1vh" : "0.8vh")};
+  margin-bottom: ${(props) => (props.isWeek ? "1.2vh" : "1vh")};
 `;
 const PrevBtn = styled(IoChevronBack)`
   width: 20px;

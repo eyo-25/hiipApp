@@ -37,6 +37,7 @@ function TodoBord({ isReady }: { isReady: boolean }) {
         });
       }, 600);
     }
+    return;
   }, [isReady]);
   return (
     <Wrapper isReady={isReady}>

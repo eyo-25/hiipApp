@@ -1,7 +1,7 @@
 import { useRecoilState } from "recoil";
 import styled from "styled-components";
 import { clickDateState } from "../../../Recoil/atoms";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 
 const calendarVariants = {
@@ -11,14 +11,20 @@ const calendarVariants = {
   animate: {
     opacity: 1,
     transition: {
-      delay: 0.3,
+      delay: 0.5,
       duration: 1.2,
       type: "linear",
     },
   },
 };
 
-function MonthDatePicker({ date }: { date: Date }) {
+function MonthDatePicker({
+  date,
+  setDate,
+}: {
+  date: Date;
+  setDate: React.Dispatch<React.SetStateAction<Date>>;
+}) {
   const Moment = require("moment");
   const [clickDate, setClickDate] = useRecoilState(clickDateState);
   const [monthArray, setMonthArray] = useState<Date[]>([]);
@@ -30,6 +36,8 @@ function MonthDatePicker({ date }: { date: Date }) {
   let monthLastDate = new Date(calendarYear, calendarMonth, 0);
   // 달력 월의 마지막 일
   let calendarMonthLastDate = monthLastDate.getDate();
+  //현재달의 첫째 일
+  const startDate = new Date(date.getFullYear(), date.getMonth(), 1);
   // 달력 월의 시작 일(=마지막날에서 다음날)
   let monthStartDay = new Date(calendarYear, date.getMonth(), 1);
   // 달력 월의 시작 요일
@@ -83,9 +91,17 @@ function MonthDatePicker({ date }: { date: Date }) {
     });
   }, [date]);
 
-  const onDateClick = (date: string) => {
-    const clickDate = Moment(date).format("YYYY-MM-DD");
-    setClickDate(clickDate);
+  const onDateClick = (clickedDate: string) => {
+    const nowDate = Moment(clickedDate).format("YYYY-MM-DD");
+    setClickDate(nowDate);
+    //다음달 클릭
+    if (nowDate > Moment(date).format("YYYY-MM-DD")) {
+      setDate((date) => new Date(date.getFullYear(), date.getMonth() + 2, 0));
+    }
+    //이전달 클릭
+    if (nowDate < Moment(startDate).format("YYYY-MM-DD")) {
+      setDate((date) => new Date(date.getFullYear(), date.getMonth(), 0));
+    }
   };
 
   return (
@@ -110,7 +126,7 @@ function MonthDatePicker({ date }: { date: Date }) {
   );
 }
 
-export default MonthDatePicker;
+export default React.memo(MonthDatePicker);
 
 const DateContainer = styled(motion.div)`
   display: grid;
@@ -124,7 +140,7 @@ const DateBox = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 4.5vh;
+  height: calc(var(--vh, 1vh) * 4.7);
   cursor: pointer;
 `;
 const HoverBox = styled.div<{ clicked: boolean }>`
@@ -137,6 +153,10 @@ const HoverBox = styled.div<{ clicked: boolean }>`
   height: 25px;
   color: ${(props) => props.clicked && "white"};
   background-color: ${(props) => props.clicked && "black"};
+  @media screen and (max-height: 800px) {
+    width: 23px;
+    height: 23px;
+  }
 `;
 const DateText = styled.div<{ nowMonth: boolean }>`
   color: ${(props) => props.nowMonth && "#c4c4c4"};

@@ -11,14 +11,20 @@ const calendarVariants = {
   animate: {
     opacity: 1,
     transition: {
-      delay: 0.3,
+      delay: 0.6,
       duration: 1.2,
       type: "linear",
     },
   },
 };
 
-const WeeklyDatePicker = ({ date }: { date: Date }) => {
+const WeeklyDatePicker = ({
+  date,
+  setDate,
+}: {
+  date: Date;
+  setDate: React.Dispatch<React.SetStateAction<Date>>;
+}) => {
   const Moment = require("moment");
   const [clickDate, setClickDate] = useRecoilState(clickDateState);
   const [weekArray, setWeekArray] = useState<Date[]>([]);
@@ -50,8 +56,16 @@ const WeeklyDatePicker = ({ date }: { date: Date }) => {
     });
   }, [clickDate]);
 
-  const onDateClick = (date: string) => {
-    setClickDate(Moment(date).format("YYYY-MM-DD"));
+  const onDateClick = (clickedDate: string) => {
+    const nowDate = Moment(clickedDate).format("YYYY-MM-DD");
+    const startDate = new Date(date.getFullYear(), date.getMonth(), 1);
+    setClickDate(nowDate);
+    if (nowDate < Moment(startDate).format("YYYY-MM-DD")) {
+      setDate((date) => new Date(date.getFullYear(), date.getMonth(), 0));
+    }
+    if (nowDate > Moment(date).format("YYYY-MM-DD")) {
+      setDate((date) => new Date(date.getFullYear(), date.getMonth() + 2, 0));
+    }
   };
 
   return (
@@ -97,5 +111,9 @@ const DateBox = styled.div<{ clicked: boolean }>`
     border-radius: 50%;
     color: ${(props) => (props.clicked ? "white" : "black")};
     background-color: ${(props) => props.clicked && "black"};
+    @media screen and (max-height: 800px) {
+      width: 23px;
+      height: 23px;
+    }
   }
 `;

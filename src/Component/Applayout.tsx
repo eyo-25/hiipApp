@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { Light_Gray } from "../Styles/Colors";
 import NavBar from "./NavBar";
 
 function Applayout({ children }: { children: any }) {
@@ -17,5 +18,5 @@ const Container = styled.div`
   margin: 0 auto;
   width: 100%;
   height: calc(var(--vh, 1vh) * 100);
-  background-color: white;
+  background-color: ${Light_Gray};
 `;

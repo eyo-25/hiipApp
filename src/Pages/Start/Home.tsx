@@ -14,19 +14,6 @@ function Home() {
   const [toDos, setToDos] = useRecoilState(toDoState);
   const [isReady, setIsReady] = useState(false);
   const [isFadeout, setIsFadeout] = useState(false);
-  const btnVariants = {
-    normal: {
-      opacity: 0,
-    },
-    animate: {
-      opacity: 1,
-      transition: {
-        delay: 1,
-        duration: 1,
-        type: "linear",
-      },
-    },
-  };
   const bottomVariants = {
     normal: {
       height: "0vh",
@@ -93,12 +80,7 @@ function Home() {
         >
           <TodoBord isReady={isReady} />
         </TodoContainer>
-        <ButtonContainer
-          variants={btnVariants}
-          initial="normal"
-          animate="animate"
-          onClick={onPlayClick}
-        >
+        <ButtonContainer onClick={onPlayClick}>
           <Button isPlay={toDos.length > 0 ? true : false} />
         </ButtonContainer>
       </ContentContainer>
@@ -162,5 +144,5 @@ const BackgroundImg = styled.div`
   background-position: 65%;
 `;
 const ButtonContainer = styled(motion.div)`
-  z-index: 13;
+  z-index: 99;
 `;

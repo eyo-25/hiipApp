@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import Applayout from "../../Component/Applayout";
 import Header from "../../Component/Header";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Button from "../../Component/Button";
 import CalendarBoard from "./Calendar/CalendarBoard";
@@ -15,51 +15,64 @@ function Plan() {
       height: "0%",
     },
     animate: {
-      height: isWeek ? "17%" : "90%",
+      height: isWeek ? "17%" : "100%",
       transition: {
-        duration: 1,
+        duration: 0.8,
         type: "linear",
       },
     },
   };
-  const btnVariants = {
-    normal: {
-      opacity: 0,
-    },
-    animate: {
-      opacity: 1,
-      transition: {
-        delay: 1,
-        duration: 1,
-        type: "linear",
-      },
-    },
+
+  const [mouseDownClientY, setMouseDownClientY] = useState(0);
+  const [mouseUpClientY, setMouseUpClientY] = useState(0);
+  const onMouseUp = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
+    setMouseUpClientY(e.clientY);
   };
+  const onMouseDown = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
+    setMouseDownClientY(e.clientY);
+  };
+  useEffect(() => {
+    const distanceY = mouseDownClientY - mouseUpClientY;
+    if (distanceY < -30) {
+      setIsWeek(false);
+    }
+    if (distanceY > 30) {
+      setIsWeek(true);
+    }
+  }, [mouseUpClientY]);
+
+  const [tochedY, setTochedY] = useState(0);
+  const onTouchStart = (e: React.TouchEvent) => {
+    setTochedY(e.changedTouches[0].pageY);
+  };
+  const onTouchEnd = (e: React.TouchEvent) => {
+    const distanceY = tochedY - e.changedTouches[0].pageY;
+    if (distanceY < -30 && isWeek) {
+      setIsWeek(false);
+    }
+    if (distanceY > 30 && !isWeek) {
+      setIsWeek(true);
+    }
+  };
+
   return (
     <Applayout>
       <Header />
-      <ContentContainer>
+      <ContentContainer onMouseDown={onMouseDown} onMouseUp={onMouseUp}>
         <CalendarBox
           variants={calendarVariants}
           initial="normal"
           animate="animate"
+          onTouchEnd={onTouchEnd}
+          onTouchStart={onTouchStart}
         >
-          <CalendarBoard isWeek={isWeek} />
+          <CalendarBoard isWeek={isWeek} setIsWeek={setIsWeek} />
         </CalendarBox>
-        <TodoContainer
-          variants={btnVariants}
-          initial="normal"
-          animate="animate"
-          onClick={() => setIsWeek((prev) => !prev)}
-        >
-          <TodoBord isWeek={isWeek} />
+        <TodoContainer>
+          <TodoBord isWeek={isWeek} setIsWeek={setIsWeek} />
         </TodoContainer>
       </ContentContainer>
-      <ButtonContainer
-        variants={btnVariants}
-        initial="normal"
-        animate="animate"
-      >
+      <ButtonContainer>
         <Button isPlay={false} />
       </ButtonContainer>
     </Applayout>
@@ -79,17 +92,19 @@ const ContentContainer = styled.div`
 `;
 const CalendarBox = styled(motion.div)`
   display: flex;
+  height: 100%;
   width: 100%;
 `;
 const TodoContainer = styled(motion.div)`
+  position: relative;
   display: flex;
   width: 100%;
   height: 100%;
-  padding: 3.5vh 2.5vh;
-  padding-bottom: 0;
+  padding: 0 2.5vh;
+  padding-top: 2.8vh;
   background-color: ${Light_Gray};
   overflow: hidden;
 `;
 const ButtonContainer = styled(motion.div)`
-  z-index: 13;
+  z-index: 99;
 `;

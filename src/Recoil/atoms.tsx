@@ -16,3 +16,8 @@ export const clickDateState = atom({
   key: "clickDateState",
   default: Moment().format("YYYY-MM-DD"),
 });
+
+export const toDoEditState = atom({
+  key: "toDoEditState",
+  default: false,
+});

@@ -27,6 +27,7 @@ const Container = styled.div`
   align-items: flex-end;
   width: 100%;
   height: 7vh;
+  background-color: white;
 `;
 const HeaderBox = styled.div`
   position: relative;

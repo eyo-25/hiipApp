@@ -1,57 +1,68 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import TodoCard from "./TodoCard";
-import { toDoState } from "../../../Recoil/atoms";
+import { toDoEditState, toDoState } from "../../../Recoil/atoms";
 import { useRecoilState } from "recoil";
-import { motion } from "framer-motion";
 import { scrollIntoView } from "seamless-scroll-polyfill";
+import { motion } from "framer-motion";
 
-const bottomVariants = {
-  normal: {
-    opacity: 0,
-    height: "0vh",
-  },
-  animate: {
-    opacity: 1,
-    height: "7vh",
-    transition: {
-      delay: 0.5,
-      duration: 0.8,
-      type: "linear",
+function TodoBord({
+  isWeek,
+  setIsWeek,
+}: {
+  isWeek: boolean;
+  setIsWeek: React.Dispatch<React.SetStateAction<boolean>>;
+}) {
+  const cardVariants = {
+    normal: {
+      opacity: 0,
     },
-  },
-};
+    animate: {
+      opacity: 1,
+      transition: {
+        delay: 0.7,
+        duration: 0.8,
+        type: "linear",
+      },
+    },
+  };
 
-function TodoBord({ isWeek }: { isWeek: boolean }) {
   const [toDos, setToDos] = useRecoilState(toDoState);
+  const [isEdit, setIsEdit] = useRecoilState(toDoEditState);
   const topRef = useRef<any>(null);
-  useEffect(() => {
-    setTimeout(() => {
-      scrollIntoView(topRef.current as any, {
-        behavior: "smooth",
-      });
-    }, 1000);
-  }, [isWeek]);
+  // useEffect(() => {
+  //   setTimeout(() => {
+  //     scrollIntoView(topRef.current as any, {
+  //       behavior: "smooth",
+  //     });
+  //   }, 1000);
+  // }, [isWeek]);
   return (
     <Wrapper>
       <Container ref={topRef} id="target">
         {toDos?.map((toDo, index) => (
-          <CardWrapper key={index}>
-            <TodoCard />
+          <CardWrapper
+            variants={cardVariants}
+            initial="normal"
+            animate="animate"
+            key={index}
+          >
+            <TodoCard setIsWeek={setIsWeek} />
           </CardWrapper>
         ))}
       </Container>
-      <BottomGradient
-        variants={bottomVariants}
-        initial="normal"
-        animate="animate"
-      />
+      <Background />
     </Wrapper>
   );
 }
-
 export default TodoBord;
 
+const Background = styled.div`
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+`;
 const Wrapper = styled.div`
   display: flex;
   justify-content: center;
@@ -72,30 +83,10 @@ const Container = styled.div`
   width: 100%;
   margin: 0 auto;
 `;
-const CardWrapper = styled.div`
+const CardWrapper = styled(motion.div)`
   display: flex;
   width: 95%;
+  height: 100%;
   margin: 0 0.5vh;
-  & {
-    div {
-      background-color: white;
-      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.07);
-      div {
-        box-shadow: none;
-      }
-    }
-    li {
-      background-color: black;
-    }
-  }
-`;
-const BottomGradient = styled(motion.div)`
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  background: linear-gradient(to top, white, 80%, rgba(0, 0, 0, 0));
-  @media screen and (max-height: 800px) {
-    height: 6vh;
-    background: linear-gradient(to top, white, 70%, rgba(0, 0, 0, 0));
-  }
+  z-index: 5;
 `;

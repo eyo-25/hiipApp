@@ -3,7 +3,6 @@ import { authService, dbService } from "./firebase";
 import AppRouter from "./Router/AppRouter";
 import Splash from "./Component/Splash";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import HomeSplash from "./Component/HomeSplash";
 
 export interface IUserObjProps {
   userObj: any;
@@ -13,7 +12,6 @@ function App() {
   const [userObj, setUserObj] = useState<IUserObjProps | null>(null);
   const [isSplash, setIsSplash] = useState(true);
   const isLoggedIn = Boolean(userObj);
-  console.log(isLoggedIn);
   function setScreenSize() {
     let vh = window.innerHeight * 0.01;
     document.documentElement.style.setProperty("--vh", `${vh}px`);

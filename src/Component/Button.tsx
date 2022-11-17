@@ -5,6 +5,17 @@ import { motion } from "framer-motion";
 import { useMatch } from "react-router-dom";
 
 const boxVarients = {
+  normal: {
+    opacity: 0,
+  },
+  animate: {
+    opacity: 1,
+    transition: {
+      delay: 1,
+      duration: 1,
+      type: "linear",
+    },
+  },
   click: { scale: 0.9 },
 };
 
@@ -12,7 +23,12 @@ function Button({ isPlay }: { isPlay: boolean }) {
   const planmatch = useMatch("/plan/*");
   return (
     <Wrapper isplan={planmatch !== null}>
-      <BtnBox variants={boxVarients} whileTap="click">
+      <BtnBox
+        variants={boxVarients}
+        whileTap="click"
+        initial="normal"
+        animate="animate"
+      >
         {isPlay ? <PlayBtn /> : <PlusBtn />}
       </BtnBox>
     </Wrapper>

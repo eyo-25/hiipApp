@@ -48,6 +48,12 @@ body {
   // 스크롤 막기
   overflow: hidden;
   touch-action: none;
+  //드래그 방지
+  -ms-user-select: none;
+  -moz-user-select: -moz-none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  user-select: none;
 }
 menu, ol, ul {
   list-style: none;
