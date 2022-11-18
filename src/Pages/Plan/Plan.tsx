@@ -7,9 +7,15 @@ import Button from "../../Component/Button";
 import CalendarBoard from "./Calendar/CalendarBoard";
 import { Light_Gray } from "../../Styles/Colors";
 import TodoBord from "./Plan/TodoBoard";
+import { useRecoilState } from "recoil";
+import { toDoEditState } from "../../Recoil/atoms";
 
 function Plan() {
   const [isWeek, setIsWeek] = useState(false);
+  const [isEdit, setIsEdit] = useRecoilState(toDoEditState);
+  const [mouseDownClientY, setMouseDownClientY] = useState(0);
+  const [mouseUpClientY, setMouseUpClientY] = useState(0);
+  const [tochedY, setTochedY] = useState(0);
   const calendarVariants = {
     normal: {
       height: "0%",
@@ -22,9 +28,12 @@ function Plan() {
       },
     },
   };
-
-  const [mouseDownClientY, setMouseDownClientY] = useState(0);
-  const [mouseUpClientY, setMouseUpClientY] = useState(0);
+  const closedEdit = () => {
+    if (isEdit) {
+      setIsEdit(false);
+    }
+  };
+  // 브라우저 스와이프
   const onMouseUp = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
     setMouseUpClientY(e.clientY);
   };
@@ -35,23 +44,26 @@ function Plan() {
     const distanceY = mouseDownClientY - mouseUpClientY;
     if (distanceY < -30) {
       setIsWeek(false);
+      closedEdit();
     }
     if (distanceY > 30) {
       setIsWeek(true);
+      closedEdit();
     }
   }, [mouseUpClientY]);
-
-  const [tochedY, setTochedY] = useState(0);
+  //모바일 스와이프
   const onTouchStart = (e: React.TouchEvent) => {
     setTochedY(e.changedTouches[0].pageY);
   };
   const onTouchEnd = (e: React.TouchEvent) => {
     const distanceY = tochedY - e.changedTouches[0].pageY;
-    if (distanceY < -30 && isWeek) {
+    if (distanceY < -30) {
       setIsWeek(false);
+      closedEdit();
     }
-    if (distanceY > 30 && !isWeek) {
+    if (distanceY > 30) {
       setIsWeek(true);
+      closedEdit();
     }
   };
 
@@ -65,6 +77,7 @@ function Plan() {
           animate="animate"
           onTouchEnd={onTouchEnd}
           onTouchStart={onTouchStart}
+          onClick={closedEdit}
         >
           <CalendarBoard isWeek={isWeek} setIsWeek={setIsWeek} />
         </CalendarBox>

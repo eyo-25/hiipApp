@@ -1,9 +1,8 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect } from "react";
 import styled from "styled-components";
 import TodoCard from "./TodoCard";
 import { toDoEditState, toDoState } from "../../../Recoil/atoms";
 import { useRecoilState } from "recoil";
-import { scrollIntoView } from "seamless-scroll-polyfill";
 import { motion } from "framer-motion";
 
 function TodoBord({
@@ -26,20 +25,14 @@ function TodoBord({
       },
     },
   };
-
   const [toDos, setToDos] = useRecoilState(toDoState);
   const [isEdit, setIsEdit] = useRecoilState(toDoEditState);
-  const topRef = useRef<any>(null);
-  // useEffect(() => {
-  //   setTimeout(() => {
-  //     scrollIntoView(topRef.current as any, {
-  //       behavior: "smooth",
-  //     });
-  //   }, 1000);
-  // }, [isWeek]);
+  useEffect(() => {
+    return setIsEdit(false);
+  }, []);
   return (
-    <Wrapper>
-      <Container ref={topRef} id="target">
+    <Wrapper isEdit={isEdit}>
+      <Container>
         {toDos?.map((toDo, index) => (
           <CardWrapper
             variants={cardVariants}
@@ -47,7 +40,7 @@ function TodoBord({
             animate="animate"
             key={index}
           >
-            <TodoCard setIsWeek={setIsWeek} />
+            <TodoCard setIsWeek={setIsWeek} index={index + ""} />
           </CardWrapper>
         ))}
       </Container>
@@ -59,17 +52,18 @@ export default TodoBord;
 
 const Background = styled.div`
   position: absolute;
+  top: 0;
   width: 100%;
   height: 100%;
   cursor: pointer;
 `;
-const Wrapper = styled.div`
+const Wrapper = styled.div<{ isEdit: boolean }>`
   display: flex;
   justify-content: center;
   align-items: flex-start;
   width: 100%;
   height: 100%;
-  overflow-y: scroll;
+  overflow-y: ${(props) => (props.isEdit ? "hidden" : "scroll")};
   overflow-x: hidden;
   &::-webkit-scrollbar {
     width: 0;
@@ -82,6 +76,10 @@ const Container = styled.div`
   align-items: center;
   width: 100%;
   margin: 0 auto;
+  margin-bottom: 300px;
+  @media screen and (max-height: 800px) {
+    margin-bottom: 250px;
+  }
 `;
 const CardWrapper = styled(motion.div)`
   display: flex;

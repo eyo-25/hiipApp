@@ -2,7 +2,7 @@ import { atom } from "recoil";
 
 export const toDoState = atom<number[]>({
   key: "toDo",
-  default: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  default: [1, 2, 3, 4, 5, 6, 7, 8],
   // default: [],
 });
 export const homeSplashState = atom<boolean>({

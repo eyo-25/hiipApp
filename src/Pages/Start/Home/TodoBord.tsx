@@ -41,7 +41,7 @@ function TodoBord({ isReady }: { isReady: boolean }) {
   }, [isReady]);
   return (
     <Wrapper isReady={isReady}>
-      <Container ref={topRef} id="target">
+      <Container ref={topRef}>
         {toDos?.map((toDo, index) => (
           <CardWrapper key={index}>
             <TodoCard />

@@ -1,15 +1,19 @@
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { IoPlaySharp } from "react-icons/io5";
 import { useRecoilState } from "recoil";
 import styled from "styled-components";
 import { toDoEditState } from "../../../Recoil/atoms";
 import { Blue, Dark_Gray, Dark_Gray2 } from "../../../Styles/Colors";
+import { Link } from "react-scroll";
+import { scrollIntoView } from "seamless-scroll-polyfill";
 
 function TodoCard({
   setIsWeek,
+  index,
 }: {
   setIsWeek: React.Dispatch<React.SetStateAction<boolean>>;
+  index: string;
 }) {
   const intervalArray = [3, 2, 1];
   const [isEdit, setIsEdit] = useRecoilState(toDoEditState);
@@ -17,7 +21,13 @@ function TodoCard({
   const [isMemo, setIsMemo] = useState(false);
 
   useEffect(() => {
+    // 셀렉된 카드 전부 닫기
     if (!isMemo) {
+      setIsSelect(false);
+    }
+    // 에딧종료시 초기화
+    if (!isEdit) {
+      setIsMemo(false);
       setIsSelect(false);
     }
   }, [isEdit]);
@@ -29,19 +39,28 @@ function TodoCard({
     animate: {
       height: isMemo ? "405px" : isSelect ? "262px" : "162px",
       transition: {
-        duration: 0.7,
+        duration: 0.5,
         type: "linear",
       },
     },
   };
 
   const onCardClick = () => {
-    setIsSelect((prev) => !prev);
-    setIsMemo(false);
+    if (!isEdit) {
+      setIsSelect((prev) => !prev);
+      setIsMemo(false);
+    }
+    if (isMemo) {
+      setIsMemo(false);
+      setIsSelect(false);
+      setIsEdit(false);
+    }
   };
   const onMemoClick = () => {
-    setIsSelect(true);
-    if (isSelect) {
+    if (!isEdit) {
+      setIsSelect(true);
+    }
+    if (isSelect && !isEdit) {
       setIsMemo(true);
       setIsWeek(true);
       setIsEdit(true);
@@ -52,8 +71,23 @@ function TodoCard({
       setIsEdit(false);
     }
   };
+  useEffect(() => {
+    if (isEdit && isMemo) {
+      setTimeout(() => {
+        scrollIntoView(cardRef.current as any, {
+          behavior: "smooth",
+        });
+      }, 500);
+    }
+  }, [isEdit]);
+  const cardRef = useRef<any>(null);
   return (
-    <TodoCarWrapper variants={cardVariants} initial="normal" animate="animate">
+    <TodoCarWrapper
+      ref={cardRef}
+      variants={cardVariants}
+      initial="normal"
+      animate="animate"
+    >
       <TodoTopBox>
         <TextBox>
           <TitleBox>

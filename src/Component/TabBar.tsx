@@ -2,10 +2,35 @@ import { motion } from "framer-motion";
 import styled from "styled-components";
 import { Dark_Gray } from "../Styles/Colors";
 
+const tabVariants = {
+  normal: {
+    height: "0vh",
+  },
+  animate: {
+    height: "4vh",
+    transition: {
+      duration: 0.5,
+    },
+  },
+};
+const fadeinVariants = {
+  normal: {
+    opacity: 0,
+  },
+  animate: {
+    opacity: 1,
+    transition: {
+      delay: 0.5,
+      duration: 0.6,
+      type: "linear",
+    },
+  },
+};
+
 function TabBar() {
   return (
-    <TabContainer>
-      <Tab>
+    <TabContainer variants={tabVariants} initial="normal" animate="animate">
+      <Tab variants={fadeinVariants} initial="normal" animate="animate">
         <Tabs>
           <TabsTitle isActive={true}>프로젝트</TabsTitle>
         </Tabs>
@@ -19,7 +44,7 @@ function TabBar() {
 
 export default TabBar;
 
-const TabContainer = styled.div`
+const TabContainer = styled(motion.div)`
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -29,7 +54,7 @@ const TabContainer = styled.div`
   background-color: white;
   border-top: 1px solid ${Dark_Gray};
 `;
-const Tab = styled.ul`
+const Tab = styled(motion.ul)`
   display: flex;
   width: 85%;
   height: 100%;
