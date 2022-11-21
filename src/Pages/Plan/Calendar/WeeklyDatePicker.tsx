@@ -22,7 +22,7 @@ const WeeklyDatePicker = ({
   date,
   setDate,
 }: {
-  date: Date;
+  date: any;
   setDate: React.Dispatch<React.SetStateAction<Date>>;
 }) => {
   const Moment = require("moment");

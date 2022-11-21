@@ -38,10 +38,10 @@ export default function AppRouter({ isLoggedIn, userObj }: AppRouterProps) {
   return (
     <BrowserRouter basename={process.env.PUBLIC_URL}>
       <Routes>
-        <Route path={"/"} element={<Home />}>
-          <Route path={"/start/ready"} element={<Home />} />
+        <Route path={"/"} element={<Home />}></Route>
+        <Route path={"/plan"} element={<Plan />}>
+          <Route path={"/plan/memo/:todoId"} element={<Plan />} />
         </Route>
-        <Route path={"/plan"} element={<Plan />}></Route>
         <Route path={"/feedback"} element={<FeedBack />}></Route>
         <Route path={"/mypage"} element={<MyPage userObj={userObj} />}>
           <Route

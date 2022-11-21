@@ -45,13 +45,18 @@ const CalendarBoard = ({
         clickDateNow.getDate() - (7 + clickDateNow.getDay())
       );
       setDate(nowDate);
-      setClickDate(Moment(nowDate).format("YYYY-MM-DD"));
+      const prevDay = 7 + Moment(clickDate).day();
+      const prevWeek = Moment(clickDate)
+        .subtract(prevDay, "days")
+        .format("YYYY-MM-DD");
+      setClickDate(prevWeek);
     } else {
       const nowDate = new Date(date.getFullYear(), date.getMonth() - 1, 1);
       setClickDate(Moment(nowDate).format("YYYY-MM-DD"));
       setDate((date) => new Date(date.getFullYear(), date.getMonth(), 0));
     }
   };
+
   const onNextClick = () => {
     const clickDateNow = new Date(clickDate.split("-"));
     if (isWeek) {
@@ -61,7 +66,10 @@ const CalendarBoard = ({
         clickDateNow.getDate() + (7 - clickDateNow.getDay())
       );
       setDate(nowDate);
-      setClickDate(Moment(nowDate).format("YYYY-MM-DD"));
+      const nextWeek = 7 - Moment(clickDate).day();
+      setClickDate(
+        Moment(clickDate).add(nextWeek, "days").format("YYYY-MM-DD")
+      );
     } else {
       const nowDate = new Date(date.getFullYear(), date.getMonth() + 1, 1);
       setClickDate(Moment(nowDate).format("YYYY-MM-DD"));
@@ -83,9 +91,9 @@ const CalendarBoard = ({
         <MonthBox>
           <PrevBtn onClick={onPrevClick} />
           <MonthText onClick={onTodayClick}>
-            {isWeek
-              ? new Date(clickDate.split("-")).getMonth() + 1
-              : date.getMonth() + 1}
+            {Moment(clickDate).format("MM") > 10
+              ? Moment(clickDate).format("MM")
+              : Moment(clickDate).format("M")}
             월
           </MonthText>
           <NextBtn onClick={onNextClick} />

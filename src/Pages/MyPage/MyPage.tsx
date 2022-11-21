@@ -1,13 +1,15 @@
 import { IoChevronForward } from "react-icons/io5";
 import { useMatch, useNavigate } from "react-router-dom";
+import { useRecoilState } from "recoil";
 import styled from "styled-components";
 import Applayout from "../../Component/Applayout";
 import Header from "../../Component/Header";
 import { authService } from "../../firebase";
-import { IUserObjProps } from "../../Utils/interface";
+import { homeSplashState } from "../../Recoil/atoms";
 import EditProfile from "./MyPage/EditProfile";
 
 function MyPage({ userObj }: any) {
+  const [homeSplash, setHomeSplash] = useRecoilState(homeSplashState);
   const localPhotoURL = JSON.parse(
     localStorage.getItem("user") as any
   ).photoURL;
@@ -21,6 +23,7 @@ function MyPage({ userObj }: any) {
     authService.signOut();
     window.localStorage.removeItem("user");
     navigate(`/`);
+    setHomeSplash(true);
   };
   const onEditClick = () => {
     navigate(`/mypage/editprofile`);
@@ -90,14 +93,12 @@ const Container = styled.div`
   width: 90%;
   margin: 0 auto;
 `;
-
 const ProfileBox = styled.div`
   height: 10vh;
   display: flex;
   align-items: center;
   margin-bottom: 15px;
 `;
-
 const ProfileImg = styled.img`
   background-color: #c4c4c4;
   width: 50px;
@@ -105,7 +106,6 @@ const ProfileImg = styled.img`
   border-radius: 25px;
   cursor: pointer;
 `;
-
 const UserText = styled.div`
   display: flex;
   flex-direction: column;
@@ -115,7 +115,6 @@ const UserText = styled.div`
     font-size: 12px;
   }
 `;
-
 const UserNameBox = styled.div`
   display: flex;
   align-items: center;
@@ -126,7 +125,6 @@ const UserNameBox = styled.div`
     font-weight: 600;
   }
 `;
-
 const UserRank = styled.div`
   display: flex;
   justify-content: center;
@@ -143,13 +141,11 @@ const UserRank = styled.div`
     padding-bottom: 0;
   }
 `;
-
 const Items = styled.ul`
   display: flex;
   flex-direction: column;
   margin-bottom: 20px;
 `;
-
 const Item = styled.li`
   display: flex;
   width: 100%;
@@ -159,10 +155,6 @@ const Item = styled.li`
   @media screen and (max-height: 700px) {
     font-size: 14px;
   }
-  /* font-size: 2vh;
-  @media screen and (max-height: 700px) {
-    font-size: 2.3vh;
-  } */
   cursor: pointer;
   div {
     font-weight: 600;

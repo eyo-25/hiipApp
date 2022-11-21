@@ -19,7 +19,7 @@ function TodoBord({
     animate: {
       opacity: 1,
       transition: {
-        delay: 0.7,
+        delay: 1,
         duration: 0.8,
         type: "linear",
       },
@@ -40,7 +40,12 @@ function TodoBord({
             animate="animate"
             key={index}
           >
-            <TodoCard setIsWeek={setIsWeek} index={index + ""} />
+            <TodoCard
+              setIsWeek={setIsWeek}
+              index={index + ""}
+              todoId={toDo.todoId}
+              memo={toDo.memo}
+            />
           </CardWrapper>
         ))}
       </Container>
@@ -76,10 +81,7 @@ const Container = styled.div`
   align-items: center;
   width: 100%;
   margin: 0 auto;
-  margin-bottom: 300px;
-  @media screen and (max-height: 800px) {
-    margin-bottom: 250px;
-  }
+  margin-bottom: 162px;
 `;
 const CardWrapper = styled(motion.div)`
   display: flex;

@@ -77,6 +77,11 @@ a {
   text-decoration: none;
 }
 
+//텍스트에리어 크기조절 잠금
+textarea {
+  resize: none;
+}
+
 body::-webkit-scrollbar {
   width: 5px;  /* 스크롤바의 너비 */
 }

@@ -2,25 +2,6 @@ import { motion } from "framer-motion";
 import { useEffect } from "react";
 import styled from "styled-components";
 import Background from "../Assets/image/start_background2.png";
-import NavBar from "./NavBar";
-
-const navVariants = {
-  normal: {
-    opacity: 0,
-    y: "-calc(var(--vh, 1vh) * 10)",
-    transition: {
-      delay: 1,
-    },
-  },
-  animate: {
-    opacity: 1,
-    y: "calc(var(--vh, 1vh) * 0)",
-    transition: {
-      duration: 0.5,
-      type: "linear",
-    },
-  },
-};
 
 const gradientVariants = {
   normal: {
@@ -76,9 +57,6 @@ function HomeSplash({
           <h4>Planing</h4>
         </TextBox>
       </GradationBox>
-      {/* <NavBox variants={navVariants} initial="normal" animate="animate">
-        <NavBar />
-      </NavBox> */}
     </Container>
   );
 }

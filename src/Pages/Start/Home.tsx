@@ -14,6 +14,10 @@ function Home() {
   const [toDos, setToDos] = useRecoilState(toDoState);
   const [isReady, setIsReady] = useState(false);
   const [isFadeout, setIsFadeout] = useState(false);
+  const [mouseDownClientY, setMouseDownClientY] = useState(0);
+  const [mouseUpClientY, setMouseUpClientY] = useState(0);
+  const [tochedY, setTochedY] = useState(0);
+
   const bottomVariants = {
     normal: {
       height: "0vh",
@@ -47,11 +51,7 @@ function Home() {
     },
   };
   const onPlayClick = () => {
-    if (toDos.length <= 0) return;
-    setIsReady(true);
-    setTimeout(() => {
-      setIsFadeout(true);
-    }, 400);
+    //타이머로 이꾸
   };
   const onBackClick = () => {
     setIsReady(false);
@@ -59,11 +59,73 @@ function Home() {
       setIsFadeout(false);
     }, 400);
   };
+
+  // 브라우저 스와이프
+  const onMouseUp = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
+    setMouseUpClientY(e.clientY);
+  };
+  const onMouseDown = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
+    setMouseDownClientY(e.clientY);
+  };
+  useEffect(() => {
+    const distanceY = mouseDownClientY - mouseUpClientY;
+    if (distanceY < -30) {
+      setIsReady(false);
+      setTimeout(() => {
+        setIsFadeout(false);
+      }, 400);
+    }
+    if (distanceY > 30) {
+      if (toDos.length <= 0) return;
+      setIsReady(true);
+      setTimeout(() => {
+        setIsFadeout(true);
+      }, 400);
+    }
+  }, [mouseUpClientY]);
+  //모바일 스와이프
+  const onTouchStart = (e: React.TouchEvent) => {
+    setTochedY(e.changedTouches[0].pageY);
+  };
+  const onTouchEnd = (e: React.TouchEvent) => {
+    const distanceY = tochedY - e.changedTouches[0].pageY;
+    if (distanceY < -30) {
+      setIsReady(false);
+      setTimeout(() => {
+        setIsFadeout(false);
+      }, 400);
+    }
+    if (distanceY > 30) {
+      if (toDos.length <= 0) return;
+      setIsReady(true);
+      setTimeout(() => {
+        setIsFadeout(true);
+      }, 400);
+    }
+  };
+  //모바일 스와이프2
+  const onTouchStart2 = (e: React.TouchEvent) => {
+    setTochedY(e.changedTouches[0].pageY);
+  };
+  const onTouchEnd2 = (e: React.TouchEvent) => {
+    const distanceY = tochedY - e.changedTouches[0].pageY;
+    if (distanceY > 30) {
+      if (toDos.length <= 0) return;
+      setIsReady(true);
+      setTimeout(() => {
+        setIsFadeout(true);
+      }, 400);
+    }
+  };
   return (
     <Applayout>
-      <ContentContainer>
+      <ContentContainer onMouseDown={onMouseDown} onMouseUp={onMouseUp}>
         <BackgroundImg />
-        <BackContainer isFadeout={isFadeout && toDos.length > 0}>
+        <BackContainer
+          onTouchEnd={onTouchEnd}
+          onTouchStart={onTouchStart}
+          isFadeout={isFadeout && toDos.length > 0}
+        >
           <ProjectContainer>
             <ProjectInfo isReady={isReady} onBackClick={onBackClick} />
           </ProjectContainer>
@@ -74,6 +136,8 @@ function Home() {
           animate="animate"
         />
         <TodoContainer
+          onTouchStart={onTouchStart2}
+          onTouchEnd={onTouchEnd2}
           variants={bottomVariants}
           initial="normal"
           animate="animate"

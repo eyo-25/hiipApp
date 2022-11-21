@@ -166,21 +166,20 @@ const Wrapper = styled.div`
   top: 0;
   left: 0;
   width: 100%;
-  height: 100vh;
+  height: calc(var(--vh, 1vh) * 100);
   z-index: 20;
 `;
-
 const Overlay = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.3);
   z-index: 20;
   cursor: pointer;
+  backdrop-filter: blur(1.5px);
 `;
-
 const Container = styled.div`
   position: absolute;
   display: flex;
@@ -191,7 +190,6 @@ const Container = styled.div`
   margin: 0 auto;
   z-index: 90;
 `;
-
 const ModalBox = styled.div`
   display: flex;
   flex-direction: column;
@@ -244,7 +242,6 @@ const ConfirmBtn = styled.button`
   border: 1px solid black;
   border-top-right-radius: 4px;
   border-bottom-right-radius: 4px;
-  padding-bottom: 2px;
   cursor: pointer;
 `;
 const CancelBtn = styled.div`
@@ -256,7 +253,6 @@ const CancelBtn = styled.div`
   border: 1px solid black;
   border-top-left-radius: 4px;
   border-bottom-left-radius: 4px;
-  padding-bottom: 2px;
   cursor: pointer;
 `;
 const PhotoInput = styled.input`

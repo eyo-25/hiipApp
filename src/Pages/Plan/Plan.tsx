@@ -9,6 +9,7 @@ import { Light_Gray } from "../../Styles/Colors";
 import TodoBord from "./Plan/TodoBoard";
 import { useRecoilState } from "recoil";
 import { toDoEditState } from "../../Recoil/atoms";
+import TodoMemo from "./Plan/TodoMemo";
 
 function Plan() {
   const [isWeek, setIsWeek] = useState(false);
@@ -85,9 +86,12 @@ function Plan() {
           <TodoBord isWeek={isWeek} setIsWeek={setIsWeek} />
         </TodoContainer>
       </ContentContainer>
-      <ButtonContainer>
-        <Button isPlay={false} />
-      </ButtonContainer>
+      {!isEdit && (
+        <ButtonContainer>
+          <Button isPlay={false} />
+        </ButtonContainer>
+      )}
+      {isEdit && <TodoMemo />}
     </Applayout>
   );
 }
@@ -107,6 +111,12 @@ const CalendarBox = styled(motion.div)`
   display: flex;
   height: 100%;
   width: 100%;
+  @media screen and (max-height: 650px) {
+    min-height: 84px;
+  }
+  @media screen and (max-height: 400px) {
+    min-height: 70px;
+  }
 `;
 const TodoContainer = styled(motion.div)`
   position: relative;

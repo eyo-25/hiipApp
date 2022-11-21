@@ -61,7 +61,6 @@ const DetailBox = styled(motion.div)`
   height: 12.5%;
   padding: 0 2.5vh;
 `;
-
 const DetailItems = styled.div`
   display: flex;
   flex-direction: column;
@@ -71,12 +70,10 @@ const DetailItems = styled.div`
   height: 100%;
   color: white;
 `;
-
 const DetailText = styled.div`
   font-size: 1.5vh;
   font-weight: 100;
 `;
-
 const DetailItem = styled.div`
   display: flex;
   align-items: flex-end;
