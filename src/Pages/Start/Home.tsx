@@ -7,19 +7,22 @@ import { motion } from "framer-motion";
 import Background from "../../Assets/image/start_background2.png";
 import TodoBord from "./Home/TodoBord";
 import { useRecoilState } from "recoil";
-import { toDoState } from "../../Recoil/atoms";
+import { projectState, toDoState } from "../../Recoil/atoms";
 import { onSnapshot, query } from "firebase/firestore";
 import ProjectInfo from "./Home/ProjectInfo";
 import { authService, dbService } from "../../firebase";
 import { onAuthStateChanged } from "firebase/auth";
+import { useNavigate } from "react-router-dom";
 
 function Home() {
+  const [project, setProject] = useRecoilState(projectState);
   const [toDos, setToDos] = useRecoilState(toDoState);
   const [isReady, setIsReady] = useState(false);
   const [isFadeout, setIsFadeout] = useState(false);
   const [mouseDownClientY, setMouseDownClientY] = useState(0);
   const [mouseUpClientY, setMouseUpClientY] = useState(0);
   const [tochedY, setTochedY] = useState(0);
+  const navigate = useNavigate();
   const uid = JSON.parse(localStorage.getItem("user") as any).uid;
 
   // useEffect(() => {
@@ -85,6 +88,9 @@ function Home() {
     },
   };
   const onPlayClick = () => {
+    if (project.length <= 0) {
+      navigate("/createProject");
+    }
     //타이머로 이꾸
   };
   const onBackClick = () => {

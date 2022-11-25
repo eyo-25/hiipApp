@@ -8,13 +8,14 @@ import CalendarBoard from "./Calendar/CalendarBoard";
 import { Light_Gray } from "../../Styles/Colors";
 import TodoBord from "./Plan/TodoBoard";
 import { useRecoilState } from "recoil";
-import { selectState, toDoEditState } from "../../Recoil/atoms";
+import { projectState, selectState, toDoEditState } from "../../Recoil/atoms";
 import TodoMemo from "./Plan/TodoMemo";
 import CardManage from "./Plan/CardManage";
 import { useNavigate } from "react-router-dom";
 
 function Plan() {
   const navigate = useNavigate();
+  const [project, setProject] = useRecoilState(projectState);
   const [isWeek, setIsWeek] = useState(false);
   const [isEdit, setIsEdit] = useRecoilState(toDoEditState);
   const [isSelect, setIsSelect] = useRecoilState(selectState);
@@ -77,8 +78,12 @@ function Plan() {
     }
   };
   const onPlusClick = () => {
-    navigate("/plan/create");
-    setIsCreate(true);
+    if (project.length <= 0) {
+      navigate("/createProject");
+    } else {
+      navigate("/plan/createTodo");
+      setIsCreate(true);
+    }
   };
 
   return (
@@ -125,6 +130,7 @@ const CalendarBox = styled(motion.div)`
   display: flex;
   height: 100%;
   width: 100%;
+  background-color: white;
   @media screen and (max-height: 650px) {
     min-height: 84px;
   }

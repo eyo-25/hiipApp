@@ -1,11 +1,10 @@
-import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { IoChevronForward, IoChevronBack } from "react-icons/io5";
-import { useRecoilState } from "recoil";
-import { clickDateState } from "../../../Recoil/atoms";
-import WeeklyDatePicker from "./WeeklyDatePicker";
-import MonthDatePicker from "./MonthDatePicker";
 import { motion } from "framer-motion";
+import { useRecoilState } from "recoil";
+import { clickDateState } from "../../Recoil/atoms";
+import { useEffect } from "react";
+import MonthDatePicker from "./MonthDatePicker";
 
 const calendarVariants = {
   normal: {
@@ -14,52 +13,30 @@ const calendarVariants = {
   animate: {
     opacity: 1,
     transition: {
-      delay: 0.5,
-      duration: 1.2,
+      duration: 1,
       type: "linear",
     },
   },
 };
 
-const CalendarBoard = ({
-  isWeek,
-  setIsWeek,
-}: {
-  isWeek: boolean;
-  setIsWeek: React.Dispatch<React.SetStateAction<boolean>>;
-}) => {
+function CalendarBoard() {
   const Moment = require("moment");
   const calendarDays = ["일", "월", "화", "수", "목", "금", "토"];
   const [clickDate, setClickDate] = useRecoilState(clickDateState);
 
   const onPrevClick = () => {
-    if (isWeek) {
-      const prevDay = 7 + Moment(clickDate).day();
-      const prevWeek = Moment(clickDate)
-        .subtract(prevDay, "days")
-        .format("YYYY-MM-DD");
-      setClickDate(prevWeek);
-    } else {
-      const prevMonth = Moment(clickDate)
-        .subtract(1, "Month")
-        .startOf("month")
-        .format("YYYY-MM-DD");
-      setClickDate(prevMonth);
-    }
+    const prevMonth = Moment(clickDate)
+      .subtract(1, "Month")
+      .startOf("month")
+      .format("YYYY-MM-DD");
+    setClickDate(prevMonth);
   };
   const onNextClick = () => {
-    if (isWeek) {
-      const nextWeek = 7 - Moment(clickDate).day();
-      setClickDate(
-        Moment(clickDate).add(nextWeek, "days").format("YYYY-MM-DD")
-      );
-    } else {
-      const nextMonth = Moment(clickDate)
-        .add(1, "Month")
-        .startOf("month")
-        .format("YYYY-MM-DD");
-      setClickDate(nextMonth);
-    }
+    const nextMonth = Moment(clickDate)
+      .add(1, "Month")
+      .startOf("month")
+      .format("YYYY-MM-DD");
+    setClickDate(nextMonth);
   };
   const onTodayClick = () => {
     setClickDate(Moment().format("YYYY-MM-DD"));
@@ -84,27 +61,20 @@ const CalendarBoard = ({
         </MonthBox>
         <DayContainer>
           {calendarDays.map((days) => (
-            <DayBox key={days} isWeek={isWeek}>
-              {days}
-            </DayBox>
+            <DayBox key={days}>{days}</DayBox>
           ))}
         </DayContainer>
-        {isWeek && <WeeklyDatePicker />}
-        {!isWeek && <MonthDatePicker />}
+        <MonthDatePicker />
       </Container>
     </Wrapper>
   );
-};
+}
 
-export default React.memo(CalendarBoard);
+export default CalendarBoard;
 
 const Wrapper = styled.div`
   width: 100%;
-  height: 13vh;
   cursor: pointer;
-  @media screen and (max-height: 670px) {
-    height: 90px;
-  }
 `;
 const Container = styled(motion.div)`
   display: flex;
@@ -143,11 +113,11 @@ const DayContainer = styled.div`
   font-size: 12px;
   font-weight: 600;
 `;
-const DayBox = styled.div<{ isWeek: boolean }>`
+const DayBox = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-bottom: ${(props) => (props.isWeek ? "1.2vh" : "1vh")};
+  margin-bottom: 1vh;
 `;
 const PrevBtn = styled(IoChevronBack)`
   width: 20px;
