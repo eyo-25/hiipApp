@@ -18,36 +18,30 @@ const calendarVariants = {
   },
 };
 
-function MonthDatePicker({
-  date,
-  setDate,
-}: {
-  date: Date;
-  setDate: React.Dispatch<React.SetStateAction<Date>>;
-}) {
+function MonthDatePicker() {
   const Moment = require("moment");
   const [clickDate, setClickDate] = useRecoilState(clickDateState);
-  const [monthArray, setMonthArray] = useState<Date[]>([]);
-  // 달력 연도
-  let calendarYear = date.getFullYear();
-  // 달력 월
-  let calendarMonth = date.getMonth() + 1;
-  //Date 객체에서는 일자가 0이면 이전달의 마지막 일자를 계산하여 이전 달의 마지막 날짜로 자동 설정됩니다.
-  let monthLastDate = new Date(calendarYear, calendarMonth, 0);
-  // 달력 월의 마지막 일
-  let calendarMonthLastDate = monthLastDate.getDate();
-  //현재달의 첫째 일
-  const startDate = new Date(date.getFullYear(), date.getMonth(), 1);
-  // 달력 월의 시작 일(=마지막날에서 다음날)
-  let monthStartDay = new Date(calendarYear, date.getMonth(), 1);
-  // 달력 월의 시작 요일
-  let calendarMonthStartDay = monthStartDay.getDay();
-  //이전달 마지막일
-  let prevMonthLastDate = new Date(
-    calendarYear,
-    calendarMonth - 1,
-    0
-  ).getDate();
+  const [monthArray, setMonthArray] = useState<string[]>([]);
+  // 현재월
+  let calendarMonth = Number(Moment(clickDate).format("MM"));
+  // 현재월의 마지막 일
+  let calendarMonthLastDate = Number(
+    Moment(clickDate).endOf("month").format("DD")
+  );
+  // 현재월의 첫째 일
+  let monthStartDate = Moment(clickDate).startOf("month").format("YYYY-MM-DD");
+  // 현재월의 시작 요일
+  let calendarMonthStartDay = Moment(monthStartDate).startOf("month").day();
+  // 이전달 마지막일자
+  let prevMonthLastDate = Moment(monthStartDate)
+    .subtract(1, "Month")
+    .endOf("month")
+    .format("YYYY-MM-DD");
+  // 다음달 시작일자
+  let nextMonthStartDate = Moment(monthStartDate)
+    .add(1, "Month")
+    .startOf("month")
+    .format("YYYY-MM-DD");
 
   useEffect(() => {
     setMonthArray((prev) => {
@@ -59,49 +53,34 @@ function MonthDatePicker({
         index < calendarMonthLastDate + calendarMonthStartDay;
         index++
       ) {
-        copy[index] = new Date(
-          calendarYear,
-          calendarMonth - 1,
-          monthStartDay.getDate() + addDay1
-        );
+        copy[index] = Moment(monthStartDate)
+          .add(addDay1, "days")
+          .format("YYYY-MM-DD");
         addDay1++;
       }
       // 이전 달 date배정
-      let addDay2 = 1;
+      let addDay2 = 0;
       for (let index = calendarMonthStartDay - 1; index >= 0; index--) {
-        --addDay2;
-        copy[index] = new Date(
-          calendarYear,
-          calendarMonth - 2,
-          prevMonthLastDate + addDay2
-        );
+        copy[index] = Moment(prevMonthLastDate)
+          .subtract(addDay2, "days")
+          .format("YYYY-MM-DD");
+        addDay2++;
       }
       // 다음 달 date배정
       let addDay3 = 0;
       let prevDate = calendarMonthLastDate + calendarMonthStartDay;
       for (let index = prevDate; index < 42; index++) {
-        copy[index] = new Date(
-          calendarYear,
-          calendarMonth,
-          monthStartDay.getDate() + addDay3
-        );
+        copy[index] = Moment(nextMonthStartDate)
+          .add(addDay3, "days")
+          .format("YYYY-MM-DD");
         addDay3++;
       }
       return [...copy];
     });
-  }, [date]);
+  }, [clickDate]);
 
   const onDateClick = (clickedDate: string) => {
-    const nowDate = Moment(clickedDate).format("YYYY-MM-DD");
-    setClickDate(nowDate);
-    //다음달 클릭
-    if (nowDate > Moment(date).format("YYYY-MM-DD")) {
-      setDate((date) => new Date(date.getFullYear(), date.getMonth() + 2, 0));
-    }
-    //이전달 클릭
-    if (nowDate < Moment(startDate).format("YYYY-MM-DD")) {
-      setDate((date) => new Date(date.getFullYear(), date.getMonth(), 0));
-    }
+    setClickDate(clickedDate);
   };
 
   return (
@@ -110,14 +89,16 @@ function MonthDatePicker({
       initial="normal"
       animate="animate"
     >
-      {monthArray.map((date: any, index: number) => (
+      {monthArray.map((date: string, index: number) => (
         <DateBox key={index}>
           <HoverBox
             clicked={clickDate === Moment(date).format("YYYY-MM-DD")}
             onClick={() => onDateClick(date)}
           >
-            <DateText nowMonth={date.getMonth() + 1 != calendarMonth}>
-              {date.getDate()}
+            <DateText
+              nowMonth={Number(Moment(date).format("MM")) !== calendarMonth}
+            >
+              {Number(Moment(date).format("DD"))}
             </DateText>
           </HoverBox>
         </DateBox>

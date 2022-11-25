@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { useRecoilState } from "recoil";
 import styled from "styled-components";
-import { toDoEditState } from "../../../Recoil/atoms";
+import { selectState, toDoEditState } from "../../../Recoil/atoms";
 import MemoCard from "./MemoCard";
 
 const TodoMemo = () => {
@@ -21,9 +21,11 @@ const TodoMemo = () => {
     },
   };
   const [isEdit, setIsEdit] = useRecoilState(toDoEditState);
+  const [isSelect, setIsSelect] = useRecoilState(selectState);
   const navigate = useNavigate();
-  const onOverlayClicked = () => {
+  const onOverlayClicked = (e: any) => {
     setIsEdit(false);
+    setIsSelect(false);
     navigate("/plan");
   };
   return (
@@ -47,7 +49,7 @@ const TodoMemo = () => {
 
 export default TodoMemo;
 
-const Wrapper = styled.div`
+export const Wrapper = styled.div`
   position: fixed;
   display: flex;
   align-items: center;
@@ -59,7 +61,7 @@ const Wrapper = styled.div`
   margin: 0 auto;
   z-index: 999;
 `;
-const Overlay = styled(motion.div)`
+export const Overlay = styled(motion.div)`
   position: fixed;
   top: 0;
   left: 0;
@@ -71,18 +73,18 @@ const Overlay = styled(motion.div)`
   z-index: 998;
   cursor: pointer;
 `;
-const Container = styled.div`
+export const Container = styled.div`
   position: absolute;
   display: flex;
   justify-content: center;
   align-items: center;
   width: 100%;
   max-width: 414px;
+  padding: 0 2.5vh;
   margin: 0 auto;
   z-index: 999;
 `;
-const ModalBox = styled.div`
-  margin: 0 2.5vh;
+export const ModalBox = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -90,7 +92,7 @@ const ModalBox = styled.div`
   border-radius: 8px;
   z-index: 999;
 `;
-const MemoWrapper = styled(motion.div)`
+export const MemoWrapper = styled(motion.div)`
   display: flex;
   width: 95%;
   height: 100%;

@@ -29,60 +29,44 @@ const CalendarBoard = ({
   setIsWeek: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   const Moment = require("moment");
-  const today = new Date();
-  let calendarDays = ["일", "월", "화", "수", "목", "금", "토"];
-  const [date, setDate] = useState(
-    new Date(today.getFullYear(), today.getMonth() + 1, 0)
-  );
+  const calendarDays = ["일", "월", "화", "수", "목", "금", "토"];
   const [clickDate, setClickDate] = useRecoilState(clickDateState);
 
   const onPrevClick = () => {
-    const clickDateNow = new Date(clickDate.split("-"));
     if (isWeek) {
-      const nowDate = new Date(
-        clickDateNow.getFullYear(),
-        clickDateNow.getMonth(),
-        clickDateNow.getDate() - (7 + clickDateNow.getDay())
-      );
-      setDate(nowDate);
       const prevDay = 7 + Moment(clickDate).day();
       const prevWeek = Moment(clickDate)
         .subtract(prevDay, "days")
         .format("YYYY-MM-DD");
       setClickDate(prevWeek);
     } else {
-      const nowDate = new Date(date.getFullYear(), date.getMonth() - 1, 1);
-      setClickDate(Moment(nowDate).format("YYYY-MM-DD"));
-      setDate((date) => new Date(date.getFullYear(), date.getMonth(), 0));
+      const prevMonth = Moment(clickDate)
+        .subtract(1, "Month")
+        .startOf("month")
+        .format("YYYY-MM-DD");
+      setClickDate(prevMonth);
     }
   };
-
   const onNextClick = () => {
-    const clickDateNow = new Date(clickDate.split("-"));
     if (isWeek) {
-      const nowDate = new Date(
-        clickDateNow.getFullYear(),
-        clickDateNow.getMonth(),
-        clickDateNow.getDate() + (7 - clickDateNow.getDay())
-      );
-      setDate(nowDate);
       const nextWeek = 7 - Moment(clickDate).day();
       setClickDate(
         Moment(clickDate).add(nextWeek, "days").format("YYYY-MM-DD")
       );
     } else {
-      const nowDate = new Date(date.getFullYear(), date.getMonth() + 1, 1);
-      setClickDate(Moment(nowDate).format("YYYY-MM-DD"));
-      setDate((date) => new Date(date.getFullYear(), date.getMonth() + 2, 0));
+      const nextMonth = Moment(clickDate)
+        .add(1, "Month")
+        .startOf("month")
+        .format("YYYY-MM-DD");
+      setClickDate(nextMonth);
     }
   };
   const onTodayClick = () => {
     setClickDate(Moment().format("YYYY-MM-DD"));
-    setDate(() => new Date(today.getFullYear(), today.getMonth() + 1, 0));
   };
 
   useEffect(() => {
-    setClickDate(Moment().format("YYYY-MM-DD"));
+    onTodayClick();
   }, []);
 
   return (
@@ -105,8 +89,8 @@ const CalendarBoard = ({
             </DayBox>
           ))}
         </DayContainer>
-        {isWeek && <WeeklyDatePicker date={date} setDate={setDate} />}
-        {!isWeek && <MonthDatePicker date={date} setDate={setDate} />}
+        {isWeek && <WeeklyDatePicker />}
+        {!isWeek && <MonthDatePicker />}
       </Container>
     </Wrapper>
   );
@@ -116,8 +100,12 @@ export default React.memo(CalendarBoard);
 
 const Wrapper = styled.div`
   width: 100%;
-  background-color: white;
+  height: 13vh;
   cursor: pointer;
+  background-color: white;
+  @media screen and (max-height: 670px) {
+    height: 90px;
+  }
 `;
 const Container = styled(motion.div)`
   display: flex;
@@ -125,7 +113,6 @@ const Container = styled(motion.div)`
   align-items: center;
   padding-top: 2.2vh;
   max-width: 400px;
-  height: 13vh;
   margin: 0 auto;
   position: relative;
   @media screen and (max-height: 800px) {

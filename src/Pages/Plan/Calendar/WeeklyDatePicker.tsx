@@ -18,13 +18,7 @@ const calendarVariants = {
   },
 };
 
-const WeeklyDatePicker = ({
-  date,
-  setDate,
-}: {
-  date: any;
-  setDate: React.Dispatch<React.SetStateAction<Date>>;
-}) => {
+const WeeklyDatePicker = () => {
   const Moment = require("moment");
   const [clickDate, setClickDate] = useRecoilState(clickDateState);
   const [weekArray, setWeekArray] = useState<Date[]>([]);
@@ -35,21 +29,17 @@ const WeeklyDatePicker = ({
       // 앞 배열 채우기
       let removeDay = 0;
       for (let index = Moment(clickDate).day(); index >= 0; index--) {
-        copy[index] = new Date(
-          Moment(clickDate).year(),
-          Moment(clickDate).month(),
-          Moment(clickDate).date() + removeDay
-        );
-        removeDay--;
+        copy[index] = Moment(clickDate)
+          .subtract(removeDay, "days")
+          .format("YYYY-MM-DD");
+        removeDay++;
       }
       let addDay = 0;
       // 뒷 배열 채우기
       for (let index = Moment(clickDate).day(); index < 7; index++) {
-        copy[index] = new Date(
-          Moment(clickDate).year(),
-          Moment(clickDate).month(),
-          Moment(clickDate).date() + addDay
-        );
+        copy[index] = Moment(clickDate)
+          .add(addDay, "days")
+          .format("YYYY-MM-DD");
         addDay++;
       }
       return [...copy];
@@ -57,15 +47,7 @@ const WeeklyDatePicker = ({
   }, [clickDate]);
 
   const onDateClick = (clickedDate: string) => {
-    const nowDate = Moment(clickedDate).format("YYYY-MM-DD");
-    const startDate = new Date(date.getFullYear(), date.getMonth(), 1);
-    setClickDate(nowDate);
-    if (nowDate < Moment(startDate).format("YYYY-MM-DD")) {
-      setDate((date) => new Date(date.getFullYear(), date.getMonth(), 0));
-    }
-    if (nowDate > Moment(date).format("YYYY-MM-DD")) {
-      setDate((date) => new Date(date.getFullYear(), date.getMonth() + 2, 0));
-    }
+    setClickDate(clickedDate);
   };
 
   return (
@@ -77,10 +59,10 @@ const WeeklyDatePicker = ({
       {weekArray.map((date: any, index: number) => (
         <DateBox
           key={index}
-          clicked={clickDate === Moment(date).format("YYYY-MM-DD")}
+          clicked={clickDate === date}
           onClick={() => onDateClick(date)}
         >
-          <div>{date.getDate()}</div>
+          <div>{Number(Moment(date).format("DD"))}</div>
         </DateBox>
       ))}
     </DateContainer>

@@ -41,6 +41,7 @@ export default function AppRouter({ isLoggedIn, userObj }: AppRouterProps) {
         <Route path={"/"} element={<Home />}></Route>
         <Route path={"/plan"} element={<Plan />}>
           <Route path={"/plan/memo/:todoId"} element={<Plan />} />
+          <Route path={"/plan/create"} element={<Plan />} />
         </Route>
         <Route path={"/feedback"} element={<FeedBack />}></Route>
         <Route path={"/mypage"} element={<MyPage userObj={userObj} />}>

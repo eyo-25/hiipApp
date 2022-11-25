@@ -3,12 +3,10 @@ import { useEffect, useState, useRef } from "react";
 import { IoPlaySharp } from "react-icons/io5";
 import { useRecoilState } from "recoil";
 import styled from "styled-components";
-import { toDoEditState } from "../../../Recoil/atoms";
+import { selectState, toDoEditState } from "../../../Recoil/atoms";
 import { Blue, Dark_Gray, Dark_Gray2 } from "../../../Styles/Colors";
 import { scrollIntoView } from "seamless-scroll-polyfill";
 import { useNavigate } from "react-router-dom";
-import { ReactComponent as SaveIcon } from "../../../Assets/Icons/save.svg";
-import TodoMemo from "./TodoMemo";
 
 export const iconVariants = {
   normal: {
@@ -39,29 +37,23 @@ function TodoCard({
 }) {
   const navigate = useNavigate();
   const intervalArray = [3, 2, 1];
+  const [isClicked, setIsClicked] = useState(false);
+  const [isSelect, setIsSelect] = useRecoilState(selectState);
   const [isEdit, setIsEdit] = useRecoilState(toDoEditState);
-  const [isSelect, setIsSelect] = useState(false);
-  const [isMemo, setIsMemo] = useState(false);
 
   useEffect(() => {
     // 셀렉된 카드 전부 닫기
-    if (!isMemo) {
-      setIsSelect(false);
+    if (!isSelect) {
+      setIsClicked(false);
     }
-    // 에딧종료시 초기화
-    if (!isEdit) {
-      setIsMemo(false);
-      setIsSelect(false);
-    }
-  }, [isEdit]);
+  }, [isSelect]);
 
   const cardVariants = {
     normal: {
       height: "162px",
     },
     animate: {
-      height: isSelect ? "262px" : "162px",
-      // height: isMemo ? "405px" : isSelect ? "262px" : "162px",
+      height: isClicked ? "262px" : "162px",
       transition: {
         duration: 0.5,
         type: "linear",
@@ -74,44 +66,44 @@ function TodoCard({
       height: "42px",
     },
     animate: {
-      height: isSelect ? "142px" : "39px",
+      height: isClicked ? "142px" : "39px",
       transition: {
         duration: 0.5,
         type: "linear",
       },
     },
   };
-
-  const onCardClick = () => {
-    if (!isEdit) {
-      setIsSelect((prev) => !prev);
-      setIsMemo(false);
+  const clickToggle = () => {
+    if (!isSelect) {
+      setIsSelect(true);
+      setIsClicked(true);
     }
-    if (isMemo) {
-      setIsMemo(false);
+    if (isSelect && !isClicked) {
       setIsSelect(false);
-      setIsEdit(false);
+      setTimeout(() => {
+        setIsSelect(true);
+        setIsClicked(true);
+      }, 500);
     }
   };
-  const onMemoClick = () => {
-    if (!isEdit) {
-      setIsSelect(true);
+
+  const onCardClick = async () => {
+    if (isSelect && isClicked) {
+      setIsSelect(false);
+      setIsClicked(false);
     }
-    if (isSelect && !isEdit) {
-      setIsMemo(true);
+    clickToggle();
+  };
+  const onMemoClick = () => {
+    if (isSelect && isClicked) {
       setIsWeek(true);
       setIsEdit(true);
       navigate(`/plan/memo/${todoId}`);
     }
-  };
-  const onCancelClick = () => {
-    setIsMemo(false);
-    setIsSelect(false);
-    setIsEdit(false);
-    navigate("/plan");
+    clickToggle();
   };
   useEffect(() => {
-    if (isEdit && isMemo) {
+    if (isEdit && isClicked) {
       setTimeout(() => {
         scrollIntoView(cardRef.current as any, {
           behavior: "smooth",
@@ -128,7 +120,7 @@ function TodoCard({
         initial="normal"
         animate="animate"
       >
-        <TodoTopBox isMemo={isMemo}>
+        <TodoTopBox>
           <TextBox>
             <TitleBox>
               <h4>대창 볶음밥</h4>
@@ -144,42 +136,23 @@ function TodoCard({
             <StartBtn />
           </IntervalBox>
         </TodoTopBox>
-        <MemoContainer onClick={onMemoClick}>
+        <MemoContainer onClick={onMemoClick} isselect={isSelect}>
           {memo !== "" ? (
             <MemoText
               variants={textVariants}
               initial="normal"
               animate="animate"
-              isSelect={isSelect}
             >
               {memo}
             </MemoText>
           ) : (
-            <MemoText isSelect={isSelect}>
+            <MemoText>
               <p>
                 계획 실천 후 피드백이나 <br />
                 실천 중 메모를 적어주세요
               </p>
             </MemoText>
           )}
-          {/* {!isMemo ? (
-              <MemoText isSelect={isSelect}>
-                <p>
-                  계획 실천 후 피드백이나 <br />
-                  실천 중 메모를 적어주세요
-                </p>
-              </MemoText>
-          ) : (
-            <MemoForm>
-              <MemoInput autoFocus required />
-              <IconBox>
-                <Item>
-                  <SaveIcon />
-                  <p>저장</p>
-                </Item>
-              </IconBox>
-            </MemoForm>
-          )} */}
         </MemoContainer>
         <IntervalBarBox>
           {intervalArray.map((index) => (
@@ -216,14 +189,14 @@ export const TodoCarWrapper = styled(motion.div)`
     margin-bottom: 20px;
   }
 `;
-export const TodoTopBox = styled.div<{ isMemo: boolean }>`
+export const TodoTopBox = styled.div`
   position: relative;
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   width: 100%;
   border-radius: 10px;
-  margin-bottom: ${(props) => (props.isMemo ? "30px" : "30px")};
+  margin-bottom: 30px;
   cursor: pointer;
 `;
 export const TextBox = styled.div`
@@ -287,21 +260,21 @@ export const IntervalBar = styled.li`
   width: 100%;
   margin: 0 3px;
 `;
-export const MemoContainer = styled.div`
+export const MemoContainer = styled.div<{ isselect: boolean }>`
   display: flex;
   width: 100%;
   height: 100%;
   z-index: 5;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: ${(props) => (props.isselect ? 9 : 2)};
+  -webkit-box-orient: vertical;
 `;
-export const MemoText = styled(motion.div)<{ isSelect: boolean }>`
+export const MemoText = styled(motion.div)`
   font-weight: 500;
   letter-spacing: -1px;
   line-height: 1.4;
   font-size: 14px;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: ${(props) => (props.isSelect ? 9 : 2)};
-  -webkit-box-orient: vertical;
   overflow: hidden;
   p {
     color: ${Dark_Gray};
@@ -313,24 +286,11 @@ export const MemoForm = styled.form`
   width: 100%;
   height: 100%;
 `;
-const MemoInput = styled.textarea`
-  font-weight: 600;
-  letter-spacing: -1px;
-  line-height: 1.4;
-  border: none;
-  display: flex;
-  width: 100%;
-  height: 83%;
-  &::-webkit-scrollbar {
-    width: 0;
-  }
-`;
 export const IconBox = styled.div`
   display: flex;
   justify-content: flex-end;
   align-items: flex-end;
   width: 100%;
-  height: 17%;
   padding-right: 7px;
 `;
 export const Item = styled(motion.div)`

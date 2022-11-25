@@ -94,6 +94,15 @@ body::-webkit-scrollbar-thumb {
 body::-webkit-scrollbar-track {
     background: #0c0c0c  /*스크롤바 뒷 배경 색상*/
 }
+// 인풋 글자 고정
+input {
+  font-size: 16px !important;
+  letter-spacing: -1.2;
+}
+textarea {
+  font-size: 16px !important;
+  letter-spacing: -1.2;
+}
 `;
 
 export default GlobalStyle;

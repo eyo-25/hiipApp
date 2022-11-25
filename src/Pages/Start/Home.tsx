@@ -8,7 +8,10 @@ import Background from "../../Assets/image/start_background2.png";
 import TodoBord from "./Home/TodoBord";
 import { useRecoilState } from "recoil";
 import { toDoState } from "../../Recoil/atoms";
+import { onSnapshot, query } from "firebase/firestore";
 import ProjectInfo from "./Home/ProjectInfo";
+import { authService, dbService } from "../../firebase";
+import { onAuthStateChanged } from "firebase/auth";
 
 function Home() {
   const [toDos, setToDos] = useRecoilState(toDoState);
@@ -17,6 +20,37 @@ function Home() {
   const [mouseDownClientY, setMouseDownClientY] = useState(0);
   const [mouseUpClientY, setMouseUpClientY] = useState(0);
   const [tochedY, setTochedY] = useState(0);
+  const uid = JSON.parse(localStorage.getItem("user") as any).uid;
+
+  // useEffect(() => {
+  //   const q = query(
+  //     dbService
+  //       .collection("plan")
+  //       .where("creatorId", "==", uid)
+  //       .orderBy("index", "desc")
+  //   );
+  //   const unsubscribe = onSnapshot(q, (querySnapshot) => {
+  //     const newArray = querySnapshot.docs.map((doc: any) => {
+  //       return {
+  //         id: doc.id,
+  //         ...doc.data(),
+  //       };
+  //     });
+  //     setToDos(() => {
+  //       const newArray2 = newArray.map((e) => {
+  //         e.startDate = e.startDate.toDate();
+  //         e.endDate = e.endDate.toDate();
+  //         return e;
+  //       });
+  //       return newArray2;
+  //     });
+  //   });
+  //   onAuthStateChanged(authService, (user) => {
+  //     if (user == null) {
+  //       unsubscribe();
+  //     }
+  //   });
+  // }, []);
 
   const bottomVariants = {
     normal: {
@@ -31,7 +65,7 @@ function Home() {
       height: isReady && toDos.length > 0 ? "57%" : "23%",
       opacity: 1,
       transition: {
-        duration: 0.9,
+        duration: 0.7,
         type: "linear",
       },
     },
@@ -117,6 +151,7 @@ function Home() {
       }, 400);
     }
   };
+
   return (
     <Applayout>
       <ContentContainer onMouseDown={onMouseDown} onMouseUp={onMouseUp}>

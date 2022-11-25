@@ -12,7 +12,7 @@ const boxVarients = {
     opacity: 1,
     transition: {
       delay: 1,
-      duration: 1,
+      duration: 0.9,
       type: "linear",
     },
   },

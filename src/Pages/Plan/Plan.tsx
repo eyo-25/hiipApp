@@ -8,12 +8,17 @@ import CalendarBoard from "./Calendar/CalendarBoard";
 import { Light_Gray } from "../../Styles/Colors";
 import TodoBord from "./Plan/TodoBoard";
 import { useRecoilState } from "recoil";
-import { toDoEditState } from "../../Recoil/atoms";
+import { selectState, toDoEditState } from "../../Recoil/atoms";
 import TodoMemo from "./Plan/TodoMemo";
+import CardManage from "./Plan/CardManage";
+import { useNavigate } from "react-router-dom";
 
 function Plan() {
+  const navigate = useNavigate();
   const [isWeek, setIsWeek] = useState(false);
   const [isEdit, setIsEdit] = useRecoilState(toDoEditState);
+  const [isSelect, setIsSelect] = useRecoilState(selectState);
+  const [isCreate, setIsCreate] = useState(false);
   const [mouseDownClientY, setMouseDownClientY] = useState(0);
   const [mouseUpClientY, setMouseUpClientY] = useState(0);
   const [tochedY, setTochedY] = useState(0);
@@ -24,7 +29,7 @@ function Plan() {
     animate: {
       height: isWeek ? "17%" : "100%",
       transition: {
-        duration: 0.8,
+        duration: 0.9,
         type: "linear",
       },
     },
@@ -34,6 +39,10 @@ function Plan() {
       setIsEdit(false);
     }
   };
+  // 언마운트 초기화
+  useEffect(() => {
+    return setIsEdit(false), setIsSelect(false);
+  }, []);
   // 브라우저 스와이프
   const onMouseUp = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
     setMouseUpClientY(e.clientY);
@@ -67,6 +76,10 @@ function Plan() {
       closedEdit();
     }
   };
+  const onPlusClick = () => {
+    navigate("/plan/create");
+    setIsCreate(true);
+  };
 
   return (
     <Applayout>
@@ -87,11 +100,12 @@ function Plan() {
         </TodoContainer>
       </ContentContainer>
       {!isEdit && (
-        <ButtonContainer>
+        <ButtonContainer onClick={onPlusClick}>
           <Button isPlay={false} />
         </ButtonContainer>
       )}
       {isEdit && <TodoMemo />}
+      {isCreate && <CardManage setIsCreate={setIsCreate} />}
     </Applayout>
   );
 }

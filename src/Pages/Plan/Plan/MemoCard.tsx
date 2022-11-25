@@ -9,7 +9,6 @@ import {
   IntervalBarBox,
   IntervalBox,
   Item,
-  MemoContainer,
   MemoForm,
   StartBtn,
   StatusBox,
@@ -18,12 +17,13 @@ import {
 } from "./TodoCard";
 import { Dark_Gray2 } from "../../../Styles/Colors";
 import { useRecoilState } from "recoil";
-import { toDoEditState, toDoState } from "../../../Recoil/atoms";
+import { selectState, toDoEditState, toDoState } from "../../../Recoil/atoms";
 import { useNavigate, useParams } from "react-router-dom";
 
 function MemoCard() {
   const navigate = useNavigate();
   const [isEdit, setIsEdit] = useRecoilState(toDoEditState);
+  const [isSelect, setIsSelect] = useRecoilState(selectState);
   const [toDos, setToDos] = useRecoilState(toDoState);
   const [memoText, setMemoText] = useState("");
   const autoFocusRef = useRef<any>(null);
@@ -59,14 +59,20 @@ function MemoCard() {
     });
   }, []);
   const onSaveClick = () => {
-    setToDos((todo) => {
-      const copy = [...todo];
-      const index = toDos.findIndex((item) => item.todoId === todoId);
-      copy[index] = { ...copy[index], memo: memoText };
-      return [...copy];
-    });
-    navigate("/plan");
+    const index = toDos.findIndex((item) => item.todoId === todoId);
+    const text = toDos[index].memo;
+    if (text !== memoText) {
+      console.log("저장!");
+      setToDos((todo) => {
+        const copy = [...todo];
+        const index = toDos.findIndex((item) => item.todoId === todoId);
+        copy[index] = { ...copy[index], memo: memoText };
+        return [...copy];
+      });
+    }
     setIsEdit(false);
+    setIsSelect(false);
+    navigate("/plan");
   };
   const onTextChange = (event: React.FormEvent<HTMLTextAreaElement>) => {
     const {
@@ -150,7 +156,7 @@ const TodoCarWrapper = styled(motion.div)`
     height: 280px;
   }
   @media screen and (max-height: 360px) {
-    height: 50%;
+    height: 80vh;
   }
 `;
 const MemoInput = styled.textarea`
@@ -159,10 +165,11 @@ const MemoInput = styled.textarea`
   border: none;
   display: flex;
   width: 100%;
-  height: 78%;
+  height: 80%;
   margin-bottom: 5%;
   font-size: 14px;
   font-weight: 500;
+  padding: 0;
   &::placeholder {
     color: ${Dark_Gray2};
   }
@@ -179,4 +186,11 @@ const TodoTopBox = styled.div`
   border-radius: 10px;
   margin-bottom: 20px;
   cursor: pointer;
+`;
+const MemoContainer = styled.div`
+  display: flex;
+  width: 100%;
+  height: 100%;
+  z-index: 5;
+  overflow: hidden;
 `;
