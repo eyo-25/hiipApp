@@ -1,4 +1,4 @@
-import { atom } from "recoil";
+import { atom, selector } from "recoil";
 
 const Moment = require("moment");
 
@@ -14,7 +14,7 @@ export interface ITodo {
   todoId: any;
 }
 
-export const projectState = atom({
+export const projectState = atom<any>({
   key: "projectState",
   default: [],
 });
@@ -41,4 +41,34 @@ export const selectState = atom({
 export const inputFocusState = atom({
   key: "inputFocusState",
   default: false,
+});
+//
+export const startDateState = atom({
+  key: "startDateState",
+  default: "",
+});
+// export const startChange = selector<any>({
+//   key: "startChange",
+//   get: ({ get }) => {
+//     const oldStartDate = get(startDateState);
+//     if (oldStartDate !== "") {
+//       return new Date(oldStartDate.split("-") + "");
+//     }
+//     return null;
+//   },
+//   set: ({ set }, newValue) => {
+//     let newStartDate = newValue;
+//     if (newStartDate !== null) {
+//       newStartDate = Moment(newValue).format("YYYY-MM-DD");
+//     }
+//     set(startDateState, newStartDate);
+//   },
+// });
+export const endDateState = atom({
+  key: "endDateState",
+  default: "",
+});
+export const projectTitleState = atom({
+  key: "projectTitleState",
+  default: "",
 });

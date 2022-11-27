@@ -12,15 +12,16 @@ function App() {
   const [userObj, setUserObj] = useState<IUserObjProps | null>(null);
   const [isSplash, setIsSplash] = useState(true);
   const isLoggedIn = Boolean(userObj);
+  //리사이즈 이벤트발생시 vh 다시설정
   function setScreenSize() {
     let vh = window.innerHeight * 0.01;
     document.documentElement.style.setProperty("--vh", `${vh}px`);
   }
-
   useEffect(() => {
     window.addEventListener("resize", () => setScreenSize());
     setScreenSize();
   }, []);
+  //유저변경 감지
   useEffect(() => {
     authService.onAuthStateChanged(async (user: any) => {
       if (user) {

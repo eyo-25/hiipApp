@@ -59,7 +59,7 @@ export const Wrapper = styled.div`
   width: 100%;
   height: calc(var(--vh, 1vh) * 100);
   margin: 0 auto;
-  z-index: 999;
+  z-index: 99;
 `;
 export const Overlay = styled(motion.div)`
   position: fixed;
@@ -70,7 +70,7 @@ export const Overlay = styled(motion.div)`
   justify-content: center;
   width: 100%;
   height: calc(var(--vh, 1vh) * 100);
-  z-index: 998;
+  z-index: 98;
   cursor: pointer;
 `;
 export const Container = styled.div`

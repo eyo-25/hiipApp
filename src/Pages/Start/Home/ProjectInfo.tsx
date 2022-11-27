@@ -46,7 +46,7 @@ function ProjectInfo({
             ) : (
               <h4>
                 D-DAY를 설정하고 <br />
-                TO-DO를 추가하세요
+                TO-DO를 추가하세요.
               </h4>
             )}
           </MessageBox>

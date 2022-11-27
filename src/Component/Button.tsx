@@ -44,7 +44,7 @@ const Wrapper = styled.div<{ isplan: boolean }>`
   left: 0;
   right: 0;
   bottom: ${(props) => (props.isplan ? "18vh" : "15vh")};
-  z-index: 999;
+  z-index: 50;
   width: 78px;
   @media screen and (max-height: 800px) {
     width: 70px;

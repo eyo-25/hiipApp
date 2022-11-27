@@ -2,22 +2,9 @@ import styled from "styled-components";
 import { IoChevronForward, IoChevronBack } from "react-icons/io5";
 import { motion } from "framer-motion";
 import { useRecoilState } from "recoil";
-import { clickDateState } from "../../Recoil/atoms";
+import { clickDateState } from "../../../Recoil/atoms";
 import { useEffect } from "react";
-import MonthDatePicker from "./MonthDatePicker";
-
-const calendarVariants = {
-  normal: {
-    opacity: 0,
-  },
-  animate: {
-    opacity: 1,
-    transition: {
-      duration: 1,
-      type: "linear",
-    },
-  },
-};
+import MonthDatePicker from "../Calendar/MonthDatePicker";
 
 function CalendarBoard() {
   const Moment = require("moment");
@@ -48,7 +35,7 @@ function CalendarBoard() {
 
   return (
     <Wrapper>
-      <Container variants={calendarVariants} initial="normal" animate="animate">
+      <Container>
         <MonthBox>
           <PrevBtn onClick={onPrevClick} />
           <MonthText onClick={onTodayClick}>

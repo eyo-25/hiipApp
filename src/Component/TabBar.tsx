@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { useMatch } from "react-router-dom";
 import styled from "styled-components";
 import { Dark_Gray } from "../Styles/Colors";
 
@@ -28,14 +29,15 @@ const fadeinVariants = {
 };
 
 function TabBar() {
+  const intervalMatch = useMatch("/plan/intervalSetting");
   return (
     <TabContainer variants={tabVariants} initial="normal" animate="animate">
       <Tab variants={fadeinVariants} initial="normal" animate="animate">
         <Tabs>
-          <TabsTitle isActive={true}>프로젝트</TabsTitle>
+          <TabsTitle isActive={intervalMatch === null}>프로젝트</TabsTitle>
         </Tabs>
         <Tabs>
-          <TabsTitle isActive={false}>인터벌</TabsTitle>
+          <TabsTitle isActive={intervalMatch !== null}>인터벌</TabsTitle>
         </Tabs>
       </Tab>
     </TabContainer>

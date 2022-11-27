@@ -1,6 +1,10 @@
 import { useRecoilState } from "recoil";
 import styled from "styled-components";
-import { clickDateState } from "../../Recoil/atoms";
+import {
+  clickDateState,
+  endDateState,
+  startDateState,
+} from "../../../Recoil/atoms";
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 
@@ -8,8 +12,8 @@ function MonthDatePicker() {
   const Moment = require("moment");
   const [clickDate, setClickDate] = useRecoilState(clickDateState);
   const [monthArray, setMonthArray] = useState<string[]>([]);
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
+  const [startDate, setStartDate] = useRecoilState(startDateState);
+  const [endDate, setEndDate] = useRecoilState(endDateState);
   const [click, setClick] = useState(0);
 
   // 현재월
@@ -141,6 +145,9 @@ const DateBox = styled.div`
   align-items: center;
   height: calc(var(--vh, 1vh) * 4.7);
   cursor: pointer;
+  @media screen and (max-height: 600px) {
+    height: 30px;
+  }
 `;
 const HoverBox = styled.div<{ clicked: boolean }>`
   display: flex;
@@ -169,10 +176,4 @@ const DateBar = styled.div<{ isSame: boolean }>`
   width: 100%;
   height: 4px;
   background-color: ${(props) => (props.isSame ? "#FFC500" : "#0002ff")};
-`;
-const BarPoint = styled.div`
-  width: 5px;
-  height: 100%;
-  border-radius: 50%;
-  background-color: #fb0045;
 `;

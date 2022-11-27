@@ -25,35 +25,25 @@ function Home() {
   const navigate = useNavigate();
   const uid = JSON.parse(localStorage.getItem("user") as any).uid;
 
-  // useEffect(() => {
-  //   const q = query(
-  //     dbService
-  //       .collection("plan")
-  //       .where("creatorId", "==", uid)
-  //       .orderBy("index", "desc")
-  //   );
-  //   const unsubscribe = onSnapshot(q, (querySnapshot) => {
-  //     const newArray = querySnapshot.docs.map((doc: any) => {
-  //       return {
-  //         id: doc.id,
-  //         ...doc.data(),
-  //       };
-  //     });
-  //     setToDos(() => {
-  //       const newArray2 = newArray.map((e) => {
-  //         e.startDate = e.startDate.toDate();
-  //         e.endDate = e.endDate.toDate();
-  //         return e;
-  //       });
-  //       return newArray2;
-  //     });
-  //   });
-  //   onAuthStateChanged(authService, (user) => {
-  //     if (user == null) {
-  //       unsubscribe();
-  //     }
-  //   });
-  // }, []);
+  //살시간 감지
+  useEffect(() => {
+    const uid = JSON.parse(localStorage.getItem("user") as any).uid;
+    const q = query(dbService.collection("project").where("uid", "==", uid));
+    const addId = onSnapshot(q, (querySnapshot) => {
+      const newArray = querySnapshot.docs.map((doc: any) => {
+        return {
+          id: doc.id,
+          ...doc.data(),
+        };
+      });
+      setProject(newArray);
+    });
+    onAuthStateChanged(authService, (user) => {
+      if (user == null) {
+        addId();
+      }
+    });
+  }, []);
 
   const bottomVariants = {
     normal: {
@@ -89,7 +79,7 @@ function Home() {
   };
   const onPlayClick = () => {
     if (project.length <= 0) {
-      navigate("/createProject");
+      navigate("/plan/createProject");
     }
     //타이머로 이꾸
   };

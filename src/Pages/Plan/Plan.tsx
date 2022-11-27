@@ -10,8 +10,11 @@ import TodoBord from "./Plan/TodoBoard";
 import { useRecoilState } from "recoil";
 import { projectState, selectState, toDoEditState } from "../../Recoil/atoms";
 import TodoMemo from "./Plan/TodoMemo";
-import CardManage from "./Plan/CardManage";
 import { useNavigate } from "react-router-dom";
+import { onSnapshot, query } from "firebase/firestore";
+import { authService, dbService } from "../../firebase";
+import { onAuthStateChanged } from "firebase/auth";
+import CreateCard from "./CreateTodo/CreateCard";
 
 function Plan() {
   const navigate = useNavigate();
@@ -35,6 +38,26 @@ function Plan() {
       },
     },
   };
+  console.log(project);
+  //살시간 감지
+  useEffect(() => {
+    const uid = JSON.parse(localStorage.getItem("user") as any).uid;
+    const q = query(dbService.collection("project").where("uid", "==", uid));
+    const addId = onSnapshot(q, (querySnapshot) => {
+      const newArray = querySnapshot.docs.map((doc: any) => {
+        return {
+          id: doc.id,
+          ...doc.data(),
+        };
+      });
+      setProject(newArray);
+    });
+    onAuthStateChanged(authService, (user) => {
+      if (user == null) {
+        addId();
+      }
+    });
+  }, []);
   const closedEdit = () => {
     if (isEdit) {
       setIsEdit(false);
@@ -79,7 +102,7 @@ function Plan() {
   };
   const onPlusClick = () => {
     if (project.length <= 0) {
-      navigate("/createProject");
+      navigate("/plan/createProject");
     } else {
       navigate("/plan/createTodo");
       setIsCreate(true);
@@ -110,7 +133,7 @@ function Plan() {
         </ButtonContainer>
       )}
       {isEdit && <TodoMemo />}
-      {isCreate && <CardManage setIsCreate={setIsCreate} />}
+      {isCreate && <CreateCard setIsCreate={setIsCreate} />}
     </Applayout>
   );
 }

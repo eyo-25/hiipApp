@@ -21,7 +21,7 @@ function MyPage({ userObj }: any) {
   const editMatch = useMatch(`/mypage/editprofile`);
   const onLogOutClick = () => {
     authService.signOut();
-    window.localStorage.removeItem("user");
+    // window.localStorage.removeItem("user");
     navigate(`/`);
     setHomeSplash(true);
   };

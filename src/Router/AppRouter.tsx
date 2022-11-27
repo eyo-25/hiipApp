@@ -4,8 +4,9 @@ import HomeSplash from "../Component/HomeSplash";
 import Auth from "../Pages/Auth/Auth";
 import FeedBack from "../Pages/FeedBack/FeedBack";
 import MyPage from "../Pages/MyPage/MyPage";
+import IntervalSetting from "../Pages/Plan/Project/IntervalSetting";
 import Plan from "../Pages/Plan/Plan";
-import CreateProject from "../Pages/Project/CreateProject";
+import CreateProject from "../Pages/Plan/Project/CreateProject";
 import Home from "../Pages/Start/Home";
 
 interface AppRouterProps {
@@ -44,7 +45,8 @@ export default function AppRouter({ isLoggedIn, userObj }: AppRouterProps) {
           <Route path={"/plan/memo/:todoId"} element={<Plan />} />
           <Route path={"/plan/createTodo"} element={<Plan />} />
         </Route>
-        <Route path={"/createProject"} element={<CreateProject />} />
+        <Route path={"/plan/createProject"} element={<CreateProject />} />
+        <Route path={"/plan/intervalSetting"} element={<IntervalSetting />} />
         <Route path={"/feedback"} element={<FeedBack />}></Route>
         <Route path={"/mypage"} element={<MyPage userObj={userObj} />}>
           <Route

@@ -2,11 +2,14 @@ import { motion } from "framer-motion";
 import { IoAddCircle, IoRemoveCircle } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { Container, Overlay, Wrapper } from "./TodoMemo";
 import { useEffect, useState } from "react";
 import { dbService } from "../../../firebase";
+import { useRecoilState } from "recoil";
+import { endDateState, startDateState } from "../../../Recoil/atoms";
+import MonthModal from "./CalendarBoard";
+import { Overlay, Wrapper } from "../Plan/TodoMemo";
 
-const CardManage = ({
+const CreateCard = ({
   setIsCreate,
 }: {
   setIsCreate: (value: React.SetStateAction<boolean>) => void;
@@ -14,10 +17,10 @@ const CardManage = ({
   const Moment = require("moment");
   const navigate = useNavigate();
   const [count, setCount] = useState(1);
-  const [startDate, setStartDate] = useState<string>(
-    Moment().format("YYYY-MM-DD")
-  );
-  const [endDate, setEndDate] = useState<string>("");
+  const [startDate, setStartDate] = useRecoilState(startDateState);
+  const [startToggle, setStartToggle] = useState(false);
+  const [endDate, setEndDate] = useRecoilState(endDateState);
+  const [endToggle, setEndToggle] = useState(false);
   const [planTitle, setPlanTitle] = useState("");
   const [planSubTitle, setPlanSubTitle] = useState("");
   const backVariants = {
@@ -63,8 +66,7 @@ const CardManage = ({
     if (count <= 1) return;
     setCount((prev) => prev - 1);
   };
-  const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const onSubmit = async () => {
     const ok = window.confirm("플랜을 생성하시겠습니까?");
     if (ok) {
       const newObj = {
@@ -92,6 +94,7 @@ const CardManage = ({
         sec: 10,
         breakMin: 0,
         breakSec: 5,
+        stopDate: "",
       };
     }
   };
@@ -119,9 +122,18 @@ const CardManage = ({
     } = event;
     setEndDate(value);
   };
+  const modalClosed = () => {
+    setStartToggle(false);
+    setEndToggle(false);
+  };
   return (
     <Wrapper>
-      <ModalWrapper variants={slideVariants} initial="normal" animate="animate">
+      <ModalWrapper
+        // onClick={modalClosed}
+        variants={slideVariants}
+        initial="normal"
+        animate="animate"
+      >
         <ModalForm onSubmit={onSubmit}>
           <ItemBox>
             <ItemTitle>TO-DO 제목</ItemTitle>
@@ -155,23 +167,48 @@ const CardManage = ({
           </ItemBox>
           <ItemWrapper>
             <ItemBox>
+              {startToggle && (
+                <StartMonthModal>
+                  <MonthModal />
+                </StartMonthModal>
+              )}
               <ItemTitle>시작 날짜</ItemTitle>
               <DateInput
                 value={startDate}
                 onChange={startDateChange}
+                inputMode="none"
+                onFocus={() => {
+                  setStartToggle(true);
+                  setEndToggle(false);
+                }}
                 required
               />
             </ItemBox>
             <ItemBox>
+              {endToggle && <EndMonthModal />}
               <ItemTitle>종료 날짜</ItemTitle>
-              <DateInput value={endDate} onChange={endDateChange} required />
+              <DateInput
+                value={endDate}
+                onChange={endDateChange}
+                onFocus={() => {
+                  setStartToggle(false);
+                  setEndToggle(true);
+                }}
+                inputMode="none"
+                required
+              />
             </ItemBox>
           </ItemWrapper>
           <BtnBox>
-            <CancelBtn onClick={onCancleClicked}>취소</CancelBtn>
-            <ConfirmBtn>생성</ConfirmBtn>
+            <CancelBtn type="button" onClick={onCancleClicked}>
+              취소
+            </CancelBtn>
+            <ConfirmBtn type="submit" onClick={onSubmit}>
+              생성
+            </ConfirmBtn>
           </BtnBox>
         </ModalForm>
+        {(startToggle || endToggle) && <Backgound onClick={modalClosed} />}
       </ModalWrapper>
       <Overlay
         onClick={onOverlayClicked}
@@ -183,7 +220,32 @@ const CardManage = ({
   );
 };
 
-export default CardManage;
+export default CreateCard;
+const Backgound = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 100;
+`;
+const StartMonthModal = styled.div`
+  position: absolute;
+  top: -210px;
+  width: 250px;
+  height: 200px;
+  background-color: red;
+  z-index: 200;
+`;
+const EndMonthModal = styled.div`
+  position: absolute;
+  top: -210px;
+  right: 0;
+  width: 250px;
+  height: 200px;
+  background-color: red;
+  z-index: 200;
+`;
 const ModalWrapper = styled(motion.div)`
   position: fixed;
   bottom: 0;
@@ -191,7 +253,7 @@ const ModalWrapper = styled(motion.div)`
   height: 45vh;
   width: 100%;
   background-color: white;
-  z-index: 999;
+  z-index: 99;
   border-top-right-radius: 2vh;
   border-top-left-radius: 2vh;
   max-width: 414px;
@@ -207,6 +269,7 @@ const ModalWrapper = styled(motion.div)`
   }
 `;
 const ModalForm = styled(motion.form)`
+  position: relative;
   display: flex;
   justify-content: center;
   flex-direction: column;
@@ -214,7 +277,6 @@ const ModalForm = styled(motion.form)`
   height: 100%;
   margin: 0 auto;
 `;
-
 const ItemWrapper = styled.div`
   display: flex;
   justify-content: space-between;
@@ -231,6 +293,7 @@ const HorizonTitle = styled.div`
   font-weight: 600;
 `;
 const ItemBox = styled.div`
+  position: relative;
   display: flex;
   flex-direction: column;
   margin-bottom: 2vh;
@@ -255,6 +318,7 @@ const TitleInput = styled.input`
 `;
 const DateInput = styled.input`
   width: 165px;
+  z-index: 200;
   @media screen and (max-width: 414px) {
     width: 155px;
   }
