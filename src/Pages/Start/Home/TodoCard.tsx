@@ -1,4 +1,5 @@
 import { IoPlaySharp } from "react-icons/io5";
+import { useEffect, useState } from "react";
 import styled from "styled-components";
 import {
   Blue,
@@ -7,21 +8,30 @@ import {
   Normal_Gray3,
 } from "../../../Styles/Colors";
 
-function TodoCard() {
-  const intervalArray = [3, 2, 1];
+function TodoCard({ todoObj }: any) {
+  const [intervalArray, setIntervalArray] = useState<number[]>([]);
+  useEffect(() => {
+    setIntervalArray((prev) => {
+      const copy = [...prev];
+      for (let index = 0; index < todoObj.defaultSet; index++) {
+        copy[index] = index;
+      }
+      return [...copy];
+    });
+  }, []);
   return (
     <DragBox>
       <TextBox>
         <TitleBox>
-          <h4>대창 볶음밥</h4>
+          <h4>{todoObj.planTitle}</h4>
           <StatusBox>
             <h5>진행중</h5>
           </StatusBox>
         </TitleBox>
-        <p>아보카도 샌드위치</p>
+        <p>{todoObj.planSubTitle}</p>
       </TextBox>
       <IntervalBox>
-        <h4>0</h4>
+        <h4>{todoObj.defaultSet}</h4>
         <p>SET</p>
         <StartBtn />
       </IntervalBox>
@@ -42,14 +52,14 @@ const DragBox = styled.div`
   justify-content: space-between;
   align-items: center;
   padding: 20px 35px;
-  height: 90px;
+  height: 100px;
   width: 100%;
   border-radius: 10px;
   margin-bottom: 15px;
   background-color: ${Normal_Gray2};
   cursor: pointer;
   @media screen and (max-height: 800px) {
-    height: 80px;
+    height: 90px;
   }
 `;
 const TextBox = styled.div`
@@ -104,7 +114,7 @@ const IntervalBarBox = styled.ul`
   bottom: 0;
   padding-right: 5px;
   width: 80%;
-  height: 4px;
+  height: 5px;
 `;
 const IntervalBar = styled.li`
   display: flex;

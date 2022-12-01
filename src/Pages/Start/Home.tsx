@@ -45,6 +45,35 @@ function Home() {
     });
   }, []);
 
+  //투두 변경 감지
+  useEffect(() => {
+    if (project.length > 0) {
+      const projectIndex = project.findIndex(
+        (item: any) => item.select === "true"
+      );
+      const q = query(
+        dbService
+          .collection("plan")
+          .where("projectId", "==", project[projectIndex].id)
+          .orderBy("index", "desc")
+      );
+      const addId = onSnapshot(q, (querySnapshot) => {
+        const newArray = querySnapshot.docs.map((doc: any) => {
+          return {
+            id: doc.id,
+            ...doc.data(),
+          };
+        });
+        setToDos(newArray);
+      });
+      onAuthStateChanged(authService, (user) => {
+        if (user == null) {
+          addId();
+        }
+      });
+    }
+  }, [project]);
+
   const bottomVariants = {
     normal: {
       height: "0vh",

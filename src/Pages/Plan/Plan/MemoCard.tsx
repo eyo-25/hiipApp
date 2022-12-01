@@ -4,7 +4,6 @@ import styled from "styled-components";
 import { ReactComponent as SaveIcon } from "../../../Assets/Icons/save.svg";
 import {
   IconBox,
-  iconVariants,
   IntervalBar,
   IntervalBarBox,
   IntervalBox,
@@ -19,6 +18,7 @@ import { Dark_Gray2 } from "../../../Styles/Colors";
 import { useRecoilState } from "recoil";
 import { selectState, toDoEditState, toDoState } from "../../../Recoil/atoms";
 import { useNavigate, useParams } from "react-router-dom";
+import { dbService } from "../../../firebase";
 
 function MemoCard() {
   const navigate = useNavigate();
@@ -27,9 +27,20 @@ function MemoCard() {
   const [toDos, setToDos] = useRecoilState(toDoState);
   const [memoText, setMemoText] = useState("");
   const autoFocusRef = useRef<any>(null);
-  const intervalArray = [3, 2, 1];
   const params = useParams();
   const todoId = params.todoId;
+  const index = toDos.findIndex((item) => item.id === todoId);
+  const [intervalArray, setIntervalArray] = useState<number[]>([]);
+  useEffect(() => {
+    const set = toDos[index].defaultSet;
+    setIntervalArray((prev) => {
+      const copy = [...prev];
+      for (let index = 0; index < set; index++) {
+        copy[index] = index;
+      }
+      return [...copy];
+    });
+  }, []);
 
   const cardVariants = {
     normal: {
@@ -52,24 +63,14 @@ function MemoCard() {
       }
     }, 1000);
     //메모 디폴트 부여
-    setMemoText(() => {
-      const index = toDos.findIndex((item) => item.todoId === todoId);
-      const text = toDos[index].memo;
-      return text;
-    });
+    setMemoText(toDos[index].memo);
   }, []);
-  const onSaveClick = () => {
-    const index = toDos.findIndex((item) => item.todoId === todoId);
-    const text = toDos[index].memo;
-    if (text !== memoText) {
-      console.log("저장!");
-      setToDos((todo) => {
-        const copy = [...todo];
-        const index = toDos.findIndex((item) => item.todoId === todoId);
-        copy[index] = { ...copy[index], memo: memoText };
-        return [...copy];
-      });
-    }
+  const onSaveClick = async () => {
+    await dbService
+      .collection("plan")
+      .doc(`${toDos[index].id}`)
+      .update({ memo: memoText });
+
     setIsEdit(false);
     setIsSelect(false);
     navigate("/plan");
@@ -90,15 +91,15 @@ function MemoCard() {
         <TodoTopBox>
           <TextBox>
             <TitleBox>
-              <h4>대창 볶음밥</h4>
+              <h4>{toDos[index].planTitle}</h4>
               <StatusBox>
                 <h5>진행중</h5>
               </StatusBox>
             </TitleBox>
-            <p>아보카도 샌드위치</p>
+            <p>{toDos[index].planSubTitle}</p>
           </TextBox>
           <IntervalBox>
-            <h4>0</h4>
+            <h4>{toDos[index].defaultSet}</h4>
             <p>SET</p>
             <StartBtn />
           </IntervalBox>
@@ -113,12 +114,7 @@ function MemoCard() {
               onChange={onTextChange}
             />
             <IconBox>
-              <Item
-                onClick={onSaveClick}
-                variants={iconVariants}
-                initial="normal"
-                animate="animate"
-              >
+              <Item onClick={onSaveClick}>
                 <SaveIcon />
                 <p>저장</p>
               </Item>

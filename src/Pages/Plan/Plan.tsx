@@ -8,17 +8,23 @@ import CalendarBoard from "./Calendar/CalendarBoard";
 import { Light_Gray } from "../../Styles/Colors";
 import TodoBord from "./Plan/TodoBoard";
 import { useRecoilState } from "recoil";
-import { projectState, selectState, toDoEditState } from "../../Recoil/atoms";
+import {
+  projectState,
+  selectState,
+  toDoEditState,
+  toDoState,
+} from "../../Recoil/atoms";
 import TodoMemo from "./Plan/TodoMemo";
 import { useNavigate } from "react-router-dom";
 import { onSnapshot, query } from "firebase/firestore";
 import { authService, dbService } from "../../firebase";
 import { onAuthStateChanged } from "firebase/auth";
-import CreateCard from "./CreateTodo/CreateCard";
+import CreateBoard from "./CreateTodo/CreateBoard";
 
 function Plan() {
   const navigate = useNavigate();
   const [project, setProject] = useRecoilState(projectState);
+  const [toDos, setToDos] = useRecoilState(toDoState);
   const [isWeek, setIsWeek] = useState(false);
   const [isEdit, setIsEdit] = useRecoilState(toDoEditState);
   const [isSelect, setIsSelect] = useRecoilState(selectState);
@@ -38,8 +44,7 @@ function Plan() {
       },
     },
   };
-  console.log(project);
-  //살시간 감지
+  //프로젝트 변경 감지
   useEffect(() => {
     const uid = JSON.parse(localStorage.getItem("user") as any).uid;
     const q = query(dbService.collection("project").where("uid", "==", uid));
@@ -58,6 +63,33 @@ function Plan() {
       }
     });
   }, []);
+  //투두 변경 감지
+  useEffect(() => {
+    const projectIndex = project.findIndex(
+      (item: any) => item.select === "true"
+    );
+    const q = query(
+      dbService
+        .collection("plan")
+        .where("projectId", "==", project[projectIndex].id)
+        .orderBy("index", "desc")
+    );
+    const addId = onSnapshot(q, (querySnapshot) => {
+      const newArray = querySnapshot.docs.map((doc: any) => {
+        return {
+          id: doc.id,
+          ...doc.data(),
+        };
+      });
+      setToDos(newArray);
+    });
+    onAuthStateChanged(authService, (user) => {
+      if (user == null) {
+        addId();
+      }
+    });
+  }, []);
+
   const closedEdit = () => {
     if (isEdit) {
       setIsEdit(false);
@@ -133,7 +165,7 @@ function Plan() {
         </ButtonContainer>
       )}
       {isEdit && <TodoMemo />}
-      {isCreate && <CreateCard setIsCreate={setIsCreate} />}
+      {isCreate && <CreateBoard type={"CREATE"} setIsCreate={setIsCreate} />}
     </Applayout>
   );
 }
@@ -167,7 +199,6 @@ const TodoContainer = styled(motion.div)`
   width: 100%;
   height: 100%;
   padding: 0 2.5vh;
-  padding-top: 2.8vh;
   background-color: ${Light_Gray};
   overflow: hidden;
 `;

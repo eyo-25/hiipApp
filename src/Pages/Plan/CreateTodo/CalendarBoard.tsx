@@ -2,14 +2,44 @@ import styled from "styled-components";
 import { IoChevronForward, IoChevronBack } from "react-icons/io5";
 import { motion } from "framer-motion";
 import { useRecoilState } from "recoil";
-import { clickDateState } from "../../../Recoil/atoms";
+import {
+  createClickDateState,
+  createEndDateState,
+  createStartDateState,
+} from "../../../Recoil/atoms";
 import { useEffect } from "react";
-import MonthDatePicker from "../Calendar/MonthDatePicker";
+import MonthDatePicker from "./MonthDatePicker";
+import { Dark_Gray2 } from "../../../Styles/Colors";
 
-function CalendarBoard() {
+const calendarVariants = {
+  normal: {
+    opacity: 0,
+  },
+  animate: {
+    opacity: 1,
+    transition: {
+      duration: 1,
+      type: "linear",
+    },
+  },
+};
+
+interface ICalendarBoard {
+  setStartToggle: React.Dispatch<React.SetStateAction<boolean>>;
+  setEndToggle: React.Dispatch<React.SetStateAction<boolean>>;
+  isType: string;
+}
+
+function CalendarBoard({
+  setStartToggle,
+  setEndToggle,
+  isType,
+}: ICalendarBoard) {
   const Moment = require("moment");
   const calendarDays = ["일", "월", "화", "수", "목", "금", "토"];
-  const [clickDate, setClickDate] = useRecoilState(clickDateState);
+  const [clickDate, setClickDate] = useRecoilState(createClickDateState);
+  const [startDate, setStartDate] = useRecoilState(createStartDateState);
+  const [endDate, setEndDate] = useRecoilState(createEndDateState);
 
   const onPrevClick = () => {
     const prevMonth = Moment(clickDate)
@@ -30,12 +60,29 @@ function CalendarBoard() {
   };
 
   useEffect(() => {
-    onTodayClick();
+    if (isType === "START") {
+      if (startDate !== "") {
+        setClickDate(startDate);
+      } else {
+        onTodayClick();
+      }
+    } else {
+      if (endDate !== "") {
+        setClickDate(endDate);
+      } else {
+        onTodayClick();
+      }
+    }
   }, []);
 
   return (
-    <Wrapper>
+    <Wrapper variants={calendarVariants} initial="normal" animate="animate">
       <Container>
+        <TextBox>
+          {isType === "START"
+            ? "시작 날짜를 설정해 주세요"
+            : "종료 날짜를 설정해 주세요"}
+        </TextBox>
         <MonthBox>
           <PrevBtn onClick={onPrevClick} />
           <MonthText onClick={onTodayClick}>
@@ -51,7 +98,11 @@ function CalendarBoard() {
             <DayBox key={days}>{days}</DayBox>
           ))}
         </DayContainer>
-        <MonthDatePicker />
+        <MonthDatePicker
+          setStartToggle={setStartToggle}
+          setEndToggle={setEndToggle}
+          isType={isType}
+        />
       </Container>
     </Wrapper>
   );
@@ -59,7 +110,7 @@ function CalendarBoard() {
 
 export default CalendarBoard;
 
-const Wrapper = styled.div`
+const Wrapper = styled(motion.div)`
   width: 100%;
   cursor: pointer;
 `;
@@ -67,13 +118,17 @@ const Container = styled(motion.div)`
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-top: 2.2vh;
-  max-width: 400px;
   margin: 0 auto;
   position: relative;
-  @media screen and (max-height: 800px) {
-    padding-top: 1.6vh;
-  }
+  padding: 0 10px;
+`;
+const TextBox = styled.div`
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -1px;
+  margin-bottom: 35px;
+  margin-top: 10px;
+  color: ${Dark_Gray2};
 `;
 const MonthBox = styled.div`
   display: flex;
@@ -81,7 +136,7 @@ const MonthBox = styled.div`
   align-items: center;
   width: 90%;
   font-weight: 600;
-  margin-bottom: 1.8vh;
+  margin-bottom: 15px;
 `;
 const MonthText = styled.div`
   display: flex;
@@ -89,9 +144,6 @@ const MonthText = styled.div`
   align-items: center;
   padding-bottom: 2px;
   border-radius: 50%;
-  @media screen and (max-height: 800px) {
-    font-size: 14px;
-  }
 `;
 const DayContainer = styled.div`
   display: grid;
@@ -104,23 +156,15 @@ const DayBox = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-bottom: 1vh;
+  margin-bottom: 10px;
 `;
 const PrevBtn = styled(IoChevronBack)`
   width: 20px;
   height: 20px;
   cursor: pointer;
-  @media screen and (max-height: 800px) {
-    width: 16px;
-    height: 16px;
-  }
 `;
 const NextBtn = styled(IoChevronForward)`
   width: 20px;
   height: 20px;
   cursor: pointer;
-  @media screen and (max-height: 800px) {
-    width: 16px;
-    height: 16px;
-  }
 `;

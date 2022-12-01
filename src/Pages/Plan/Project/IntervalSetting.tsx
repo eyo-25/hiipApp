@@ -17,6 +17,7 @@ import { dbService } from "../../../firebase";
 
 function IntervalSetting() {
   const navigate = useNavigate();
+  const [project, setProject] = useRecoilState(projectState);
   const [focusMin, setFocusMin] = useState(25);
   const [breakMin, setBreakMin] = useState(5);
   const [defaultSet, setDefaultSet] = useState(4);
@@ -92,6 +93,8 @@ function IntervalSetting() {
         breakMin: breakMin,
         startDate: startDate,
         uid: uid,
+        select: project.length <= 0 ? "true" : "false",
+        indexcount: 0,
       };
       await dbService
         .collection("project")

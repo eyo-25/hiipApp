@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import TodoCard from "./TodoCard";
 import { toDoEditState, toDoState } from "../../../Recoil/atoms";
@@ -40,12 +40,7 @@ function TodoBord({
             animate="animate"
             key={index}
           >
-            <TodoCard
-              setIsWeek={setIsWeek}
-              index={index + ""}
-              todoId={toDo.todoId}
-              memo={toDo.memo}
-            />
+            <TodoCard setIsWeek={setIsWeek} todoObj={toDo} index={index} />
           </CardWrapper>
         ))}
       </Container>
@@ -81,9 +76,10 @@ const Container = styled.div`
   align-items: center;
   width: 100%;
   margin: 0 auto;
-  margin-bottom: 162px;
+  margin-bottom: 500px;
 `;
 const CardWrapper = styled(motion.div)`
+  position: relative;
   display: flex;
   width: 95%;
   height: 100%;

@@ -5,13 +5,14 @@ const Moment = require("moment");
 export interface ITodo {
   endDate: string;
   index: number;
-  intervalSet: number;
+  defaultSet: number;
   memo: string;
   planSubTitle: string;
   planTitle: string;
   startDate: string;
   status: string;
   todoId: any;
+  id: string;
 }
 
 export const projectState = atom<any>({
@@ -38,37 +39,41 @@ export const selectState = atom({
   key: "selectState",
   default: false,
 });
+//project
 export const inputFocusState = atom({
   key: "inputFocusState",
   default: false,
 });
-//
 export const startDateState = atom({
   key: "startDateState",
   default: "",
 });
-// export const startChange = selector<any>({
-//   key: "startChange",
-//   get: ({ get }) => {
-//     const oldStartDate = get(startDateState);
-//     if (oldStartDate !== "") {
-//       return new Date(oldStartDate.split("-") + "");
-//     }
-//     return null;
-//   },
-//   set: ({ set }, newValue) => {
-//     let newStartDate = newValue;
-//     if (newStartDate !== null) {
-//       newStartDate = Moment(newValue).format("YYYY-MM-DD");
-//     }
-//     set(startDateState, newStartDate);
-//   },
-// });
 export const endDateState = atom({
   key: "endDateState",
   default: "",
 });
 export const projectTitleState = atom({
   key: "projectTitleState",
+  default: "",
+});
+//create
+export const createStartDateState = atom({
+  key: "creatStartDateState",
+  default: "",
+});
+export const createEndDateState = atom({
+  key: "createEndDateStat",
+  default: "",
+});
+export const createClickDateState = atom({
+  key: "createClickDateState",
+  default: "",
+});
+export const createTitleState = atom({
+  key: "createTitleState",
+  default: "",
+});
+export const createSubTitleState = atom({
+  key: "createSubTitleState",
   default: "",
 });

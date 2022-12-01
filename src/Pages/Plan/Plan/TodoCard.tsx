@@ -1,12 +1,15 @@
 import { motion } from "framer-motion";
-import { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { IoPlaySharp } from "react-icons/io5";
 import { useRecoilState } from "recoil";
 import styled from "styled-components";
-import { selectState, toDoEditState } from "../../../Recoil/atoms";
+import { selectState, toDoEditState, toDoState } from "../../../Recoil/atoms";
 import { Blue, Dark_Gray, Dark_Gray2 } from "../../../Styles/Colors";
 import { scrollIntoView } from "seamless-scroll-polyfill";
 import { useNavigate } from "react-router-dom";
+import { ReactComponent as EditBtn } from "../../../Assets/Icons/editbtn.svg";
+import { ReactComponent as DeletBtn } from "../../../Assets/Icons/deletbtn.svg";
+import { dbService } from "../../../firebase";
 
 export const iconVariants = {
   normal: {
@@ -24,43 +27,21 @@ export const iconVariants = {
   },
 };
 
-function TodoCard({
-  setIsWeek,
-  index,
-  todoId,
-  memo,
-}: {
+interface ITodoCard {
+  todoObj: any;
   setIsWeek: React.Dispatch<React.SetStateAction<boolean>>;
-  index: string;
-  todoId: string;
-  memo: string;
-}) {
+  index: number;
+}
+
+function TodoCard({ setIsWeek, todoObj, index }: ITodoCard) {
   const navigate = useNavigate();
-  const intervalArray = [3, 2, 1];
+  const cardRef = useRef<any>(null);
+  const [toDos, setToDos] = useRecoilState(toDoState);
   const [isClicked, setIsClicked] = useState(false);
   const [isSelect, setIsSelect] = useRecoilState(selectState);
   const [isEdit, setIsEdit] = useRecoilState(toDoEditState);
-
-  useEffect(() => {
-    // 셀렉된 카드 전부 닫기
-    if (!isSelect) {
-      setIsClicked(false);
-    }
-  }, [isSelect]);
-
-  const cardVariants = {
-    normal: {
-      height: "162px",
-    },
-    animate: {
-      height: isClicked ? "262px" : "162px",
-      transition: {
-        duration: 0.5,
-        type: "linear",
-      },
-    },
-  };
-
+  const [counter, setCounter] = useState(0);
+  const [btnPopup, setBtnPopup] = useState(false);
   const textVariants = {
     normal: {
       height: "42px",
@@ -73,6 +54,78 @@ function TodoCard({
       },
     },
   };
+  useEffect(() => {
+    // 셀렉된 카드 전부 닫기
+    if (!isSelect) {
+      setIsClicked(false);
+    }
+  }, [isSelect]);
+  useEffect(() => {
+    if (isEdit && isClicked) {
+      setTimeout(() => {
+        scrollIntoView(cardRef.current as any, {
+          behavior: "smooth",
+        });
+      }, 500);
+    }
+  }, [isEdit]);
+  const cardVariants = {
+    normal: {
+      height: "162px",
+    },
+    animate: {
+      height: isClicked ? "262px" : "162px",
+      transition: {
+        duration: 0.5,
+        type: "linear",
+      },
+    },
+    click: {
+      scale: isSelect || btnPopup ? 1 : 0.95,
+      transition: {
+        delay: 0.3,
+      },
+    },
+  };
+  const vibeVariants = {
+    normal: {},
+    animate: {
+      transition: {
+        rotateZ: [50, -50],
+        React: "infinity",
+        type: "linear",
+      },
+    },
+  };
+  // 버튼 팝업
+  const intervalRef = React.useRef(null) as any;
+  const startCounter = () => {
+    intervalRef.current = setInterval(() => {
+      setCounter((prevCounter) => prevCounter + 1);
+    }, 100);
+  };
+  useEffect(() => {
+    if (6 < counter) {
+      setBtnPopup(true);
+      setIsSelect(false);
+      setIsClicked(false);
+    }
+  }, [counter]);
+  const stopCounter = () => {
+    if (6 >= counter) {
+      if (isSelect && isClicked) {
+        setIsSelect(false);
+        setIsClicked(false);
+      }
+      clickToggle();
+    }
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+      setCounter(0);
+    }
+  };
+
   const clickToggle = () => {
     if (!isSelect) {
       setIsSelect(true);
@@ -83,67 +136,85 @@ function TodoCard({
       setTimeout(() => {
         setIsSelect(true);
         setIsClicked(true);
-      }, 500);
+      }, 400);
     }
   };
-
-  const onCardClick = async () => {
-    if (isSelect && isClicked) {
-      setIsSelect(false);
-      setIsClicked(false);
-    }
-    clickToggle();
+  const onCardClick = () => {
+    // if (isSelect && isClicked) {
+    //   setIsSelect(false);
+    //   setIsClicked(false);
+    // }
+    // clickToggle();
   };
   const onMemoClick = () => {
     if (isSelect && isClicked) {
       setIsWeek(true);
       setIsEdit(true);
-      navigate(`/plan/memo/${todoId}`);
+      navigate(`/plan/memo/${todoObj.id}`);
     }
     clickToggle();
   };
-  useEffect(() => {
-    if (isEdit && isClicked) {
-      setTimeout(() => {
-        scrollIntoView(cardRef.current as any, {
-          behavior: "smooth",
-        });
-      }, 500);
+  let intervalArray = [] as any;
+  for (let index = 0; index < todoObj.defaultSet; index++) {
+    intervalArray[index] = index;
+  }
+  const onDelete = async () => {
+    const ok = window.confirm("플랜을 삭제 하시겠습니까?");
+    if (ok) {
+      await dbService.doc(`plan/${todoObj.id}`).delete();
+      await dbService
+        .doc(`plan/${todoObj.id}`)
+        .collection("timer")
+        .doc("time")
+        .delete();
+      // .then(() => {
+      //   setToDos((toDos) => {
+      //     const copy = [...toDos];
+      //     const index = toDos.findIndex((item) => item.id === todoObj.id);
+      //     copy.splice(index, 1);
+      //     return [...copy];
+      //   });
+      // });
     }
-  }, [isEdit]);
-  const cardRef = useRef<any>(null);
+  };
   return (
-    <>
+    <Wrapper ref={cardRef}>
+      {btnPopup && (
+        <BtnBox>
+          <DeletBtn onClick={onDelete} />
+          <EditBtn />
+        </BtnBox>
+      )}
       <TodoCarWrapper
-        ref={cardRef}
         variants={cardVariants}
         initial="normal"
         animate="animate"
+        whileTap="click"
       >
         <TodoTopBox>
           <TextBox>
             <TitleBox>
-              <h4>대창 볶음밥</h4>
+              <h4>{todoObj.planTitle}</h4>
               <StatusBox>
                 <h5>진행중</h5>
               </StatusBox>
             </TitleBox>
-            <p>아보카도 샌드위치</p>
+            <p>{todoObj.planSubTitle}</p>
           </TextBox>
           <IntervalBox>
-            <h4>0</h4>
+            <h4>{todoObj.defaultSet}</h4>
             <p>SET</p>
             <StartBtn />
           </IntervalBox>
         </TodoTopBox>
         <MemoContainer onClick={onMemoClick} isselect={isSelect}>
-          {memo !== "" ? (
+          {todoObj.memo !== "" ? (
             <MemoText
               variants={textVariants}
               initial="normal"
               animate="animate"
             >
-              {memo}
+              {todoObj.memo}
             </MemoText>
           ) : (
             <MemoText>
@@ -155,18 +226,31 @@ function TodoCard({
           )}
         </MemoContainer>
         <IntervalBarBox>
-          {intervalArray.map((index) => (
+          {intervalArray.map((index: number) => (
             <IntervalBar key={index} />
           ))}
         </IntervalBarBox>
-        <Background onClick={onCardClick} />
+        <Background
+          onClick={onCardClick}
+          onMouseUp={stopCounter}
+          onMouseDown={startCounter}
+        />
       </TodoCarWrapper>
-    </>
+    </Wrapper>
   );
 }
 
-export default TodoCard;
+export default React.memo(TodoCard);
 
+const Wrapper = styled.div`
+  height: 100%;
+  width: 100%;
+  margin-bottom: 5px;
+  padding-top: 20px;
+  @media screen and (max-height: 800px) {
+    padding-top: 15px;
+  }
+`;
 export const Background = styled.div`
   position: absolute;
   left: 0;
@@ -181,13 +265,9 @@ export const TodoCarWrapper = styled(motion.div)`
   padding: 25px 35px;
   width: 100%;
   border-radius: 10px;
-  margin-bottom: 25px;
   background-color: white;
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.07);
   cursor: pointer;
-  @media screen and (max-height: 800px) {
-    margin-bottom: 20px;
-  }
 `;
 export const TodoTopBox = styled.div`
   position: relative;
@@ -196,7 +276,7 @@ export const TodoTopBox = styled.div`
   align-items: flex-start;
   width: 100%;
   border-radius: 10px;
-  margin-bottom: 30px;
+  margin-bottom: 25px;
   cursor: pointer;
 `;
 export const TextBox = styled.div`
@@ -273,7 +353,7 @@ export const MemoContainer = styled.div<{ isselect: boolean }>`
 export const MemoText = styled(motion.div)`
   font-weight: 500;
   letter-spacing: -1px;
-  line-height: 1.4;
+  line-height: 1.5;
   font-size: 14px;
   overflow: hidden;
   p {
@@ -311,5 +391,18 @@ export const Item = styled(motion.div)`
     font-weight: 400;
     margin-top: 5px;
     color: #cccccc;
+  }
+`;
+const BtnBox = styled.div`
+  display: flex;
+  top: 6px;
+  right: 20px;
+  position: absolute;
+  z-index: 5;
+  svg {
+    margin-left: 5px;
+    width: 35px;
+    height: 35px;
+    cursor: pointer;
   }
 `;
