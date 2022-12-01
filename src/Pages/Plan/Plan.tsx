@@ -9,26 +9,29 @@ import { Light_Gray } from "../../Styles/Colors";
 import TodoBord from "./Plan/TodoBoard";
 import { useRecoilState } from "recoil";
 import {
+  isCreateState,
   projectState,
   selectState,
-  toDoEditState,
+  cardEditState,
   toDoState,
+  isTodoEditState,
 } from "../../Recoil/atoms";
 import TodoMemo from "./Plan/TodoMemo";
 import { useNavigate } from "react-router-dom";
 import { onSnapshot, query } from "firebase/firestore";
 import { authService, dbService } from "../../firebase";
 import { onAuthStateChanged } from "firebase/auth";
-import CreateBoard from "./CreateTodo/CreateBoard";
+import CreateTodo from "./CreateTodo/CreateTodo";
 
 function Plan() {
   const navigate = useNavigate();
   const [project, setProject] = useRecoilState(projectState);
   const [toDos, setToDos] = useRecoilState(toDoState);
   const [isWeek, setIsWeek] = useState(false);
-  const [isEdit, setIsEdit] = useRecoilState(toDoEditState);
+  const [isEdit, setIsEdit] = useRecoilState(cardEditState);
   const [isSelect, setIsSelect] = useRecoilState(selectState);
-  const [isCreate, setIsCreate] = useState(false);
+  const [isTodoEdit, setIsTodoEdit] = useRecoilState(isTodoEditState);
+  const [isCreate, setIsCreate] = useRecoilState(isCreateState);
   const [mouseDownClientY, setMouseDownClientY] = useState(0);
   const [mouseUpClientY, setMouseUpClientY] = useState(0);
   const [tochedY, setTochedY] = useState(0);
@@ -95,8 +98,10 @@ function Plan() {
       setIsEdit(false);
     }
   };
-  // 언마운트 초기화
+  // 초기화
   useEffect(() => {
+    setIsTodoEdit(false);
+    setIsCreate(false);
     return setIsEdit(false), setIsSelect(false);
   }, []);
   // 브라우저 스와이프
@@ -165,7 +170,8 @@ function Plan() {
         </ButtonContainer>
       )}
       {isEdit && <TodoMemo />}
-      {isCreate && <CreateBoard type={"CREATE"} setIsCreate={setIsCreate} />}
+      {isCreate && <CreateTodo mode={"CREATE"} />}
+      {isTodoEdit && <CreateTodo mode={"EDIT"} />}
     </Applayout>
   );
 }

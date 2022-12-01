@@ -31,8 +31,8 @@ export const clickDateState = atom({
   key: "clickDateState",
   default: Moment().format("YYYY-MM-DD"),
 });
-export const toDoEditState = atom({
-  key: "toDoEditState",
+export const cardEditState = atom({
+  key: "cardEditState",
   default: false,
 });
 export const selectState = atom({
@@ -57,6 +57,14 @@ export const projectTitleState = atom({
   default: "",
 });
 //create
+export const isCreateState = atom({
+  key: "isCreateState",
+  default: false,
+});
+export const isTodoEditState = atom({
+  key: "isTodoEditState",
+  default: false,
+});
 export const createStartDateState = atom({
   key: "creatStartDateState",
   default: "",

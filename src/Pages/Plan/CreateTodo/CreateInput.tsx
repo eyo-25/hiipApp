@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { IoAddCircle, IoRemoveCircle } from "react-icons/io5";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useRecoilState } from "recoil";
 import styled from "styled-components";
 import { dbService } from "../../../firebase";
@@ -10,36 +10,48 @@ import {
   createStartDateState,
   createSubTitleState,
   createTitleState,
+  isCreateState,
+  isTodoEditState,
   projectState,
 } from "../../../Recoil/atoms";
 
 interface ICreateInput {
-  setIsCreate: (value: React.SetStateAction<boolean>) => void;
   setStartToggle: (value: React.SetStateAction<boolean>) => void;
   setEndToggle: (value: React.SetStateAction<boolean>) => void;
   count: number;
   setCount: React.Dispatch<React.SetStateAction<number>>;
+  mode: string;
+  defaultSet: number;
 }
 
 function CreateInput({
-  setIsCreate,
   setStartToggle,
   setEndToggle,
   count,
   setCount,
+  mode,
+  defaultSet,
 }: ICreateInput) {
   const navigate = useNavigate();
+  const [isCreate, setIsCreate] = useRecoilState(isCreateState);
   const [project, setProject] = useRecoilState(projectState);
   const [startDate, setStartDate] = useRecoilState(createStartDateState);
   const [endDate, setEndDate] = useRecoilState(createEndDateState);
   const [planTitle, setPlanTitle] = useRecoilState(createTitleState);
   const [planSubTitle, setPlanSubTitle] = useRecoilState(createSubTitleState);
+  const [isTodoEdit, setIsTodoEdit] = useRecoilState(isTodoEditState);
   const uid = JSON.parse(localStorage.getItem("user") as any).uid;
   const projectIndex = project.findIndex((item: any) => item.select === "true");
+  const params = useParams();
+  const todoId = params.todoId;
 
   const onCancleClicked = () => {
+    if (mode === "CREATE") {
+      setIsCreate(false);
+    } else {
+      setIsTodoEdit(false);
+    }
     navigate("/plan");
-    setIsCreate(false);
   };
   const onCountUp = () => {
     if (count >= 10) return;
@@ -50,56 +62,81 @@ function CreateInput({
     setCount((prev) => prev - 1);
   };
   const onSubmit = async () => {
-    const ok = window.confirm("플랜을 생성하시겠습니까?");
-    if (ok) {
-      if (planTitle === "" || planSubTitle === "") {
-        alert("To-Do제목을 적어주세요");
-        return;
+    if (mode === "CREATE") {
+      const ok = window.confirm("플랜을 생성하시겠습니까?");
+      if (ok) {
+        if (planTitle === "" || planSubTitle === "") {
+          alert("To-Do제목을 적어주세요");
+          return;
+        }
+        if (startDate === "" || endDate === "") {
+          alert("To-Do날짜를 정해 주세요");
+          return;
+        }
+        const planObj = {
+          index: project[projectIndex].indexcount + 1,
+          defaultSet: count,
+          memo: "",
+          planSubTitle: planSubTitle,
+          planTitle: planTitle,
+          startDate: startDate,
+          endDate: endDate,
+          status: "ready",
+          uId: uid,
+          projectId: project[projectIndex].id,
+        };
+        const defaultTimeObj = {
+          setFocusSet: count,
+          setBreakSet: count - 1 <= 0 ? 0 : count - 1,
+          FocusSet: count,
+          breakSet: count - 1 <= 0 ? 0 : count - 1,
+          stopDate: "",
+          //테스트 끝나면 분만 적용
+          setFocusMin: 0,
+          setFocusSec: 10,
+          setBreakMin: 0,
+          setBreakSec: 5,
+          min: 0,
+          sec: 10,
+          breakMin: 0,
+          breakSec: 5,
+        };
+        (await dbService.collection("plan").add(planObj))
+          .collection("timer")
+          .doc("time")
+          .set(defaultTimeObj);
+        await dbService
+          .collection("project")
+          .doc(project[projectIndex].id)
+          .update({ indexcount: project[projectIndex].indexcount + 1 });
       }
-      if (startDate === "" || endDate === "") {
-        alert("To-Do날짜를 정해 주세요");
-        return;
-      }
-      const planObj = {
-        index: project[projectIndex].indexcount + 1,
+      setIsCreate(false);
+    } else if (mode === "EDIT") {
+      const editObj = {
         defaultSet: count,
-        memo: "",
         planSubTitle: planSubTitle,
         planTitle: planTitle,
         startDate: startDate,
         endDate: endDate,
-        status: "ready",
-        uId: uid,
-        projectId: project[projectIndex].id,
       };
-      const defaultTimeObj = {
-        setFocusSet: count,
-        setBreakSet: count - 1 <= 0 ? 0 : count - 1,
-        FocusSet: count,
-        breakSet: count - 1 <= 0 ? 0 : count - 1,
-        stopDate: "",
-        //테스트 끝나면 분만 적용
-        setFocusMin: 0,
-        setFocusSec: 10,
-        setBreakMin: 0,
-        setBreakSec: 5,
-        min: 0,
-        sec: 10,
-        breakMin: 0,
-        breakSec: 5,
-      };
-      (await dbService.collection("plan").add(planObj))
-        .collection("timer")
-        .doc("time")
-        .set(defaultTimeObj);
-      await dbService
-        .collection("project")
-        .doc(project[projectIndex].id)
-        .update({ indexcount: project[projectIndex].indexcount + 1 });
-
-      navigate("/plan");
-      setIsCreate(false);
+      if (defaultSet !== count) {
+        const editTimeObj = {
+          setFocusSet: count,
+          setBreakSet: count - 1 <= 0 ? 0 : count - 1,
+          FocusSet: count,
+          breakSet: count - 1 <= 0 ? 0 : count - 1,
+        };
+        await dbService
+          .collection("plan")
+          .doc(todoId)
+          .collection("timer")
+          .doc("time")
+          .update(editTimeObj);
+      }
+      await dbService.collection("plan").doc(todoId).update(editObj);
+      setIsTodoEdit(false);
     }
+    navigate("/plan");
   };
 
   const titleChange = (event: React.FormEvent<HTMLInputElement>) => {
@@ -189,7 +226,7 @@ function CreateInput({
           취소
         </CancelBtn>
         <ConfirmBtn type="button" onClick={onSubmit}>
-          생성
+          {mode === "CREATE" ? "생성" : "수정"}
         </ConfirmBtn>
       </BtnBox>
     </ModalForm>

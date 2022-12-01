@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
 import { useEffect, useState } from "react";
 import { Overlay, Wrapper } from "../Plan/TodoMemo";
@@ -10,19 +10,19 @@ import {
   createStartDateState,
   createSubTitleState,
   createTitleState,
+  isCreateState,
+  isTodoEditState,
   projectState,
+  toDoState,
 } from "../../../Recoil/atoms";
 import CalendarBoard from "./CalendarBoard";
 
-const CreateCard = ({
-  setIsCreate,
-  type,
-}: {
-  setIsCreate: (value: React.SetStateAction<boolean>) => void;
-  type: string;
-}) => {
+const CreateTodo = ({ mode }: { mode: string }) => {
   const navigate = useNavigate();
   const [project, setProject] = useRecoilState(projectState);
+  const [toDos, setToDos] = useRecoilState(toDoState);
+  const [isCreate, setIsCreate] = useRecoilState(isCreateState);
+  const [isTodoEdit, setIsTodoEdit] = useRecoilState(isTodoEditState);
   const [startToggle, setStartToggle] = useState(false);
   const [endToggle, setEndToggle] = useState(false);
   const [startDate, setStartDate] = useRecoilState(createStartDateState);
@@ -30,13 +30,31 @@ const CreateCard = ({
   const [planTitle, setPlanTitle] = useRecoilState(createTitleState);
   const [planSubTitle, setPlanSubTitle] = useRecoilState(createSubTitleState);
   const [count, setCount] = useState(1);
+  const params = useParams();
+  const todoId = params.todoId;
+  const index = toDos.findIndex((item) => item.id === todoId);
 
   useEffect(() => {
-    const projectIndex = project.findIndex(
-      (item: any) => item.select === "true"
-    );
-    //디폴트 세트부여
-    setCount(project[projectIndex].defaultSet);
+    //Default 부여
+    if (mode === "CREATE") {
+      const projectIndex = project.findIndex(
+        (item: any) => item.select === "true"
+      );
+      setCount(project[projectIndex].defaultSet);
+    } else {
+      setStartDate(`${toDos[index].startDate}`);
+      setEndDate(`${toDos[index].endDate}`);
+      setPlanTitle(`${toDos[index].planTitle}`);
+      setPlanSubTitle(`${toDos[index].planSubTitle}`);
+      setCount(toDos[index].defaultSet);
+    }
+    //클린업
+    return () => {
+      setStartDate("");
+      setEndDate("");
+      setPlanTitle("");
+      setPlanSubTitle("");
+    };
   }, []);
 
   const backgroundVariants = {
@@ -67,38 +85,24 @@ const CreateCard = ({
     },
   };
   const onOverlayClicked = () => {
-    navigate("/plan");
-    setIsCreate(false);
-  };
-  useEffect(() => {
-    if (type === "CREATE") {
-      setStartDate("");
-      setEndDate("");
-      setPlanTitle("");
-      setPlanSubTitle("");
+    if (mode === "CREATE") {
+      setIsCreate(false);
     } else {
-      setStartDate("");
-      setEndDate("");
-      setPlanTitle("");
-      setPlanSubTitle("");
+      setIsTodoEdit(false);
     }
-    return () => {
-      setStartDate("");
-      setEndDate("");
-      setPlanTitle("");
-      setPlanSubTitle("");
-    };
-  }, []);
+    navigate("/plan");
+  };
   return (
     <Wrapper>
       <ModalWrapper variants={popupVariants} initial="normal" animate="animate">
         {!startToggle && !endToggle && (
           <CreateInput
-            setIsCreate={setIsCreate}
             setStartToggle={setStartToggle}
             setEndToggle={setEndToggle}
             count={count}
             setCount={setCount}
+            mode={mode}
+            defaultSet={toDos[index].defaultSet}
           />
         )}
         {startToggle && (
@@ -126,7 +130,7 @@ const CreateCard = ({
   );
 };
 
-export default CreateCard;
+export default CreateTodo;
 const ModalWrapper = styled(motion.div)`
   display: flex;
   align-items: center;

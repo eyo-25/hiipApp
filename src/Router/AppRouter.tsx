@@ -44,6 +44,7 @@ export default function AppRouter({ isLoggedIn, userObj }: AppRouterProps) {
         <Route path={"/plan"} element={<Plan />}>
           <Route path={"/plan/memo/:todoId"} element={<Plan />} />
           <Route path={"/plan/createTodo"} element={<Plan />} />
+          <Route path={"/plan/editTodo/:todoId"} element={<Plan />} />
         </Route>
         <Route path={"/plan/createProject"} element={<CreateProject />} />
         <Route path={"/plan/intervalSetting"} element={<IntervalSetting />} />

@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { useRecoilState } from "recoil";
 import styled from "styled-components";
-import { selectState, toDoEditState } from "../../../Recoil/atoms";
+import { selectState, cardEditState } from "../../../Recoil/atoms";
 import MemoCard from "./MemoCard";
 
 const TodoMemo = () => {
@@ -20,7 +20,7 @@ const TodoMemo = () => {
       },
     },
   };
-  const [isEdit, setIsEdit] = useRecoilState(toDoEditState);
+  const [isEdit, setIsEdit] = useRecoilState(cardEditState);
   const [isSelect, setIsSelect] = useRecoilState(selectState);
   const navigate = useNavigate();
   const onOverlayClicked = (e: any) => {

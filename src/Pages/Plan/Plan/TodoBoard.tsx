@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import TodoCard from "./TodoCard";
-import { toDoEditState, toDoState } from "../../../Recoil/atoms";
+import { cardEditState, toDoState } from "../../../Recoil/atoms";
 import { useRecoilState } from "recoil";
 import { motion } from "framer-motion";
 
@@ -26,7 +26,7 @@ function TodoBord({
     },
   };
   const [toDos, setToDos] = useRecoilState(toDoState);
-  const [isEdit, setIsEdit] = useRecoilState(toDoEditState);
+  const [isEdit, setIsEdit] = useRecoilState(cardEditState);
   useEffect(() => {
     return setIsEdit(false);
   }, []);

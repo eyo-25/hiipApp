@@ -3,7 +3,12 @@ import React, { useEffect, useState, useRef } from "react";
 import { IoPlaySharp } from "react-icons/io5";
 import { useRecoilState } from "recoil";
 import styled from "styled-components";
-import { selectState, toDoEditState, toDoState } from "../../../Recoil/atoms";
+import {
+  selectState,
+  cardEditState,
+  toDoState,
+  isTodoEditState,
+} from "../../../Recoil/atoms";
 import { Blue, Dark_Gray, Dark_Gray2 } from "../../../Styles/Colors";
 import { scrollIntoView } from "seamless-scroll-polyfill";
 import { useNavigate } from "react-router-dom";
@@ -21,7 +26,7 @@ export const iconVariants = {
     scale: 1,
     transition: {
       delay: 0.3,
-      duration: 1,
+      duration: 0.8,
       type: "linear",
     },
   },
@@ -38,8 +43,9 @@ function TodoCard({ setIsWeek, todoObj, index }: ITodoCard) {
   const cardRef = useRef<any>(null);
   const [toDos, setToDos] = useRecoilState(toDoState);
   const [isClicked, setIsClicked] = useState(false);
+  const [isTodoEdit, setIsTodoEdit] = useRecoilState(isTodoEditState);
   const [isSelect, setIsSelect] = useRecoilState(selectState);
-  const [isEdit, setIsEdit] = useRecoilState(toDoEditState);
+  const [isEdit, setIsEdit] = useRecoilState(cardEditState);
   const [counter, setCounter] = useState(0);
   const [btnPopup, setBtnPopup] = useState(false);
   const textVariants = {
@@ -158,7 +164,7 @@ function TodoCard({ setIsWeek, todoObj, index }: ITodoCard) {
   for (let index = 0; index < todoObj.defaultSet; index++) {
     intervalArray[index] = index;
   }
-  const onDelete = async () => {
+  const onDeleteClick = async () => {
     const ok = window.confirm("플랜을 삭제 하시겠습니까?");
     if (ok) {
       await dbService.doc(`plan/${todoObj.id}`).delete();
@@ -167,22 +173,18 @@ function TodoCard({ setIsWeek, todoObj, index }: ITodoCard) {
         .collection("timer")
         .doc("time")
         .delete();
-      // .then(() => {
-      //   setToDos((toDos) => {
-      //     const copy = [...toDos];
-      //     const index = toDos.findIndex((item) => item.id === todoObj.id);
-      //     copy.splice(index, 1);
-      //     return [...copy];
-      //   });
-      // });
     }
+  };
+  const onEditClick = async () => {
+    navigate(`/plan/editTodo/${todoObj.id}`);
+    setIsTodoEdit(true);
   };
   return (
     <Wrapper ref={cardRef}>
       {btnPopup && (
         <BtnBox>
-          <DeletBtn onClick={onDelete} />
-          <EditBtn />
+          <DeletBtn onClick={onDeleteClick} />
+          <EditBtn onClick={onEditClick} />
         </BtnBox>
       )}
       <TodoCarWrapper

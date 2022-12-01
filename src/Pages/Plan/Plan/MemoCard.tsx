@@ -16,13 +16,13 @@ import {
 } from "./TodoCard";
 import { Dark_Gray2 } from "../../../Styles/Colors";
 import { useRecoilState } from "recoil";
-import { selectState, toDoEditState, toDoState } from "../../../Recoil/atoms";
+import { selectState, cardEditState, toDoState } from "../../../Recoil/atoms";
 import { useNavigate, useParams } from "react-router-dom";
 import { dbService } from "../../../firebase";
 
 function MemoCard() {
   const navigate = useNavigate();
-  const [isEdit, setIsEdit] = useRecoilState(toDoEditState);
+  const [isEdit, setIsEdit] = useRecoilState(cardEditState);
   const [isSelect, setIsSelect] = useRecoilState(selectState);
   const [toDos, setToDos] = useRecoilState(toDoState);
   const [memoText, setMemoText] = useState("");
@@ -31,6 +31,7 @@ function MemoCard() {
   const todoId = params.todoId;
   const index = toDos.findIndex((item) => item.id === todoId);
   const [intervalArray, setIntervalArray] = useState<number[]>([]);
+
   useEffect(() => {
     const set = toDos[index].defaultSet;
     setIntervalArray((prev) => {
