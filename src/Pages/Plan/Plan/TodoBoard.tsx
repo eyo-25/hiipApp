@@ -76,7 +76,6 @@ const Container = styled.div`
   align-items: center;
   width: 100%;
   margin: 0 auto;
-  margin-bottom: 500px;
 `;
 const CardWrapper = styled(motion.div)`
   position: relative;
@@ -85,4 +84,7 @@ const CardWrapper = styled(motion.div)`
   height: 100%;
   margin: 0 0.5vh;
   z-index: 5;
+  &:last-child {
+    padding-bottom: 300px;
+  }
 `;

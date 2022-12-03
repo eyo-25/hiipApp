@@ -58,11 +58,11 @@ function MemoCard() {
   };
   useEffect(() => {
     //autoFocus 부여
-    setTimeout(() => {
-      if (autoFocusRef.current) {
-        autoFocusRef.current.focus();
-      }
-    }, 1000);
+    // setTimeout(() => {
+    //   if (autoFocusRef.current) {
+    //     autoFocusRef.current.focus();
+    //   }
+    // }, 1000);
     //메모 디폴트 부여
     setMemoText(toDos[index].memo);
   }, []);

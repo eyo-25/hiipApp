@@ -1,8 +1,15 @@
 import { useRecoilState } from "recoil";
 import styled from "styled-components";
-import { clickDateState } from "../../../Recoil/atoms";
+import {
+  clickDateState,
+  createEndDateState,
+  createStartDateState,
+  selectTodoState,
+  toDoState,
+} from "../../../Recoil/atoms";
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { Red } from "../../../Styles/Colors";
 
 const calendarVariants = {
   normal: {
@@ -22,6 +29,21 @@ function MonthDatePicker() {
   const Moment = require("moment");
   const [clickDate, setClickDate] = useRecoilState(clickDateState);
   const [monthArray, setMonthArray] = useState<string[]>([]);
+
+  const [toDos, setToDos] = useRecoilState(toDoState);
+  const [selectTodo, setSelectTodo] = useRecoilState(selectTodoState);
+  const index = toDos.findIndex((item) => item.id === selectTodo);
+
+  const [startDate, setStartDate] = useRecoilState(createStartDateState);
+  const [endDate, setEndDate] = useRecoilState(createEndDateState);
+
+  useEffect(() => {
+    if (selectTodo !== "") {
+      setStartDate(() => toDos[index].startDate);
+      setEndDate(() => toDos[index].endDate);
+    }
+  }, [selectTodo]);
+
   // 현재월
   let calendarMonth = Number(Moment(clickDate).format("MM"));
   // 현재월의 마지막 일
@@ -92,7 +114,8 @@ function MonthDatePicker() {
       {monthArray.map((date: string, index: number) => (
         <DateBox key={index}>
           <HoverBox
-            clicked={clickDate === Moment(date).format("YYYY-MM-DD")}
+            clicked={clickDate === date}
+            isDeadLine={startDate === date || endDate === date}
             onClick={() => onDateClick(date)}
           >
             <DateText
@@ -124,7 +147,7 @@ const DateBox = styled.div`
   height: calc(var(--vh, 1vh) * 4.7);
   cursor: pointer;
 `;
-const HoverBox = styled.div<{ clicked: boolean }>`
+const HoverBox = styled.div<{ clicked: boolean; isDeadLine: boolean }>`
   display: flex;
   justify-content: center;
   align-items: center;
@@ -132,8 +155,9 @@ const HoverBox = styled.div<{ clicked: boolean }>`
   border-radius: 50%;
   width: 25px;
   height: 25px;
-  color: ${(props) => props.clicked && "white"};
-  background-color: ${(props) => props.clicked && "black"};
+  color: ${(props) => (props.clicked || props.isDeadLine) && "white"};
+  background-color: ${(props) =>
+    props.isDeadLine ? "black" : props.clicked ? " Red" : null};
   @media screen and (max-height: 800px) {
     width: 23px;
     height: 23px;

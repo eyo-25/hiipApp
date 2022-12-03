@@ -24,6 +24,8 @@ time, mark, audio, video, button {
   font-size: 100%;
   font: inherit;
   vertical-align: baseline;
+  //하이라이트 방지
+  -webkit-tap-highlight-color:transparent;
 }
 /* HTML5 display-role reset for older browsers */
 article, aside, details, figcaption, figure,

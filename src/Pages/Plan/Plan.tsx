@@ -15,6 +15,9 @@ import {
   cardEditState,
   toDoState,
   isTodoEditState,
+  selectTodoState,
+  createEndDateState,
+  createStartDateState,
 } from "../../Recoil/atoms";
 import TodoMemo from "./Plan/TodoMemo";
 import { useNavigate } from "react-router-dom";
@@ -35,6 +38,10 @@ function Plan() {
   const [mouseDownClientY, setMouseDownClientY] = useState(0);
   const [mouseUpClientY, setMouseUpClientY] = useState(0);
   const [tochedY, setTochedY] = useState(0);
+  const [selectTodo, setSelectTodo] = useRecoilState(selectTodoState);
+  const [startDate, setStartDate] = useRecoilState(createStartDateState);
+  const [endDate, setEndDate] = useRecoilState(createEndDateState);
+
   const calendarVariants = {
     normal: {
       height: "0%",
@@ -102,7 +109,18 @@ function Plan() {
   useEffect(() => {
     setIsTodoEdit(false);
     setIsCreate(false);
-    return setIsEdit(false), setIsSelect(false);
+    if (0 < toDos.length) {
+      setSelectTodo(toDos[0].id);
+      setStartDate(() => toDos[0].startDate);
+      setEndDate(() => toDos[0].endDate);
+    }
+    return () => {
+      setIsEdit(false);
+      setIsSelect(false);
+      setSelectTodo("");
+      setStartDate("");
+      setEndDate("");
+    };
   }, []);
   // 브라우저 스와이프
   const onMouseUp = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
@@ -149,13 +167,15 @@ function Plan() {
   return (
     <Applayout>
       <Header />
-      <ContentContainer onMouseDown={onMouseDown} onMouseUp={onMouseUp}>
+      <ContentContainer>
         <CalendarBox
           variants={calendarVariants}
           initial="normal"
           animate="animate"
           onTouchEnd={onTouchEnd}
           onTouchStart={onTouchStart}
+          onMouseDown={onMouseDown}
+          onMouseUp={onMouseUp}
           onClick={closedEdit}
         >
           <CalendarBoard isWeek={isWeek} setIsWeek={setIsWeek} />

@@ -13,6 +13,7 @@ import {
   isCreateState,
   isTodoEditState,
   projectState,
+  toDoState,
 } from "../../../Recoil/atoms";
 
 interface ICreateInput {
@@ -21,7 +22,6 @@ interface ICreateInput {
   count: number;
   setCount: React.Dispatch<React.SetStateAction<number>>;
   mode: string;
-  defaultSet: number;
 }
 
 function CreateInput({
@@ -30,11 +30,11 @@ function CreateInput({
   count,
   setCount,
   mode,
-  defaultSet,
 }: ICreateInput) {
   const navigate = useNavigate();
-  const [isCreate, setIsCreate] = useRecoilState(isCreateState);
+  const [toDos, setToDos] = useRecoilState(toDoState);
   const [project, setProject] = useRecoilState(projectState);
+  const [isCreate, setIsCreate] = useRecoilState(isCreateState);
   const [startDate, setStartDate] = useRecoilState(createStartDateState);
   const [endDate, setEndDate] = useRecoilState(createEndDateState);
   const [planTitle, setPlanTitle] = useRecoilState(createTitleState);
@@ -119,7 +119,7 @@ function CreateInput({
         startDate: startDate,
         endDate: endDate,
       };
-      if (defaultSet !== count) {
+      if (project[projectIndex].defaultSet !== count) {
         const editTimeObj = {
           setFocusSet: count,
           setBreakSet: count - 1 <= 0 ? 0 : count - 1,

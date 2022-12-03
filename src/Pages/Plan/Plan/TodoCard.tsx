@@ -6,8 +6,9 @@ import styled from "styled-components";
 import {
   selectState,
   cardEditState,
-  toDoState,
   isTodoEditState,
+  toDoState,
+  selectTodoState,
 } from "../../../Recoil/atoms";
 import { Blue, Dark_Gray, Dark_Gray2 } from "../../../Styles/Colors";
 import { scrollIntoView } from "seamless-scroll-polyfill";
@@ -15,6 +16,8 @@ import { useNavigate } from "react-router-dom";
 import { ReactComponent as EditBtn } from "../../../Assets/Icons/editbtn.svg";
 import { ReactComponent as DeletBtn } from "../../../Assets/Icons/deletbtn.svg";
 import { dbService } from "../../../firebase";
+import useOnClickOutSide from "../../../hooks/useOnClickOutSide";
+import { BrowserView, MobileView } from "react-device-detect";
 
 export const iconVariants = {
   normal: {
@@ -39,15 +42,19 @@ interface ITodoCard {
 }
 
 function TodoCard({ setIsWeek, todoObj, index }: ITodoCard) {
-  const navigate = useNavigate();
-  const cardRef = useRef<any>(null);
-  const [toDos, setToDos] = useRecoilState(toDoState);
+  const [selectTodo, setSelectTodo] = useRecoilState(selectTodoState);
   const [isClicked, setIsClicked] = useState(false);
   const [isTodoEdit, setIsTodoEdit] = useRecoilState(isTodoEditState);
   const [isSelect, setIsSelect] = useRecoilState(selectState);
   const [isEdit, setIsEdit] = useRecoilState(cardEditState);
   const [counter, setCounter] = useState(0);
   const [btnPopup, setBtnPopup] = useState(false);
+  const cardWrapperRef = useRef<any>(null);
+  const cardRef = useRef<any>();
+  const navigate = useNavigate();
+  useOnClickOutSide(cardRef, () => {
+    setBtnPopup(false);
+  });
   const textVariants = {
     normal: {
       height: "42px",
@@ -60,6 +67,13 @@ function TodoCard({ setIsWeek, todoObj, index }: ITodoCard) {
       },
     },
   };
+
+  useEffect(() => {
+    return () => {
+      setSelectTodo("");
+    };
+  }, []);
+
   useEffect(() => {
     // 셀렉된 카드 전부 닫기
     if (!isSelect) {
@@ -69,7 +83,7 @@ function TodoCard({ setIsWeek, todoObj, index }: ITodoCard) {
   useEffect(() => {
     if (isEdit && isClicked) {
       setTimeout(() => {
-        scrollIntoView(cardRef.current as any, {
+        scrollIntoView(cardWrapperRef.current as any, {
           behavior: "smooth",
         });
       }, 500);
@@ -93,45 +107,6 @@ function TodoCard({ setIsWeek, todoObj, index }: ITodoCard) {
       },
     },
   };
-  const vibeVariants = {
-    normal: {},
-    animate: {
-      transition: {
-        rotateZ: [50, -50],
-        React: "infinity",
-        type: "linear",
-      },
-    },
-  };
-  // 버튼 팝업
-  const intervalRef = React.useRef(null) as any;
-  const startCounter = () => {
-    intervalRef.current = setInterval(() => {
-      setCounter((prevCounter) => prevCounter + 1);
-    }, 100);
-  };
-  useEffect(() => {
-    if (6 < counter) {
-      setBtnPopup(true);
-      setIsSelect(false);
-      setIsClicked(false);
-    }
-  }, [counter]);
-  const stopCounter = () => {
-    if (6 >= counter) {
-      if (isSelect && isClicked) {
-        setIsSelect(false);
-        setIsClicked(false);
-      }
-      clickToggle();
-    }
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
-      setCounter(0);
-    }
-  };
-
   const clickToggle = () => {
     if (!isSelect) {
       setIsSelect(true);
@@ -145,26 +120,60 @@ function TodoCard({ setIsWeek, todoObj, index }: ITodoCard) {
       }, 400);
     }
   };
-  const onCardClick = () => {
-    // if (isSelect && isClicked) {
-    //   setIsSelect(false);
-    //   setIsClicked(false);
-    // }
-    // clickToggle();
-  };
-  const onMemoClick = () => {
-    if (isSelect && isClicked) {
-      setIsWeek(true);
-      setIsEdit(true);
-      navigate(`/plan/memo/${todoObj.id}`);
+  // 버튼 팝업
+  const intervalRef = React.useRef(null) as any;
+  useEffect(() => {
+    if (6 < counter) {
+      setBtnPopup(true);
+      setIsSelect(false);
+      setIsClicked(false);
     }
-    clickToggle();
+  }, [counter]);
+
+  const startCounter = () => {
+    intervalRef.current = setInterval(() => {
+      setCounter((prevCounter) => prevCounter + 1);
+    }, 100);
   };
+  const stopCounter = () => {
+    if (counter <= 6) {
+      setSelectTodo(todoObj.id);
+      clickToggle();
+      if (isSelect && isClicked) {
+        setIsSelect(false);
+        setIsClicked(false);
+      }
+    }
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+      setCounter(0);
+    }
+  };
+
+  const stopMemoCounter = () => {
+    if (6 >= counter) {
+      if (isSelect && isClicked) {
+        setIsWeek(true);
+        setIsEdit(true);
+        setBtnPopup(false);
+        navigate(`/plan/memo/${todoObj.id}`);
+      }
+      clickToggle();
+    }
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+      setCounter(0);
+    }
+  };
+
   let intervalArray = [] as any;
   for (let index = 0; index < todoObj.defaultSet; index++) {
     intervalArray[index] = index;
   }
   const onDeleteClick = async () => {
+    setBtnPopup(false);
     const ok = window.confirm("플랜을 삭제 하시겠습니까?");
     if (ok) {
       await dbService.doc(`plan/${todoObj.id}`).delete();
@@ -176,23 +185,25 @@ function TodoCard({ setIsWeek, todoObj, index }: ITodoCard) {
     }
   };
   const onEditClick = async () => {
-    navigate(`/plan/editTodo/${todoObj.id}`);
     setIsTodoEdit(true);
+    setBtnPopup(false);
+    navigate(`/plan/editTodo/${todoObj.id}`);
   };
   return (
-    <Wrapper ref={cardRef}>
-      {btnPopup && (
-        <BtnBox>
-          <DeletBtn onClick={onDeleteClick} />
-          <EditBtn onClick={onEditClick} />
-        </BtnBox>
-      )}
+    <Wrapper ref={cardWrapperRef}>
       <TodoCarWrapper
+        ref={cardRef}
         variants={cardVariants}
         initial="normal"
         animate="animate"
         whileTap="click"
       >
+        {btnPopup && (
+          <BtnBox>
+            <DeletBtn onClick={onDeleteClick} />
+            <EditBtn onClick={onEditClick} />
+          </BtnBox>
+        )}
         <TodoTopBox>
           <TextBox>
             <TitleBox>
@@ -209,7 +220,13 @@ function TodoCard({ setIsWeek, todoObj, index }: ITodoCard) {
             <StartBtn />
           </IntervalBox>
         </TodoTopBox>
-        <MemoContainer onClick={onMemoClick} isselect={isSelect}>
+        <MemoContainer
+          onMouseDown={startCounter}
+          onMouseUp={stopMemoCounter}
+          onTouchStart={startCounter}
+          onTouchEnd={stopMemoCounter}
+          isselect={isSelect}
+        >
           {todoObj.memo !== "" ? (
             <MemoText
               variants={textVariants}
@@ -232,11 +249,17 @@ function TodoCard({ setIsWeek, todoObj, index }: ITodoCard) {
             <IntervalBar key={index} />
           ))}
         </IntervalBarBox>
-        <Background
-          onClick={onCardClick}
-          onMouseUp={stopCounter}
-          onMouseDown={startCounter}
-        />
+        <BrowserView>
+          <Background
+            onMouseUp={stopCounter}
+            onMouseDown={startCounter}
+            onTouchStart={startCounter}
+            onTouchEnd={stopCounter}
+          />
+        </BrowserView>
+        <MobileView>
+          <Background onTouchStart={startCounter} onTouchEnd={stopCounter} />
+        </MobileView>
       </TodoCarWrapper>
     </Wrapper>
   );
@@ -248,9 +271,9 @@ const Wrapper = styled.div`
   height: 100%;
   width: 100%;
   margin-bottom: 5px;
-  padding-top: 20px;
+  padding-top: 23px;
   @media screen and (max-height: 800px) {
-    padding-top: 15px;
+    padding-top: 20px;
   }
 `;
 export const Background = styled.div`
@@ -397,7 +420,7 @@ export const Item = styled(motion.div)`
 `;
 const BtnBox = styled.div`
   display: flex;
-  top: 6px;
+  top: -15px;
   right: 20px;
   position: absolute;
   z-index: 5;

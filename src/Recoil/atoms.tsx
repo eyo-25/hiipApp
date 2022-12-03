@@ -15,10 +15,6 @@ export interface ITodo {
   id: string;
 }
 
-export const projectState = atom<any>({
-  key: "projectState",
-  default: [],
-});
 export const toDoState = atom<ITodo[]>({
   key: "toDo",
   default: [],
@@ -31,6 +27,11 @@ export const clickDateState = atom({
   key: "clickDateState",
   default: Moment().format("YYYY-MM-DD"),
 });
+//plan
+export const selectTodoState = atom({
+  key: "selectTodoState",
+  default: "",
+});
 export const cardEditState = atom({
   key: "cardEditState",
   default: false,
@@ -40,6 +41,10 @@ export const selectState = atom({
   default: false,
 });
 //project
+export const projectState = atom<any>({
+  key: "projectState",
+  default: [],
+});
 export const inputFocusState = atom({
   key: "inputFocusState",
   default: false,

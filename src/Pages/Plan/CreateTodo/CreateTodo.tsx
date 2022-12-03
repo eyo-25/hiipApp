@@ -102,7 +102,6 @@ const CreateTodo = ({ mode }: { mode: string }) => {
             count={count}
             setCount={setCount}
             mode={mode}
-            defaultSet={toDos[index].defaultSet}
           />
         )}
         {startToggle && (

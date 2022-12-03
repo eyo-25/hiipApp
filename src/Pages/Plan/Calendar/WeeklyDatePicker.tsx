@@ -3,6 +3,7 @@ import { useRecoilState } from "recoil";
 import { clickDateState } from "../../../Recoil/atoms";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { Red } from "../../../Styles/Colors";
 
 const calendarVariants = {
   normal: {
@@ -92,7 +93,7 @@ const DateBox = styled.div<{ clicked: boolean }>`
     height: 25px;
     border-radius: 50%;
     color: ${(props) => (props.clicked ? "white" : "black")};
-    background-color: ${(props) => props.clicked && "black"};
+    background-color: ${(props) => props.clicked && Red};
     @media screen and (max-height: 800px) {
       width: 23px;
       height: 23px;
