@@ -2,9 +2,10 @@ import { useRecoilState } from "recoil";
 import styled from "styled-components";
 import {
   clickDateState,
-  createEndDateState,
-  createStartDateState,
+  endDateState,
+  projectState,
   selectTodoState,
+  startDateState,
   toDoState,
 } from "../../../Recoil/atoms";
 import React, { useEffect, useState } from "react";
@@ -27,22 +28,12 @@ const calendarVariants = {
 
 function MonthDatePicker() {
   const Moment = require("moment");
+  const [project, setProject] = useRecoilState(projectState);
   const [clickDate, setClickDate] = useRecoilState(clickDateState);
   const [monthArray, setMonthArray] = useState<string[]>([]);
-
   const [toDos, setToDos] = useRecoilState(toDoState);
-  const [selectTodo, setSelectTodo] = useRecoilState(selectTodoState);
-  const index = toDos.findIndex((item) => item.id === selectTodo);
-
-  const [startDate, setStartDate] = useRecoilState(createStartDateState);
-  const [endDate, setEndDate] = useRecoilState(createEndDateState);
-
-  useEffect(() => {
-    if (selectTodo !== "") {
-      setStartDate(() => toDos[index].startDate);
-      setEndDate(() => toDos[index].endDate);
-    }
-  }, [selectTodo]);
+  const [startDate, setStartDate] = useRecoilState(startDateState);
+  const [endDate, setEndDate] = useRecoilState(endDateState);
 
   // 현재월
   let calendarMonth = Number(Moment(clickDate).format("MM"));
@@ -113,17 +104,38 @@ function MonthDatePicker() {
     >
       {monthArray.map((date: string, index: number) => (
         <DateBox key={index}>
-          <HoverBox
-            clicked={clickDate === date}
-            isDeadLine={startDate === date || endDate === date}
-            onClick={() => onDateClick(date)}
-          >
-            <DateText
-              nowMonth={Number(Moment(date).format("MM")) !== calendarMonth}
+          {project.length > 0 ? (
+            <HoverBox
+              clicked={clickDate === date}
+              isDeadLine={
+                date === project[0].startDate || date === project[0].endDate
+              }
+              onClick={() => onDateClick(date)}
             >
-              {Number(Moment(date).format("DD"))}
-            </DateText>
-          </HoverBox>
+              <DateText
+                nowMonth={Number(Moment(date).format("MM")) !== calendarMonth}
+              >
+                {Number(Moment(date).format("DD"))}
+              </DateText>
+              {/* {((startDate <= date && date <= endDate) || startDate === date) &&
+                      startDate && <DateBar isSame={startDate === endDate} />} */}
+              {project[0].startDate <= date && date <= project[0].endDate && (
+                <ProjectBar />
+              )}
+            </HoverBox>
+          ) : (
+            <HoverBox
+              clicked={clickDate === date}
+              isDeadLine={false}
+              onClick={() => onDateClick(date)}
+            >
+              <DateText
+                nowMonth={Number(Moment(date).format("MM")) !== calendarMonth}
+              >
+                {Number(Moment(date).format("DD"))}
+              </DateText>
+            </HoverBox>
+          )}
         </DateBox>
       ))}
     </DateContainer>
@@ -144,7 +156,7 @@ const DateBox = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  height: calc(var(--vh, 1vh) * 4.7);
+  height: calc(var(--vh, 1vh) * 4.9);
   cursor: pointer;
 `;
 const HoverBox = styled.div<{ clicked: boolean; isDeadLine: boolean }>`
@@ -157,7 +169,7 @@ const HoverBox = styled.div<{ clicked: boolean; isDeadLine: boolean }>`
   height: 25px;
   color: ${(props) => (props.clicked || props.isDeadLine) && "white"};
   background-color: ${(props) =>
-    props.isDeadLine ? "black" : props.clicked ? " Red" : null};
+    props.clicked ? " Red" : props.isDeadLine ? "black" : null};
   @media screen and (max-height: 800px) {
     width: 23px;
     height: 23px;
@@ -165,4 +177,30 @@ const HoverBox = styled.div<{ clicked: boolean; isDeadLine: boolean }>`
 `;
 const DateText = styled.div<{ nowMonth: boolean }>`
   color: ${(props) => props.nowMonth && "#c4c4c4"};
+`;
+const DateBar = styled.div<{ isSame: boolean }>`
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  bottom: 0;
+  width: 100%;
+  height: 0.5vh;
+  background-color: ${(props) => (props.isSame ? "#FFC500" : "#0002ff")};
+  @media screen and (max-height: 800px) {
+    height: 4px;
+  }
+`;
+const ProjectBar = styled.div`
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  bottom: 0;
+  width: 100%;
+  height: 0.5vh;
+  background-color: #0002ff;
+  @media screen and (max-height: 800px) {
+    height: 4px;
+  }
 `;

@@ -16,8 +16,9 @@ import {
   toDoState,
   isTodoEditState,
   selectTodoState,
-  createEndDateState,
-  createStartDateState,
+  startDateState,
+  endDateState,
+  isWeekState,
 } from "../../Recoil/atoms";
 import TodoMemo from "./Plan/TodoMemo";
 import { useNavigate } from "react-router-dom";
@@ -30,7 +31,7 @@ function Plan() {
   const navigate = useNavigate();
   const [project, setProject] = useRecoilState(projectState);
   const [toDos, setToDos] = useRecoilState(toDoState);
-  const [isWeek, setIsWeek] = useState(false);
+  const [isWeek, setIsWeek] = useRecoilState(isWeekState);
   const [isEdit, setIsEdit] = useRecoilState(cardEditState);
   const [isSelect, setIsSelect] = useRecoilState(selectState);
   const [isTodoEdit, setIsTodoEdit] = useRecoilState(isTodoEditState);
@@ -38,22 +39,61 @@ function Plan() {
   const [mouseDownClientY, setMouseDownClientY] = useState(0);
   const [mouseUpClientY, setMouseUpClientY] = useState(0);
   const [tochedY, setTochedY] = useState(0);
+  const [startDate, setStartDate] = useRecoilState(startDateState);
+  const [endDate, setEndDate] = useRecoilState(endDateState);
   const [selectTodo, setSelectTodo] = useRecoilState(selectTodoState);
-  const [startDate, setStartDate] = useRecoilState(createStartDateState);
-  const [endDate, setEndDate] = useRecoilState(createEndDateState);
 
   const calendarVariants = {
     normal: {
       height: "0%",
     },
     animate: {
-      height: isWeek ? "17%" : "100%",
+      height: isWeek ? "20%" : "100%",
       transition: {
         duration: 0.9,
         type: "linear",
       },
     },
   };
+  // 초기화
+  useEffect(() => {
+    setIsTodoEdit(false);
+    setIsCreate(false);
+    if (0 < toDos.length) {
+      setSelectTodo(toDos[0].id);
+      setStartDate(() => toDos[0].startDate);
+      setEndDate(() => toDos[0].endDate);
+    }
+    return () => {
+      setIsEdit(false);
+      setIsSelect(false);
+      setSelectTodo("");
+      setStartDate("");
+      setEndDate("");
+      setIsWeek(false);
+    };
+  }, []);
+  //투두 선택 감지
+  useEffect(() => {
+    if (selectTodo !== "" && 0 < toDos.length) {
+      const index = toDos.findIndex((item) => item.id === selectTodo);
+      setStartDate(() => toDos[index].startDate);
+      setEndDate(() => toDos[index].endDate);
+    }
+  }, [selectTodo]);
+
+  // 투두변경 감지
+  useEffect(() => {
+    if (0 < toDos.length) {
+      setStartDate(() => toDos[0].startDate);
+      setEndDate(() => toDos[0].endDate);
+    }
+    // else if (0 < toDos.length && toDos[0].id !== selectTodo) {
+    //   const index = toDos.findIndex((item) => item.id === selectTodo);
+    //   setStartDate(() => toDos[index].startDate);
+    //   setEndDate(() => toDos[index].endDate);
+    // }
+  }, [toDos]);
   //프로젝트 변경 감지
   useEffect(() => {
     const uid = JSON.parse(localStorage.getItem("user") as any).uid;
@@ -73,31 +113,33 @@ function Plan() {
       }
     });
   }, []);
-  //투두 변경 감지
+  //투두 변경 감지(snapshot)
   useEffect(() => {
-    const projectIndex = project.findIndex(
-      (item: any) => item.select === "true"
-    );
-    const q = query(
-      dbService
-        .collection("plan")
-        .where("projectId", "==", project[projectIndex].id)
-        .orderBy("index", "desc")
-    );
-    const addId = onSnapshot(q, (querySnapshot) => {
-      const newArray = querySnapshot.docs.map((doc: any) => {
-        return {
-          id: doc.id,
-          ...doc.data(),
-        };
+    if (0 < toDos.length) {
+      const projectIndex = project.findIndex(
+        (item: any) => item.select === "true"
+      );
+      const q = query(
+        dbService
+          .collection("plan")
+          .where("projectId", "==", project[projectIndex].id)
+          .orderBy("index", "desc")
+      );
+      const addId = onSnapshot(q, (querySnapshot) => {
+        const newArray = querySnapshot.docs.map((doc: any) => {
+          return {
+            id: doc.id,
+            ...doc.data(),
+          };
+        });
+        setToDos(newArray);
       });
-      setToDos(newArray);
-    });
-    onAuthStateChanged(authService, (user) => {
-      if (user == null) {
-        addId();
-      }
-    });
+      onAuthStateChanged(authService, (user) => {
+        if (user == null) {
+          addId();
+        }
+      });
+    }
   }, []);
 
   const closedEdit = () => {
@@ -105,23 +147,6 @@ function Plan() {
       setIsEdit(false);
     }
   };
-  // 초기화
-  useEffect(() => {
-    setIsTodoEdit(false);
-    setIsCreate(false);
-    if (0 < toDos.length) {
-      setSelectTodo(toDos[0].id);
-      setStartDate(() => toDos[0].startDate);
-      setEndDate(() => toDos[0].endDate);
-    }
-    return () => {
-      setIsEdit(false);
-      setIsSelect(false);
-      setSelectTodo("");
-      setStartDate("");
-      setEndDate("");
-    };
-  }, []);
   // 브라우저 스와이프
   const onMouseUp = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
     setMouseUpClientY(e.clientY);
@@ -167,21 +192,19 @@ function Plan() {
   return (
     <Applayout>
       <Header />
-      <ContentContainer>
+      <ContentContainer onMouseDown={onMouseDown} onMouseUp={onMouseUp}>
         <CalendarBox
           variants={calendarVariants}
           initial="normal"
           animate="animate"
           onTouchEnd={onTouchEnd}
           onTouchStart={onTouchStart}
-          onMouseDown={onMouseDown}
-          onMouseUp={onMouseUp}
           onClick={closedEdit}
         >
-          <CalendarBoard isWeek={isWeek} setIsWeek={setIsWeek} />
+          <CalendarBoard />
         </CalendarBox>
         <TodoContainer>
-          <TodoBord isWeek={isWeek} setIsWeek={setIsWeek} />
+          <TodoBord />
         </TodoContainer>
       </ContentContainer>
       {!isEdit && (

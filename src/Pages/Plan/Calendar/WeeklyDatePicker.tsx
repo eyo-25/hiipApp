@@ -1,6 +1,11 @@
 import styled from "styled-components";
 import { useRecoilState } from "recoil";
-import { clickDateState } from "../../../Recoil/atoms";
+import {
+  clickDateState,
+  endDateState,
+  projectState,
+  startDateState,
+} from "../../../Recoil/atoms";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Red } from "../../../Styles/Colors";
@@ -21,8 +26,11 @@ const calendarVariants = {
 
 const WeeklyDatePicker = () => {
   const Moment = require("moment");
+  const [project, setProject] = useRecoilState(projectState);
   const [clickDate, setClickDate] = useRecoilState(clickDateState);
   const [weekArray, setWeekArray] = useState<Date[]>([]);
+  const [startDate, setStartDate] = useRecoilState(startDateState);
+  const [endDate, setEndDate] = useRecoilState(endDateState);
 
   useEffect(() => {
     setWeekArray((prev) => {
@@ -58,12 +66,29 @@ const WeeklyDatePicker = () => {
       animate="animate"
     >
       {weekArray.map((date: any, index: number) => (
-        <DateBox
-          key={index}
-          clicked={clickDate === date}
-          onClick={() => onDateClick(date)}
-        >
-          <div>{Number(Moment(date).format("DD"))}</div>
+        <DateBox key={index} onClick={() => onDateClick(date)}>
+          {project.length > 0 ? (
+            <HoverBox
+              clicked={clickDate === date}
+              isDeadLine={
+                project[0].startDate === date || project[0].endDate === date
+              }
+              onClick={() => onDateClick(date)}
+            >
+              <div>{Number(Moment(date).format("DD"))}</div>
+              {project[0].startDate <= date && date <= project[0].endDate && (
+                <ProjectBar />
+              )}
+            </HoverBox>
+          ) : (
+            <HoverBox
+              clicked={clickDate === date}
+              isDeadLine={false}
+              onClick={() => onDateClick(date)}
+            >
+              <div>{Number(Moment(date).format("DD"))}</div>
+            </HoverBox>
+          )}
         </DateBox>
       ))}
     </DateContainer>
@@ -79,24 +104,53 @@ const DateContainer = styled(motion.div)`
   font-size: 12px;
   font-weight: 600;
 `;
-const DateBox = styled.div<{ clicked: boolean }>`
+const DateBox = styled.div`
+  position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
+  height: calc(var(--vh, 1vh) * 4.8);
   cursor: pointer;
-  div {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding-bottom: 2px;
-    width: 25px;
-    height: 25px;
-    border-radius: 50%;
-    color: ${(props) => (props.clicked ? "white" : "black")};
-    background-color: ${(props) => props.clicked && Red};
-    @media screen and (max-height: 800px) {
-      width: 23px;
-      height: 23px;
-    }
+`;
+const HoverBox = styled.div<{ clicked: boolean; isDeadLine: boolean }>`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-left: 0.5px;
+  border-radius: 50%;
+  width: 25px;
+  height: 25px;
+  color: ${(props) => (props.clicked || props.isDeadLine) && "white"};
+  background-color: ${(props) =>
+    props.clicked ? " Red" : props.isDeadLine ? "black" : null};
+  @media screen and (max-height: 800px) {
+    width: 23px;
+    height: 23px;
+  }
+`;
+const DateBar = styled.div<{ isSame: boolean }>`
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  bottom: 0;
+  width: 100%;
+  height: 0.5vh;
+  background-color: ${(props) => (props.isSame ? "#FFC500" : "#0002ff")};
+  @media screen and (max-height: 800px) {
+    height: 4px;
+  }
+`;
+const ProjectBar = styled.div`
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  bottom: 0;
+  width: 100%;
+  height: 0.5vh;
+  background-color: #0002ff;
+  @media screen and (max-height: 800px) {
+    height: 4px;
   }
 `;

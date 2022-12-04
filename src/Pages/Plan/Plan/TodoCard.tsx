@@ -9,6 +9,7 @@ import {
   isTodoEditState,
   toDoState,
   selectTodoState,
+  isWeekState,
 } from "../../../Recoil/atoms";
 import { Blue, Dark_Gray, Dark_Gray2 } from "../../../Styles/Colors";
 import { scrollIntoView } from "seamless-scroll-polyfill";
@@ -37,11 +38,11 @@ export const iconVariants = {
 
 interface ITodoCard {
   todoObj: any;
-  setIsWeek: React.Dispatch<React.SetStateAction<boolean>>;
   index: number;
 }
 
-function TodoCard({ setIsWeek, todoObj, index }: ITodoCard) {
+function TodoCard({ todoObj, index }: ITodoCard) {
+  const [isWeek, setIsWeek] = useRecoilState(isWeekState);
   const [selectTodo, setSelectTodo] = useRecoilState(selectTodoState);
   const [isClicked, setIsClicked] = useState(false);
   const [isTodoEdit, setIsTodoEdit] = useRecoilState(isTodoEditState);
@@ -67,12 +68,18 @@ function TodoCard({ setIsWeek, todoObj, index }: ITodoCard) {
       },
     },
   };
-
+  //초기화
   useEffect(() => {
     return () => {
       setSelectTodo("");
     };
   }, []);
+  //isWeek 감지
+  useEffect(() => {
+    if (!isWeek) {
+      setIsClicked(false);
+    }
+  }, [isWeek]);
 
   useEffect(() => {
     // 셀렉된 카드 전부 닫기
@@ -121,7 +128,6 @@ function TodoCard({ setIsWeek, todoObj, index }: ITodoCard) {
     }
   };
   // 버튼 팝업
-  const intervalRef = React.useRef(null) as any;
   useEffect(() => {
     if (6 < counter) {
       setBtnPopup(true);
@@ -130,31 +136,29 @@ function TodoCard({ setIsWeek, todoObj, index }: ITodoCard) {
     }
   }, [counter]);
 
+  const intervalRef = React.useRef(null) as any;
   const startCounter = () => {
     intervalRef.current = setInterval(() => {
       setCounter((prevCounter) => prevCounter + 1);
     }, 100);
   };
-  const stopCounter = () => {
-    if (counter <= 6) {
-      setSelectTodo(todoObj.id);
+
+  const onCardClick = () => {
+    setSelectTodo(todoObj.id);
+    if (counter < 5 && !isClicked && isWeek) {
       clickToggle();
-      if (isSelect && isClicked) {
-        setIsSelect(false);
-        setIsClicked(false);
-      }
+    } else if (counter < 5 && isClicked && isWeek) {
+      setIsSelect(false);
+      setIsClicked(false);
     }
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
-      setCounter(0);
-    }
+    clearInterval(intervalRef.current);
+    intervalRef.current = null;
+    setCounter(0);
   };
 
-  const stopMemoCounter = () => {
-    if (6 >= counter) {
+  const onMemoClick = () => {
+    if (6 >= counter && isWeek) {
       if (isSelect && isClicked) {
-        setIsWeek(true);
         setIsEdit(true);
         setBtnPopup(false);
         navigate(`/plan/memo/${todoObj.id}`);
@@ -165,6 +169,16 @@ function TodoCard({ setIsWeek, todoObj, index }: ITodoCard) {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
       setCounter(0);
+    }
+  };
+
+  const onDubleClick = () => {
+    if (!isWeek) {
+      setIsWeek(true);
+      setIsEdit(true);
+      setBtnPopup(false);
+      clickToggle();
+      navigate(`/plan/memo/${todoObj.id}`);
     }
   };
 
@@ -222,9 +236,9 @@ function TodoCard({ setIsWeek, todoObj, index }: ITodoCard) {
         </TodoTopBox>
         <MemoContainer
           onMouseDown={startCounter}
-          onMouseUp={stopMemoCounter}
           onTouchStart={startCounter}
-          onTouchEnd={stopMemoCounter}
+          onClick={onMemoClick}
+          onDoubleClick={onDubleClick}
           isselect={isSelect}
         >
           {todoObj.memo !== "" ? (
@@ -250,15 +264,10 @@ function TodoCard({ setIsWeek, todoObj, index }: ITodoCard) {
           ))}
         </IntervalBarBox>
         <BrowserView>
-          <Background
-            onMouseUp={stopCounter}
-            onMouseDown={startCounter}
-            onTouchStart={startCounter}
-            onTouchEnd={stopCounter}
-          />
+          <Background onClick={onCardClick} onMouseDown={startCounter} />
         </BrowserView>
         <MobileView>
-          <Background onTouchStart={startCounter} onTouchEnd={stopCounter} />
+          <Background onTouchStart={startCounter} onClick={onCardClick} />
         </MobileView>
       </TodoCarWrapper>
     </Wrapper>

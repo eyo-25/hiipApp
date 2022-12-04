@@ -4,6 +4,7 @@ import {
   createClickDateState,
   createEndDateState,
   createStartDateState,
+  projectState,
 } from "../../../Recoil/atoms";
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
@@ -21,6 +22,7 @@ function MonthDatePicker({
   isType,
 }: IMonthDatePicker) {
   const Moment = require("moment");
+  const [project, setProject] = useRecoilState(projectState);
   const [clickDate, setClickDate] = useRecoilState(createClickDateState);
   const [monthArray, setMonthArray] = useState<string[]>([]);
   const [startDate, setStartDate] = useRecoilState(createStartDateState);
@@ -94,7 +96,11 @@ function MonthDatePicker({
   }, [clickDate]);
 
   const onDateClick = (clickedDate: string) => {
-    if (clickedDate < moment().format("YYYY-MM-DD")) {
+    if (
+      !(
+        project[0].startDate <= clickedDate && clickedDate <= project[0].endDate
+      )
+    ) {
       return;
     }
     // start와 앤드 사이에 눌렀을때 앤드만 변경
@@ -106,9 +112,9 @@ function MonthDatePicker({
       setStartToggle(false);
     } else {
       // start보다 먼저 눌렀을때 초기화
-      if (clickedDate < startDate) {
-        setStartDate("");
-      }
+      // if (clickedDate < startDate) {
+      //   setStartDate("");
+      // }
       setEndDate(clickedDate);
       setEndToggle(false);
     }
@@ -119,11 +125,12 @@ function MonthDatePicker({
     <DateContainer>
       {monthArray.map((date: string, index: number) => (
         <DateBox key={index}>
-          <HoverBox
-            clicked={clickDate === date}
-            onClick={() => onDateClick(date)}
-          >
-            <DateText nowMonth={date < moment().format("YYYY-MM-DD")}>
+          <HoverBox onClick={() => onDateClick(date)}>
+            <DateText
+              nowMonth={
+                project[0].startDate <= date && date <= project[0].endDate
+              }
+            >
               {Number(Moment(date).format("DD"))}
             </DateText>
             {((startDate <= date && date <= endDate) || startDate === date) &&
@@ -152,7 +159,7 @@ const DateBox = styled.div`
   height: 34px;
   cursor: pointer;
 `;
-const HoverBox = styled.div<{ clicked: boolean }>`
+const HoverBox = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
@@ -160,11 +167,9 @@ const HoverBox = styled.div<{ clicked: boolean }>`
   border-radius: 50%;
   width: 23px;
   height: 23px;
-  color: ${(props) => props.clicked && "white"};
-  background-color: ${(props) => props.clicked && "black"};
 `;
 const DateText = styled.div<{ nowMonth: boolean }>`
-  color: ${(props) => props.nowMonth && "#c4c4c4"};
+  color: ${(props) => (props.nowMonth ? "black" : "#c4c4c4")};
 `;
 const DateBar = styled.div<{ isSame: boolean }>`
   position: absolute;

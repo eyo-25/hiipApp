@@ -5,13 +5,7 @@ import { cardEditState, toDoState } from "../../../Recoil/atoms";
 import { useRecoilState } from "recoil";
 import { motion } from "framer-motion";
 
-function TodoBord({
-  isWeek,
-  setIsWeek,
-}: {
-  isWeek: boolean;
-  setIsWeek: React.Dispatch<React.SetStateAction<boolean>>;
-}) {
+function TodoBord() {
   const cardVariants = {
     normal: {
       opacity: 0,
@@ -40,7 +34,7 @@ function TodoBord({
             animate="animate"
             key={index}
           >
-            <TodoCard setIsWeek={setIsWeek} todoObj={toDo} index={index} />
+            <TodoCard todoObj={toDo} index={index} />
           </CardWrapper>
         ))}
       </Container>

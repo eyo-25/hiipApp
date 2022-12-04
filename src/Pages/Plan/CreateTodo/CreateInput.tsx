@@ -13,6 +13,7 @@ import {
   isCreateState,
   isTodoEditState,
   projectState,
+  selectTodoState,
   toDoState,
 } from "../../../Recoil/atoms";
 
@@ -35,6 +36,7 @@ function CreateInput({
   const [toDos, setToDos] = useRecoilState(toDoState);
   const [project, setProject] = useRecoilState(projectState);
   const [isCreate, setIsCreate] = useRecoilState(isCreateState);
+  const [selectTodo, setSelectTodo] = useRecoilState(selectTodoState);
   const [startDate, setStartDate] = useRecoilState(createStartDateState);
   const [endDate, setEndDate] = useRecoilState(createEndDateState);
   const [planTitle, setPlanTitle] = useRecoilState(createTitleState);

@@ -28,6 +28,10 @@ export const clickDateState = atom({
   default: Moment().format("YYYY-MM-DD"),
 });
 //plan
+export const isWeekState = atom({
+  key: "isWeekState",
+  default: false,
+});
 export const selectTodoState = atom({
   key: "selectTodoState",
   default: "",

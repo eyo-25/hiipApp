@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { IoChevronForward, IoChevronBack } from "react-icons/io5";
 import { useRecoilState } from "recoil";
-import { clickDateState } from "../../../Recoil/atoms";
+import { clickDateState, isWeekState } from "../../../Recoil/atoms";
 import WeeklyDatePicker from "./WeeklyDatePicker";
 import MonthDatePicker from "./MonthDatePicker";
 import { motion } from "framer-motion";
@@ -21,16 +21,11 @@ const calendarVariants = {
   },
 };
 
-const CalendarBoard = ({
-  isWeek,
-  setIsWeek,
-}: {
-  isWeek: boolean;
-  setIsWeek: React.Dispatch<React.SetStateAction<boolean>>;
-}) => {
+const CalendarBoard = () => {
   const Moment = require("moment");
   const calendarDays = ["일", "월", "화", "수", "목", "금", "토"];
   const [clickDate, setClickDate] = useRecoilState(clickDateState);
+  const [isWeek, setIsWeek] = useRecoilState(isWeekState);
 
   const onPrevClick = () => {
     if (isWeek) {
@@ -100,10 +95,10 @@ export default React.memo(CalendarBoard);
 
 const Wrapper = styled.div`
   width: 100%;
-  height: 13vh;
+  height: 13.5vh;
   cursor: pointer;
   @media screen and (max-height: 670px) {
-    height: 90px;
+    height: 100px;
   }
 `;
 const Container = styled(motion.div)`

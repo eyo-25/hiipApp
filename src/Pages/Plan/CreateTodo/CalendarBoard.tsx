@@ -59,13 +59,12 @@ function CalendarBoard({
     setClickDate(Moment().format("YYYY-MM-DD"));
   };
 
+  //초기화
   useEffect(() => {
     if (isType === "START") {
-      if (startDate !== "") {
-        setClickDate(startDate);
-      } else {
-        onTodayClick();
-      }
+      onTodayClick();
+      setStartDate("");
+      setEndDate("");
     } else {
       if (endDate !== "") {
         setClickDate(endDate);
