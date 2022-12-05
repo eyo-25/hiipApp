@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/hiipApp/static/css/main.34ee9472.css",
-    "main.js": "/hiipApp/static/js/main.238af53f.js",
+    "main.js": "/hiipApp/static/js/main.62635e96.js",
     "static/js/156.285d2a1a.chunk.js": "/hiipApp/static/js/156.285d2a1a.chunk.js",
     "static/js/134.bf775aa6.chunk.js": "/hiipApp/static/js/134.bf775aa6.chunk.js",
     "static/media/start_background2.png": "/hiipApp/static/media/start_background2.7f39d0b5d394d7cd25db.png",
@@ -26,12 +26,12 @@
     "static/media/plus.svg": "/hiipApp/static/media/plus.29ef5c87b8ab896d68730bf8b2420968.svg",
     "static/media/minusbtn.svg": "/hiipApp/static/media/minusbtn.9a4b268e15c74bb1d7bd0dd076a3f264.svg",
     "main.34ee9472.css.map": "/hiipApp/static/css/main.34ee9472.css.map",
-    "main.238af53f.js.map": "/hiipApp/static/js/main.238af53f.js.map",
+    "main.62635e96.js.map": "/hiipApp/static/js/main.62635e96.js.map",
     "156.285d2a1a.chunk.js.map": "/hiipApp/static/js/156.285d2a1a.chunk.js.map",
     "134.bf775aa6.chunk.js.map": "/hiipApp/static/js/134.bf775aa6.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.34ee9472.css",
-    "static/js/main.238af53f.js"
+    "static/js/main.62635e96.js"
   ]
 }
