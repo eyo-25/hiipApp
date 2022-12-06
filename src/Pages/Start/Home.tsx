@@ -84,7 +84,7 @@ function Home() {
       },
     },
     animate: {
-      height: isReady && toDos.length > 0 ? "57%" : "23%",
+      height: isReady && toDos.length > 0 ? "57%" : "25%",
       opacity: 1,
       transition: {
         duration: 0.7,

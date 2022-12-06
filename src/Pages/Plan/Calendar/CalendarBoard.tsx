@@ -97,20 +97,17 @@ const Wrapper = styled.div`
   width: 100%;
   height: 13.5vh;
   cursor: pointer;
-  @media screen and (max-height: 670px) {
-    height: 100px;
-  }
 `;
 const Container = styled(motion.div)`
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-top: 2.2vh;
+  padding-top: 1.6vh;
   max-width: 400px;
   margin: 0 auto;
   position: relative;
-  @media screen and (max-height: 800px) {
-    padding-top: 1.6vh;
+  @media screen and (max-height: 700px) {
+    padding-top: 1vh;
   }
 `;
 const MonthBox = styled.div`
@@ -119,7 +116,7 @@ const MonthBox = styled.div`
   align-items: center;
   width: 90%;
   font-weight: 600;
-  margin-bottom: 1.8vh;
+  margin-bottom: 1.6vh;
 `;
 const MonthText = styled.div`
   display: flex;
@@ -142,7 +139,7 @@ const DayBox = styled.div<{ isWeek: boolean }>`
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-bottom: ${(props) => (props.isWeek ? "1.2vh" : "1vh")};
+  margin-bottom: 0.6vh;
 `;
 const PrevBtn = styled(IoChevronBack)`
   width: 20px;
