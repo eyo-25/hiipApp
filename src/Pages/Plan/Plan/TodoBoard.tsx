@@ -79,6 +79,6 @@ const CardWrapper = styled(motion.div)`
   margin: 0 0.5vh;
   z-index: 5;
   &:last-child {
-    padding-bottom: 300px;
+    padding-bottom: 23px;
   }
 `;

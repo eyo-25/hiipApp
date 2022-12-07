@@ -8,6 +8,9 @@ import IntervalSetting from "../Pages/Plan/Project/IntervalSetting";
 import Plan from "../Pages/Plan/Plan";
 import CreateProject from "../Pages/Plan/Project/CreateProject";
 import Home from "../Pages/Start/Home";
+import Loader from "../Component/Loader";
+import { useRecoilState } from "recoil";
+import { loadState } from "../Recoil/atoms";
 
 interface AppRouterProps {
   isLoggedIn: boolean;
@@ -16,6 +19,7 @@ interface AppRouterProps {
 
 export default function AppRouter({ isLoggedIn, userObj }: AppRouterProps) {
   const [isHomeSplash, setHomeSplash] = useState(true);
+  const [isLoad, setIsLoad] = useRecoilState(loadState);
   if (!isLoggedIn) {
     return (
       <BrowserRouter basename={process.env.PUBLIC_URL}>
@@ -39,6 +43,7 @@ export default function AppRouter({ isLoggedIn, userObj }: AppRouterProps) {
   }
   return (
     <BrowserRouter basename={process.env.PUBLIC_URL}>
+      {isLoad && <Loader />}
       <Routes>
         <Route path={"/"} element={<Home />}></Route>
         <Route path={"/plan"} element={<Plan />}>

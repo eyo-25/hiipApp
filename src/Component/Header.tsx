@@ -1,15 +1,33 @@
+import { useLayoutEffect, useState } from "react";
 import { useMatch } from "react-router-dom";
+import { useRecoilState } from "recoil";
 import styled from "styled-components";
+import { projectState } from "../Recoil/atoms";
 
 function Header() {
+  const [project, setProject] = useRecoilState(projectState);
+  const [projectTitle, setProjectTitle] = useState("");
+  const [projectDday, setProjectDday] = useState("");
   const planMatch = useMatch("/plan/*");
   const mypageMatch = useMatch("/mypage/*");
+  const Moment = require("moment");
+
+  useLayoutEffect(() => {
+    if (project.length > 0) {
+      setProjectTitle(project[0].projectTitle);
+      setProjectDday(() => {
+        const dDay = Moment(project[0].endDate).diff(Moment(), "days");
+        return dDay >= 0 ? dDay : 0;
+      });
+    }
+  }, []);
+
   return (
     <Container>
       {planMatch && (
         <HeaderBox>
-          <Dday>D 14</Dday>
-          <ProjectTitle>중간고사</ProjectTitle>
+          <Dday>D {projectDday}</Dday>
+          <ProjectTitle>{projectTitle}</ProjectTitle>
           <HamMenu>
             <HamLine />
             <HamLine />

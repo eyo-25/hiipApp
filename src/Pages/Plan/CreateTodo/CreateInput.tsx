@@ -10,10 +10,13 @@ import {
   createStartDateState,
   createSubTitleState,
   createTitleState,
+  endDateState,
   isCreateState,
   isTodoEditState,
+  loadState,
   projectState,
   selectTodoState,
+  startDateState,
   toDoState,
 } from "../../../Recoil/atoms";
 
@@ -39,9 +42,12 @@ function CreateInput({
   const [selectTodo, setSelectTodo] = useRecoilState(selectTodoState);
   const [startDate, setStartDate] = useRecoilState(createStartDateState);
   const [endDate, setEndDate] = useRecoilState(createEndDateState);
+  const [startDate2, setStartDate2] = useRecoilState(startDateState);
+  const [endDate2, setEndDate2] = useRecoilState(endDateState);
   const [planTitle, setPlanTitle] = useRecoilState(createTitleState);
   const [planSubTitle, setPlanSubTitle] = useRecoilState(createSubTitleState);
   const [isTodoEdit, setIsTodoEdit] = useRecoilState(isTodoEditState);
+  const [isLoad, setIsLoad] = useRecoilState(loadState);
   const uid = JSON.parse(localStorage.getItem("user") as any).uid;
   const projectIndex = project.findIndex((item: any) => item.select === "true");
   const params = useParams();
@@ -63,57 +69,63 @@ function CreateInput({
     if (count <= 1) return;
     setCount((prev) => prev - 1);
   };
-  const onSubmit = async () => {
-    if (mode === "CREATE") {
-      const ok = window.confirm("플랜을 생성하시겠습니까?");
-      if (ok) {
-        if (planTitle === "" || planSubTitle === "") {
-          alert("To-Do제목을 적어주세요");
-          return;
-        }
-        if (startDate === "" || endDate === "") {
-          alert("To-Do날짜를 정해 주세요");
-          return;
-        }
-        const planObj = {
-          index: project[projectIndex].indexcount + 1,
-          defaultSet: count,
-          memo: "",
-          planSubTitle: planSubTitle,
-          planTitle: planTitle,
-          startDate: startDate,
-          endDate: endDate,
-          status: "ready",
-          uId: uid,
-          projectId: project[projectIndex].id,
-        };
-        const defaultTimeObj = {
-          setFocusSet: count,
-          setBreakSet: count - 1 <= 0 ? 0 : count - 1,
-          FocusSet: count,
-          breakSet: count - 1 <= 0 ? 0 : count - 1,
-          stopDate: "",
-          //테스트 끝나면 분만 적용
-          setFocusMin: 0,
-          setFocusSec: 10,
-          setBreakMin: 0,
-          setBreakSec: 5,
-          min: 0,
-          sec: 10,
-          breakMin: 0,
-          breakSec: 5,
-        };
+  //파이어베이스 ToDo생성 요청
+  async function createToDoSubmit() {
+    setIsLoad(true);
+    try {
+      const planObj = {
+        index: project[projectIndex].indexcount + 1,
+        defaultSet: count,
+        memo: "",
+        planSubTitle: planSubTitle,
+        planTitle: planTitle,
+        startDate: startDate,
+        endDate: endDate,
+        status: "ready",
+        uId: uid,
+        projectId: project[projectIndex].id,
+      };
+      const defaultTimeObj = {
+        setFocusSet: count,
+        setBreakSet: count - 1 <= 0 ? 0 : count - 1,
+        FocusSet: count,
+        breakSet: count - 1 <= 0 ? 0 : count - 1,
+        stopDate: "",
+        //테스트 끝나면 분만 적용
+        setFocusMin: 0,
+        setFocusSec: 10,
+        setBreakMin: 0,
+        setBreakSec: 5,
+        min: 0,
+        sec: 10,
+        breakMin: 0,
+        breakSec: 5,
+      };
+      const createTodoFbase = async () =>
         (await dbService.collection("plan").add(planObj))
           .collection("timer")
           .doc("time")
           .set(defaultTimeObj);
-        await dbService
+      const increaseIndexCounteFbase = () =>
+        dbService
           .collection("project")
           .doc(project[projectIndex].id)
           .update({ indexcount: project[projectIndex].indexcount + 1 });
-      }
-      setIsCreate(false);
-    } else if (mode === "EDIT") {
+
+      await Promise.all([createTodoFbase(), increaseIndexCounteFbase()]);
+    } catch (e) {
+      setIsLoad(false);
+      alert(
+        "서버 오류가 발생하여 To-Do생성이 실패 하였습니다. 다시 To-Do를 생성해 주세요."
+      );
+    } finally {
+      setIsLoad(false);
+    }
+  }
+  //파이어베이스 ToDo수정 요청
+  async function editToDoSubmit() {
+    setIsLoad(true);
+    try {
       const editObj = {
         defaultSet: count,
         planSubTitle: planSubTitle,
@@ -121,26 +133,76 @@ function CreateInput({
         startDate: startDate,
         endDate: endDate,
       };
-      if (project[projectIndex].defaultSet !== count) {
-        const editTimeObj = {
-          setFocusSet: count,
-          setBreakSet: count - 1 <= 0 ? 0 : count - 1,
-          FocusSet: count,
-          breakSet: count - 1 <= 0 ? 0 : count - 1,
-        };
-        await dbService
+      const editTimeObj = {
+        setFocusSet: count,
+        setBreakSet: count - 1 <= 0 ? 0 : count - 1,
+        FocusSet: count,
+        breakSet: count - 1 <= 0 ? 0 : count - 1,
+      };
+      const updateTimeFbase = () =>
+        dbService
           .collection("plan")
           .doc(todoId)
           .collection("timer")
           .doc("time")
           .update(editTimeObj);
-      }
-      await dbService.collection("plan").doc(todoId).update(editObj);
-      setIsTodoEdit(false);
+      const updateTodoFbase = () =>
+        dbService.collection("plan").doc(todoId).update(editObj);
+      await Promise.all([updateTimeFbase(), updateTodoFbase()]);
+    } catch (e) {
+      alert(
+        "서버 오류가 발생하여 To-Do수정이 실패 하였습니다. 다시 To-Do를 수정해 주세요."
+      );
+    } finally {
+      setIsLoad(false);
     }
-    navigate("/plan");
+  }
+
+  //전송 함수
+  const onSubmit = async () => {
+    const isRequired: boolean =
+      startDate === "" ||
+      endDate === "" ||
+      planTitle === "" ||
+      planSubTitle === "";
+    const requiredMessage = () => {
+      if (planTitle === "" || planSubTitle === "") {
+        alert("To-Do 제목을 설정해 주세요");
+        return;
+      } else if (startDate === "" || endDate === "") {
+        alert("To-Do 날짜를 설정해 주세요");
+        return;
+      }
+    };
+    if (mode === "CREATE") {
+      if (isRequired) {
+        requiredMessage();
+      } else {
+        const ok = window.confirm("To-Do를 생성하시겠습니까?");
+        if (ok) {
+          createToDoSubmit();
+          navigate("/plan");
+        }
+        setSelectTodo("");
+        setIsCreate(false);
+      }
+    } else if (mode === "EDIT") {
+      if (isRequired) {
+        requiredMessage();
+      } else {
+        const ok = window.confirm("To-Do를 수정하시겠습니까?");
+        if (ok) {
+          editToDoSubmit();
+          setStartDate2(startDate);
+          setEndDate2(endDate);
+          setIsTodoEdit(false);
+          navigate("/plan");
+        }
+      }
+    }
   };
 
+  //인풋 관리
   const titleChange = (event: React.FormEvent<HTMLInputElement>) => {
     const {
       currentTarget: { value },
@@ -172,7 +234,7 @@ function CreateInput({
         <TitleInput
           value={planTitle}
           onChange={titleChange}
-          placeholder="플랜 제목을 적어 주세요"
+          placeholder="To-Do를제목을 적어 주세요"
           required
         />
       </ItemBox>

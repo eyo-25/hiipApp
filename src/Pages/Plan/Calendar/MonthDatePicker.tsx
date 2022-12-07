@@ -10,7 +10,7 @@ import {
 } from "../../../Recoil/atoms";
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Red } from "../../../Styles/Colors";
+import { Blue, Red } from "../../../Styles/Colors";
 
 const calendarVariants = {
   normal: {
@@ -34,6 +34,7 @@ function MonthDatePicker() {
   const [toDos, setToDos] = useRecoilState(toDoState);
   const [startDate, setStartDate] = useRecoilState(startDateState);
   const [endDate, setEndDate] = useRecoilState(endDateState);
+  const [selectTodo, setSelectTodo] = useRecoilState(selectTodoState);
 
   // 현재월
   let calendarMonth = Number(Moment(clickDate).format("MM"));
@@ -117,10 +118,28 @@ function MonthDatePicker() {
               >
                 {Number(Moment(date).format("DD"))}
               </DateText>
-              {/* {((startDate <= date && date <= endDate) || startDate === date) &&
-                      startDate && <DateBar isSame={startDate === endDate} />} */}
               {project[0].startDate <= date && date <= project[0].endDate && (
-                <ProjectBar />
+                <BarBox>
+                  <DateBar
+                    isEdge={
+                      0 === Moment(date).day() || project[0].startDate === date
+                    }
+                  >
+                    <RightBar />
+                    <LeftBar />
+                  </DateBar>
+                  <PointBox>
+                    <BarPoint isRed={startDate <= date && date <= endDate} />
+                  </PointBox>
+                  <DateBar
+                    isEdge={
+                      6 === Moment(date).day() || project[0].endDate === date
+                    }
+                  >
+                    <RightBar />
+                    <LeftBar />
+                  </DateBar>
+                </BarBox>
               )}
             </HoverBox>
           ) : (
@@ -156,7 +175,7 @@ const DateBox = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  height: calc(var(--vh, 1vh) * 4.9);
+  height: calc(var(--vh, 1vh) * 5.2);
   cursor: pointer;
 `;
 const HoverBox = styled.div<{ clicked: boolean; isDeadLine: boolean }>`
@@ -169,38 +188,59 @@ const HoverBox = styled.div<{ clicked: boolean; isDeadLine: boolean }>`
   height: 25px;
   color: ${(props) => (props.clicked || props.isDeadLine) && "white"};
   background-color: ${(props) =>
-    props.clicked ? " Red" : props.isDeadLine ? "black" : null};
+    props.clicked ? "Red" : props.isDeadLine ? "black" : null};
   @media screen and (max-height: 800px) {
     width: 23px;
     height: 23px;
+  }
+  @media screen and (max-height: 700px) {
+    width: 20px;
+    height: 20px;
   }
 `;
 const DateText = styled.div<{ nowMonth: boolean }>`
   color: ${(props) => props.nowMonth && "#c4c4c4"};
 `;
-const DateBar = styled.div<{ isSame: boolean }>`
+const BarBox = styled.div`
   position: absolute;
   display: flex;
-  justify-content: center;
+  flex-direction: center;
   align-items: center;
   bottom: 0;
   width: 100%;
   height: 0.5vh;
-  background-color: ${(props) => (props.isSame ? "#FFC500" : "#0002ff")};
   @media screen and (max-height: 800px) {
     height: 4px;
   }
 `;
-const ProjectBar = styled.div`
+const DateBar = styled.div<{ isEdge: boolean }>`
+  display: flex;
+  height: 100%;
+  width: 50%;
+  background-color: ${(props) => (props.isEdge ? "white" : "#0002ff")};
+  justify-content: ${(props) => (props.isEdge ? "flex-start" : "flex-end")};
+`;
+const RightBar = styled.div`
+  height: 100%;
+  width: 50%;
+`;
+const LeftBar = styled.div`
+  height: 100%;
+  width: 50%;
+`;
+const PointBox = styled.div`
   position: absolute;
   display: flex;
   justify-content: center;
-  align-items: center;
-  bottom: 0;
   width: 100%;
-  height: 0.5vh;
-  background-color: #0002ff;
-  @media screen and (max-height: 800px) {
-    height: 4px;
-  }
+  height: 100%;
+`;
+const BarPoint = styled.div<{ isRed: boolean }>`
+  background-color: ${(props) => (props.isRed ? Red : Blue)};
+  width: 5px;
+  height: 100%;
+  margin: 0 auto;
+  z-index: 99;
+  height: 100%;
+  border-radius: 50%;
 `;

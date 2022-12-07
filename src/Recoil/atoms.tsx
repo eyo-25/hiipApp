@@ -15,6 +15,10 @@ export interface ITodo {
   id: string;
 }
 
+export const loadState = atom({
+  key: "loadState",
+  default: false,
+});
 export const toDoState = atom<ITodo[]>({
   key: "toDo",
   default: [],

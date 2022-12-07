@@ -9,6 +9,7 @@ import {
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import moment from "moment";
+import { Blue, Red } from "../../../Styles/Colors";
 
 interface IMonthDatePicker {
   setStartToggle: React.Dispatch<React.SetStateAction<boolean>>;
@@ -103,7 +104,6 @@ function MonthDatePicker({
     ) {
       return;
     }
-    // start와 앤드 사이에 눌렀을때 앤드만 변경
     if (isType === "START") {
       if (endDate < clickedDate) {
         setEndDate("");
@@ -112,9 +112,9 @@ function MonthDatePicker({
       setStartToggle(false);
     } else {
       // start보다 먼저 눌렀을때 초기화
-      // if (clickedDate < startDate) {
-      //   setStartDate("");
-      // }
+      if (clickedDate < startDate) {
+        setStartDate("");
+      }
       setEndDate(clickedDate);
       setEndToggle(false);
     }
@@ -133,8 +133,38 @@ function MonthDatePicker({
             >
               {Number(Moment(date).format("DD"))}
             </DateText>
-            {((startDate <= date && date <= endDate) || startDate === date) &&
-              startDate && <DateBar isSame={startDate === endDate} />}
+            {((startDate <= date &&
+              date <= endDate &&
+              startDate !== "" &&
+              endDate !== "") ||
+              startDate === date ||
+              endDate === date) && (
+              <BarBox>
+                <DateBar
+                  isEdge={
+                    0 === Moment(date).day() ||
+                    startDate === date ||
+                    startDate === ""
+                  }
+                >
+                  <RightBar />
+                  <LeftBar />
+                </DateBar>
+                <PointBox>
+                  <BarPoint />
+                </PointBox>
+                <DateBar
+                  isEdge={
+                    6 === Moment(date).day() ||
+                    endDate === date ||
+                    endDate === ""
+                  }
+                >
+                  <RightBar />
+                  <LeftBar />
+                </DateBar>
+              </BarBox>
+            )}
           </HoverBox>
         </DateBox>
       ))}
@@ -171,13 +201,46 @@ const HoverBox = styled.div`
 const DateText = styled.div<{ nowMonth: boolean }>`
   color: ${(props) => (props.nowMonth ? "black" : "#c4c4c4")};
 `;
-const DateBar = styled.div<{ isSame: boolean }>`
+const BarBox = styled.div`
   position: absolute;
   display: flex;
-  justify-content: center;
+  flex-direction: center;
   align-items: center;
   bottom: 0;
   width: 100%;
-  height: 4px;
-  background-color: ${(props) => (props.isSame ? "#FFC500" : "#0002ff")};
+  height: 0.5vh;
+  @media screen and (max-height: 800px) {
+    height: 4px;
+  }
+`;
+const DateBar = styled.div<{ isEdge: boolean }>`
+  display: flex;
+  height: 100%;
+  width: 50%;
+  background-color: ${(props) => (props.isEdge ? "white" : "#0002ff")};
+  justify-content: ${(props) => (props.isEdge ? "flex-start" : "flex-end")};
+`;
+const RightBar = styled.div`
+  height: 100%;
+  width: 50%;
+`;
+const LeftBar = styled.div`
+  height: 100%;
+  width: 50%;
+`;
+const PointBox = styled.div`
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+`;
+const BarPoint = styled.div`
+  background-color: Blue;
+  width: 5px;
+  height: 100%;
+  margin: 0 auto;
+  z-index: 99;
+  height: 100%;
+  border-radius: 50%;
 `;

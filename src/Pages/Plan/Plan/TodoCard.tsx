@@ -10,15 +10,16 @@ import {
   toDoState,
   selectTodoState,
   isWeekState,
+  startDateState,
+  endDateState,
 } from "../../../Recoil/atoms";
 import { Blue, Dark_Gray, Dark_Gray2 } from "../../../Styles/Colors";
 import { scrollIntoView } from "seamless-scroll-polyfill";
-import { useNavigate } from "react-router-dom";
+import { useMatch, useNavigate } from "react-router-dom";
 import { ReactComponent as EditBtn } from "../../../Assets/Icons/editbtn.svg";
 import { ReactComponent as DeletBtn } from "../../../Assets/Icons/deletbtn.svg";
 import { dbService } from "../../../firebase";
 import useOnClickOutSide from "../../../hooks/useOnClickOutSide";
-import { BrowserView, MobileView } from "react-device-detect";
 
 export const iconVariants = {
   normal: {
@@ -50,6 +51,9 @@ function TodoCard({ todoObj, index }: ITodoCard) {
   const [isEdit, setIsEdit] = useRecoilState(cardEditState);
   const [counter, setCounter] = useState(0);
   const [btnPopup, setBtnPopup] = useState(false);
+  const [startDate, setStartDate] = useRecoilState(startDateState);
+  const [endDate, setEndDate] = useRecoilState(endDateState);
+  const planMatch = useMatch("/plan/createTodo");
   const cardWrapperRef = useRef<any>(null);
   const cardRef = useRef<any>();
   const navigate = useNavigate();
@@ -68,18 +72,18 @@ function TodoCard({ todoObj, index }: ITodoCard) {
       },
     },
   };
-  //초기화
-  useEffect(() => {
-    return () => {
-      setSelectTodo("");
-    };
-  }, []);
   //isWeek 감지
   useEffect(() => {
     if (!isWeek) {
       setIsClicked(false);
     }
   }, [isWeek]);
+  //toDos 변경 감지
+  useEffect(() => {
+    if (isClicked) {
+      setIsClicked(false);
+    }
+  }, [planMatch]);
 
   useEffect(() => {
     // 셀렉된 카드 전부 닫기
@@ -87,15 +91,15 @@ function TodoCard({ todoObj, index }: ITodoCard) {
       setIsClicked(false);
     }
   }, [isSelect]);
-  useEffect(() => {
-    if (isEdit && isClicked) {
-      setTimeout(() => {
-        scrollIntoView(cardWrapperRef.current as any, {
-          behavior: "smooth",
-        });
-      }, 500);
-    }
-  }, [isEdit]);
+  // useEffect(() => {
+  //   if (isEdit && isClicked) {
+  //     setTimeout(() => {
+  //       scrollIntoView(cardWrapperRef.current as any, {
+  //         behavior: "smooth",
+  //       });
+  //     }, 500);
+  //   }
+  // }, [isEdit]);
   const cardVariants = {
     normal: {
       height: "162px",
@@ -138,16 +142,20 @@ function TodoCard({ todoObj, index }: ITodoCard) {
 
   const intervalRef = React.useRef(null) as any;
   const startCounter = () => {
+    setSelectTodo(todoObj.id);
+    setStartDate(() => todoObj.startDate);
+    setEndDate(() => todoObj.endDate);
     intervalRef.current = setInterval(() => {
-      setCounter((prevCounter) => prevCounter + 1);
+      setCounter((prev) => prev + 1);
     }, 100);
   };
-
   const onCardClick = () => {
     setSelectTodo(todoObj.id);
-    if (counter < 5 && !isClicked && isWeek) {
+    setStartDate(() => todoObj.startDate);
+    setEndDate(() => todoObj.endDate);
+    if (counter < 6 && !isClicked && isWeek) {
       clickToggle();
-    } else if (counter < 5 && isClicked && isWeek) {
+    } else if (counter < 6 && isClicked && isWeek) {
       setIsSelect(false);
       setIsClicked(false);
     }
@@ -155,7 +163,11 @@ function TodoCard({ todoObj, index }: ITodoCard) {
     intervalRef.current = null;
     setCounter(0);
   };
-
+  const counterStop = () => {
+    clearInterval(intervalRef.current);
+    intervalRef.current = null;
+    setCounter(0);
+  };
   const onMemoClick = () => {
     if (6 >= counter && isWeek) {
       if (isSelect && isClicked) {
@@ -171,7 +183,6 @@ function TodoCard({ todoObj, index }: ITodoCard) {
       setCounter(0);
     }
   };
-
   const onDubleClick = () => {
     if (!isWeek) {
       setIsWeek(true);
@@ -188,14 +199,17 @@ function TodoCard({ todoObj, index }: ITodoCard) {
   }
   const onDeleteClick = async () => {
     setBtnPopup(false);
-    const ok = window.confirm("플랜을 삭제 하시겠습니까?");
+    const ok = window.confirm("To-do를 삭제 하시겠습니까?");
     if (ok) {
       await dbService.doc(`plan/${todoObj.id}`).delete();
       await dbService
         .doc(`plan/${todoObj.id}`)
         .collection("timer")
         .doc("time")
-        .delete();
+        .delete()
+        .then(() => {
+          setSelectTodo("");
+        });
     }
   };
   const onEditClick = async () => {
@@ -237,6 +251,8 @@ function TodoCard({ todoObj, index }: ITodoCard) {
         <MemoContainer
           onMouseDown={startCounter}
           onTouchStart={startCounter}
+          onMouseOut={counterStop}
+          onTouchEnd={counterStop}
           onClick={onMemoClick}
           onDoubleClick={onDubleClick}
           isselect={isSelect}
@@ -263,12 +279,13 @@ function TodoCard({ todoObj, index }: ITodoCard) {
             <IntervalBar key={index} />
           ))}
         </IntervalBarBox>
-        <BrowserView>
-          <Background onClick={onCardClick} onMouseDown={startCounter} />
-        </BrowserView>
-        <MobileView>
-          <Background onTouchStart={startCounter} onClick={onCardClick} />
-        </MobileView>
+        <Background
+          onMouseOut={counterStop}
+          onTouchEnd={counterStop}
+          onClick={onCardClick}
+          onMouseDown={startCounter}
+          onTouchStart={startCounter}
+        />
       </TodoCarWrapper>
     </Wrapper>
   );

@@ -7,7 +7,7 @@ import { motion } from "framer-motion";
 import Background from "../../Assets/image/start_background2.png";
 import TodoBord from "./Home/TodoBord";
 import { useRecoilState } from "recoil";
-import { projectState, toDoState } from "../../Recoil/atoms";
+import { clickDateState, projectState, toDoState } from "../../Recoil/atoms";
 import { onSnapshot, query } from "firebase/firestore";
 import ProjectInfo from "./Home/ProjectInfo";
 import { authService, dbService } from "../../firebase";
@@ -21,11 +21,20 @@ function Home() {
   const [isFadeout, setIsFadeout] = useState(false);
   const [mouseDownClientY, setMouseDownClientY] = useState(0);
   const [mouseUpClientY, setMouseUpClientY] = useState(0);
+  const [clickDate, setClickDate] = useRecoilState(clickDateState);
   const [tochedY, setTochedY] = useState(0);
   const navigate = useNavigate();
   const uid = JSON.parse(localStorage.getItem("user") as any).uid;
+  const Moment = require("moment");
 
-  //살시간 감지
+  //초기화
+  useEffect(() => {
+    setClickDate(() => Moment().format("YYYY-MM-DD"));
+    return () => {
+      setClickDate(() => Moment().format("YYYY-MM-DD"));
+    };
+  }, []);
+  //프로젝트 변경 감지
   useEffect(() => {
     const uid = JSON.parse(localStorage.getItem("user") as any).uid;
     const q = query(dbService.collection("project").where("uid", "==", uid));
@@ -73,7 +82,7 @@ function Home() {
       });
     }
   }, [project]);
-
+  // 슬라이드 애니메이션
   const bottomVariants = {
     normal: {
       height: "0vh",

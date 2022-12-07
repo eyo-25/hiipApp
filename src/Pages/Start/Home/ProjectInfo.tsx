@@ -1,9 +1,10 @@
 import { motion } from "framer-motion";
 import { useRecoilState } from "recoil";
 import styled from "styled-components";
-import { toDoState } from "../../../Recoil/atoms";
+import { clickDateState, projectState, toDoState } from "../../../Recoil/atoms";
 import DetailInfo from "./DetailInfo";
 import WeeklyDatePicker from "./WeeklyDatePicker";
+import { useLayoutEffect, useState } from "react";
 
 export const fadeinVariants = {
   normal: {
@@ -27,11 +28,25 @@ function ProjectInfo({
   onBackClick: () => void;
 }) {
   const [toDos, setToDos] = useRecoilState(toDoState);
+  const [project, setProject] = useRecoilState(projectState);
+  const [projectDday, setProjectDday] = useState("");
+  const [clickDate, setClickDate] = useRecoilState(clickDateState);
+  const Moment = require("moment");
+  // 디데이 세팅
+  useLayoutEffect(() => {
+    if (project.length > 0) {
+      setProjectDday(() => {
+        const dDay = Moment(project[0].endDate).diff(Moment(clickDate), "days");
+        return dDay >= 0 ? dDay : 0;
+      });
+    }
+  }, [clickDate, project]);
+
   return (
     <InfoBox>
       <WeeklyDatePicker />
       {isReady ? (
-        <DetailInfo onBackClick={onBackClick} />
+        <DetailInfo onBackClick={onBackClick} projectDday={projectDday} />
       ) : (
         <>
           <MessageBox
@@ -51,7 +66,7 @@ function ProjectInfo({
             )}
           </MessageBox>
           <DdayBox variants={fadeinVariants} initial="normal" animate="animate">
-            <p>12</p>
+            <p>{projectDday}</p>
             <span>D.day</span>
           </DdayBox>
         </>
@@ -76,7 +91,7 @@ const MessageBox = styled(motion.div)`
   justify-content: center;
   align-items: center;
   width: 100%;
-  height: 64%;
+  height: 62%;
   margin: 0 auto;
   padding-top: 8vh;
   color: white;

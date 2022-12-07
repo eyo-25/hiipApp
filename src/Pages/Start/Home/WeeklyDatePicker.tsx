@@ -1,14 +1,25 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { IoChevronForward, IoChevronBack } from "react-icons/io5";
 import { motion } from "framer-motion";
 import { fadeinVariants } from "./ProjectInfo";
+import { clickDateState, projectState } from "../../../Recoil/atoms";
+import { useRecoilState } from "recoil";
 
 function WeeklyDatePicker() {
   const Moment = require("moment");
-  const [clickDate, setClickDate] = useState("");
-  //주간배열
+  const [clickDate, setClickDate] = useRecoilState(clickDateState);
+  const [project, setProject] = useRecoilState(projectState);
   const [weekArray, setWeekArray] = useState<Date[]>([]);
+  const [projectTitle, setProjectTitle] = useState("");
+
+  //프로젝트 타이틀 부여
+  useEffect(() => {
+    if (project.length > 0) {
+      setProjectTitle(project[0].projectTitle);
+    }
+  }, [project]);
+
+  //주간배열
   let addDay1 = 0;
   let addDay2 = 0;
 
@@ -39,18 +50,7 @@ function WeeklyDatePicker() {
   useEffect(() => {
     setClickDate(Moment().format("YYYY-MM-DD"));
   }, []);
-  const onPrevClick = () => {
-    setClickDate(() => {
-      const copy = Moment(clickDate);
-      return copy.subtract(1, "days");
-    });
-  };
-  const onNextClick = () => {
-    setClickDate(() => {
-      const copy = Moment(clickDate);
-      return copy.add(1, "days");
-    });
-  };
+  //버튼 함수
   const onTodayClick = () => {
     setClickDate(Moment().format("YYYY-MM-DD"));
   };
@@ -61,11 +61,9 @@ function WeeklyDatePicker() {
     <Wrapper variants={fadeinVariants} initial="normal" animate="animate">
       <Container>
         <MonthBox>
-          <PrevBtn onClick={onPrevClick} />
-          <MonthText onClick={onTodayClick}>
-            {Moment(clickDate).month() + 1}월
-          </MonthText>
-          <NextBtn onClick={onNextClick} />
+          <WeeklyHeaderText>{Moment(clickDate).month() + 1}월</WeeklyHeaderText>
+          <WeeklyHeaderText>{projectTitle}</WeeklyHeaderText>
+          <WeeklyHeaderText onClick={onTodayClick}>오늘</WeeklyHeaderText>
         </MonthBox>
         <DateContainer>
           {weekArray.map((date: any, index: number) => (
@@ -97,18 +95,28 @@ const Container = styled.div`
   color: white;
 `;
 const MonthBox = styled.div`
+  position: relative;
   display: flex;
   justify-content: space-between;
   align-items: center;
   width: 90%;
   margin-bottom: 1.7vh;
 `;
-const MonthText = styled.h4`
+const WeeklyHeaderText = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  font-weight: 600;
-  cursor: pointer;
+  font-weight: 500;
+  z-index: 10;
+  &:nth-child(2) {
+    position: absolute;
+    text-align: center;
+    width: 100%;
+    z-index: 5;
+  }
+  &:last-child {
+    cursor: pointer;
+  }
   @media screen and (max-height: 800px) {
     font-size: 14px;
   }
@@ -146,14 +154,4 @@ const DateText = styled.div`
     padding-bottom: 2px;
     padding-bottom: 0px;
   }
-`;
-const PrevBtn = styled(IoChevronBack)`
-  width: 20px;
-  height: 20px;
-  cursor: pointer;
-`;
-const NextBtn = styled(IoChevronForward)`
-  width: 20px;
-  height: 20px;
-  cursor: pointer;
 `;

@@ -63,8 +63,6 @@ function CalendarBoard({
   useEffect(() => {
     if (isType === "START") {
       onTodayClick();
-      setStartDate("");
-      setEndDate("");
     } else {
       if (endDate !== "") {
         setClickDate(endDate);

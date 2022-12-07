@@ -48,7 +48,7 @@ function Plan() {
       height: "0%",
     },
     animate: {
-      height: isWeek ? "20%" : "100%",
+      height: isWeek ? "21%" : "100%",
       transition: {
         duration: 0.9,
         type: "linear",
@@ -60,7 +60,7 @@ function Plan() {
     setIsTodoEdit(false);
     setIsCreate(false);
     if (0 < toDos.length) {
-      setSelectTodo(toDos[0].id);
+      setSelectTodo(() => toDos[0].id);
       setStartDate(() => toDos[0].startDate);
       setEndDate(() => toDos[0].endDate);
     }
@@ -73,27 +73,19 @@ function Plan() {
       setIsWeek(false);
     };
   }, []);
+
   //투두 선택 감지
   useEffect(() => {
-    if (selectTodo !== "" && 0 < toDos.length) {
-      const index = toDos.findIndex((item) => item.id === selectTodo);
-      setStartDate(() => toDos[index].startDate);
-      setEndDate(() => toDos[index].endDate);
-    }
-  }, [selectTodo]);
-
-  // 투두변경 감지
-  useEffect(() => {
-    if (0 < toDos.length) {
+    if (selectTodo === "" && 0 < toDos.length) {
+      setSelectTodo(() => toDos[0].id);
       setStartDate(() => toDos[0].startDate);
       setEndDate(() => toDos[0].endDate);
+    } else if (selectTodo === "" && 0 >= toDos.length) {
+      setStartDate("");
+      setEndDate("");
     }
-    // else if (0 < toDos.length && toDos[0].id !== selectTodo) {
-    //   const index = toDos.findIndex((item) => item.id === selectTodo);
-    //   setStartDate(() => toDos[index].startDate);
-    //   setEndDate(() => toDos[index].endDate);
-    // }
-  }, [toDos]);
+  }, [toDos, selectTodo]);
+
   //프로젝트 변경 감지
   useEffect(() => {
     const uid = JSON.parse(localStorage.getItem("user") as any).uid;
@@ -235,12 +227,7 @@ const CalendarBox = styled(motion.div)`
   height: 100%;
   width: 100%;
   background-color: white;
-  @media screen and (max-height: 650px) {
-    min-height: 84px;
-  }
-  @media screen and (max-height: 400px) {
-    min-height: 70px;
-  }
+  min-height: 84px;
 `;
 const TodoContainer = styled(motion.div)`
   position: relative;

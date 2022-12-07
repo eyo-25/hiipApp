@@ -2,7 +2,12 @@ import { motion } from "framer-motion";
 import styled from "styled-components";
 import { DdayBox, fadeinVariants } from "./ProjectInfo";
 
-function DetailInfo({ onBackClick }: { onBackClick: () => void }) {
+interface IDetailInfo {
+  onBackClick: () => void;
+  projectDday: string;
+}
+
+function DetailInfo({ onBackClick, projectDday }: IDetailInfo) {
   return (
     <>
       <DdayBox
@@ -11,7 +16,7 @@ function DetailInfo({ onBackClick }: { onBackClick: () => void }) {
         initial="normal"
         animate="animate"
       >
-        <p>12</p>
+        <p>{projectDday}</p>
         <span>D.day</span>
       </DdayBox>
       <DetailBox

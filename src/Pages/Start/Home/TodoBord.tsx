@@ -13,7 +13,7 @@ const bottomVariants = {
   },
   animate: {
     opacity: 1,
-    height: "7vh",
+    height: "6vh",
     transition: {
       delay: 0.5,
       duration: 0.8,
@@ -25,10 +25,7 @@ const bottomVariants = {
 function TodoBord({ isReady }: { isReady: boolean }) {
   const [toDos, setToDos] = useRecoilState(toDoState);
   const topRef = useRef<any>(null);
-  //클릭이벤트시 사용
-  // const topClick = () => {
-  //   topRef.current?.scrollIntoView({ behavior: "smooth" });
-  // };
+  //레디 상태해제시 스크롤
   useEffect(() => {
     if (!isReady) {
       setTimeout(() => {
