@@ -55,6 +55,7 @@ function Plan() {
       },
     },
   };
+
   // 초기화
   useEffect(() => {
     setIsTodoEdit(false);
@@ -105,6 +106,7 @@ function Plan() {
       }
     });
   }, []);
+
   //투두 변경 감지(snapshot)
   useEffect(() => {
     if (0 < toDos.length) {

@@ -69,7 +69,7 @@ const Dday = styled.h4`
 `;
 const ProjectTitle = styled.h4`
   font-weight: 900;
-  letter-spacing: -1.3px;
+  letter-spacing: -1px;
   font-size: 2.9vh;
   @media screen and (min-height: 800px) {
     font-size: 2.5vh;

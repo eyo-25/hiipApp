@@ -1,7 +1,9 @@
 import { motion } from "framer-motion";
 import { useEffect } from "react";
+import { useRecoilState } from "recoil";
 import styled from "styled-components";
 import Background from "../Assets/image/start_background2.png";
+import { homeSplashState } from "../Recoil/atoms";
 
 const gradientVariants = {
   normal: {
@@ -32,14 +34,11 @@ const textVariants = {
   },
 };
 
-function HomeSplash({
-  setHomeSplash,
-}: {
-  setHomeSplash: React.Dispatch<React.SetStateAction<boolean>>;
-}) {
+function HomeSplash() {
+  const [isHomeSplash, setIsHomeSplash] = useRecoilState(homeSplashState);
   useEffect(() => {
     setTimeout(() => {
-      setHomeSplash(false);
+      setIsHomeSplash(false);
     }, 2000);
   }, []);
   return (

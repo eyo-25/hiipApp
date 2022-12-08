@@ -19,14 +19,18 @@ function MyPage({ userObj }: any) {
   ).nickname;
   const navigate = useNavigate();
   const editMatch = useMatch(`/mypage/editprofile`);
-  const onLogOutClick = () => {
-    authService.signOut();
-    // window.localStorage.removeItem("user");
-    navigate(`/`);
-    setHomeSplash(true);
+  async function logoutSubmit() {
+    authService.signOut().then(() => {
+      setHomeSplash(true);
+      navigate(`/`);
+    });
+  }
+  const onLogOutClick = async () => {
+    await logoutSubmit();
   };
   const onEditClick = () => {
     navigate(`/mypage/editprofile`);
+    window.localStorage.removeItem("user");
   };
   const GUEST_ICON =
     "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS_qBTDzBVonLHd5Ejk0i-61YlcHI54KTgOMhIRea9jwACihT9hxQaj2P87_XAv87DEkAY&usqp=CAU";

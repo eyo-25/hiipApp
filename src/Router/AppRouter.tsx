@@ -10,7 +10,8 @@ import CreateProject from "../Pages/Plan/Project/CreateProject";
 import Home from "../Pages/Start/Home";
 import Loader from "../Component/Loader";
 import { useRecoilState } from "recoil";
-import { loadState } from "../Recoil/atoms";
+import { homeSplashState, loadState } from "../Recoil/atoms";
+import Start from "../Pages/Start/Start/Start";
 
 interface AppRouterProps {
   isLoggedIn: boolean;
@@ -18,29 +19,29 @@ interface AppRouterProps {
 }
 
 export default function AppRouter({ isLoggedIn, userObj }: AppRouterProps) {
-  const [isHomeSplash, setHomeSplash] = useState(true);
+  const [isHomeSplash, setHomeSplash] = useRecoilState(homeSplashState);
   const [isLoad, setIsLoad] = useRecoilState(loadState);
   if (!isLoggedIn) {
     return (
       <BrowserRouter basename={process.env.PUBLIC_URL}>
         <Routes>
-          <Route path={"/"} element={<Auth />} />
+          <Route path={"/"} element={<Auth />}></Route>
         </Routes>
       </BrowserRouter>
     );
   }
-  if (isHomeSplash) {
-    return (
-      <BrowserRouter basename={process.env.PUBLIC_URL}>
-        <Routes>
-          <Route
-            path={"/"}
-            element={<HomeSplash setHomeSplash={setHomeSplash} />}
-          />
-        </Routes>
-      </BrowserRouter>
-    );
-  }
+  // if (isHomeSplash) {
+  //   return (
+  //     <BrowserRouter basename={process.env.PUBLIC_URL}>
+  //       <Routes>
+  //         <Route
+  //           path={"/"}
+  //           element={<HomeSplash setHomeSplash={setHomeSplash} />}
+  //         />
+  //       </Routes>
+  //     </BrowserRouter>
+  //   );
+  // }
   return (
     <BrowserRouter basename={process.env.PUBLIC_URL}>
       {isLoad && <Loader />}

@@ -1,6 +1,20 @@
 import React, { useEffect, useRef } from "react";
 import Lottie from "lottie-web";
 import styled from "styled-components";
+import { motion } from "framer-motion";
+
+export const fadeinVariants = {
+  normal: {
+    opacity: 0,
+  },
+  animate: {
+    opacity: 1,
+    transition: {
+      duration: 0.3,
+      type: "linear",
+    },
+  },
+};
 
 function Loader() {
   const container = useRef(null);
@@ -10,11 +24,11 @@ function Loader() {
       renderer: "svg",
       loop: true,
       autoplay: true,
-      animationData: require("../Assets/Lottie/97443-loading-gray.json"),
+      animationData: require("../Assets/Lottie/loadingWhite.json"),
     });
   }, []);
   return (
-    <Wrapper>
+    <Wrapper variants={fadeinVariants} initial="normal" animate="animate">
       <Container>
         <div className="container" ref={container}></div>
       </Container>
@@ -24,7 +38,7 @@ function Loader() {
 
 export default Loader;
 
-const Wrapper = styled.div`
+const Wrapper = styled(motion.div)`
   position: fixed;
   display: flex;
   justify-content: center;

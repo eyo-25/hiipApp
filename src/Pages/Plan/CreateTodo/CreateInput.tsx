@@ -182,9 +182,10 @@ function CreateInput({
         if (ok) {
           createToDoSubmit();
           navigate("/plan");
+          setStartDate2(startDate);
+          setEndDate2(endDate);
+          setIsCreate(false);
         }
-        setSelectTodo("");
-        setIsCreate(false);
       }
     } else if (mode === "EDIT") {
       if (isRequired) {
@@ -192,10 +193,10 @@ function CreateInput({
       } else {
         const ok = window.confirm("To-Do를 수정하시겠습니까?");
         if (ok) {
-          editToDoSubmit();
           setStartDate2(startDate);
           setEndDate2(endDate);
           setIsTodoEdit(false);
+          editToDoSubmit();
           navigate("/plan");
         }
       }

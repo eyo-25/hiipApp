@@ -12,6 +12,7 @@ import {
   isWeekState,
   startDateState,
   endDateState,
+  loadState,
 } from "../../../Recoil/atoms";
 import { Blue, Dark_Gray, Dark_Gray2 } from "../../../Styles/Colors";
 import { scrollIntoView } from "seamless-scroll-polyfill";
@@ -53,6 +54,7 @@ function TodoCard({ todoObj, index }: ITodoCard) {
   const [btnPopup, setBtnPopup] = useState(false);
   const [startDate, setStartDate] = useRecoilState(startDateState);
   const [endDate, setEndDate] = useRecoilState(endDateState);
+  const [isLoad, setIsLoad] = useRecoilState(loadState);
   const planMatch = useMatch("/plan/createTodo");
   const cardWrapperRef = useRef<any>(null);
   const cardRef = useRef<any>();
@@ -197,19 +199,31 @@ function TodoCard({ todoObj, index }: ITodoCard) {
   for (let index = 0; index < todoObj.defaultSet; index++) {
     intervalArray[index] = index;
   }
+
+  async function deleteToDoSubmit() {
+    try {
+      const planDeleteFbase = () =>
+        dbService.doc(`plan/${todoObj.id}`).delete();
+      const timeDeleteFbase = () =>
+        dbService
+          .doc(`plan/${todoObj.id}`)
+          .collection("timer")
+          .doc("time")
+          .delete();
+      await Promise.all([planDeleteFbase(), timeDeleteFbase()]);
+    } catch (e) {
+      alert(
+        "서버 오류가 발생하여 To-Do삭제가 실패 하였습니다. 다시 To-Do를 삭제해 주세요."
+      );
+    } finally {
+    }
+  }
   const onDeleteClick = async () => {
     setBtnPopup(false);
     const ok = window.confirm("To-do를 삭제 하시겠습니까?");
     if (ok) {
-      await dbService.doc(`plan/${todoObj.id}`).delete();
-      await dbService
-        .doc(`plan/${todoObj.id}`)
-        .collection("timer")
-        .doc("time")
-        .delete()
-        .then(() => {
-          setSelectTodo("");
-        });
+      await deleteToDoSubmit();
+      setSelectTodo("");
     }
   };
   const onEditClick = async () => {
@@ -220,14 +234,13 @@ function TodoCard({ todoObj, index }: ITodoCard) {
   return (
     <Wrapper ref={cardWrapperRef}>
       <TodoCarWrapper
-        ref={cardRef}
         variants={cardVariants}
         initial="normal"
         animate="animate"
         whileTap="click"
       >
         {btnPopup && (
-          <BtnBox>
+          <BtnBox ref={cardRef}>
             <DeletBtn onClick={onDeleteClick} />
             <EditBtn onClick={onEditClick} />
           </BtnBox>
