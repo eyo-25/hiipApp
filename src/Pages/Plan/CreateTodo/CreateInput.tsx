@@ -180,11 +180,12 @@ function CreateInput({
       } else {
         const ok = window.confirm("To-Do를 생성하시겠습니까?");
         if (ok) {
-          createToDoSubmit();
-          navigate("/plan");
-          setStartDate2(startDate);
-          setEndDate2(endDate);
-          setIsCreate(false);
+          createToDoSubmit().then(() => {
+            navigate("/plan");
+            setStartDate2(startDate);
+            setEndDate2(endDate);
+            setIsCreate(false);
+          });
         }
       }
     } else if (mode === "EDIT") {

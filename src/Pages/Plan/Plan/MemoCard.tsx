@@ -16,16 +16,17 @@ import {
 } from "./TodoCard";
 import { Dark_Gray2 } from "../../../Styles/Colors";
 import { useRecoilState } from "recoil";
-import { selectState, cardEditState, toDoState } from "../../../Recoil/atoms";
-import { useNavigate, useParams } from "react-router-dom";
-import { dbService } from "../../../firebase";
+import { toDoState } from "../../../Recoil/atoms";
+import { useParams } from "react-router-dom";
 
-function MemoCard() {
-  const navigate = useNavigate();
-  const [isEdit, setIsEdit] = useRecoilState(cardEditState);
-  const [isSelect, setIsSelect] = useRecoilState(selectState);
+interface iMemoProps {
+  memoText: string;
+  setMemoText: React.Dispatch<React.SetStateAction<string>>;
+  onSaveClick: () => Promise<void>;
+}
+
+function MemoCard({ memoText, setMemoText, onSaveClick }: iMemoProps) {
   const [toDos, setToDos] = useRecoilState(toDoState);
-  const [memoText, setMemoText] = useState("");
   const autoFocusRef = useRef<any>(null);
   const params = useParams();
   const todoId = params.todoId;
@@ -33,8 +34,8 @@ function MemoCard() {
   const [intervalArray, setIntervalArray] = useState<number[]>([]);
 
   useEffect(() => {
-    const set = toDos[index].defaultSet;
     setIntervalArray((prev) => {
+      const set = toDos[index].defaultSet;
       const copy = [...prev];
       for (let index = 0; index < set; index++) {
         copy[index] = index;
@@ -57,25 +58,8 @@ function MemoCard() {
     },
   };
   useEffect(() => {
-    //autoFocus 부여
-    // setTimeout(() => {
-    //   if (autoFocusRef.current) {
-    //     autoFocusRef.current.focus();
-    //   }
-    // }, 1000);
-    //메모 디폴트 부여
     setMemoText(toDos[index].memo);
   }, []);
-  const onSaveClick = async () => {
-    await dbService
-      .collection("plan")
-      .doc(`${toDos[index].id}`)
-      .update({ memo: memoText });
-
-    setIsEdit(false);
-    setIsSelect(false);
-    navigate("/plan");
-  };
   const onTextChange = (event: React.FormEvent<HTMLTextAreaElement>) => {
     const {
       currentTarget: { value },

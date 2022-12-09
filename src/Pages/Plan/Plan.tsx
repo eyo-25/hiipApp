@@ -64,6 +64,8 @@ function Plan() {
       setSelectTodo(() => toDos[0].id);
       setStartDate(() => toDos[0].startDate);
       setEndDate(() => toDos[0].endDate);
+    } else {
+      setIsWeek(true);
     }
     return () => {
       setIsEdit(false);

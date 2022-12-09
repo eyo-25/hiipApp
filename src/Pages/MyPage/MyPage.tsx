@@ -26,11 +26,13 @@ function MyPage({ userObj }: any) {
     });
   }
   const onLogOutClick = async () => {
-    await logoutSubmit();
+    const ok = window.confirm("로그아웃 하시겠습니까?");
+    if (ok) {
+      await logoutSubmit();
+    }
   };
   const onEditClick = () => {
     navigate(`/mypage/editprofile`);
-    window.localStorage.removeItem("user");
   };
   const GUEST_ICON =
     "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS_qBTDzBVonLHd5Ejk0i-61YlcHI54KTgOMhIRea9jwACihT9hxQaj2P87_XAv87DEkAY&usqp=CAU";

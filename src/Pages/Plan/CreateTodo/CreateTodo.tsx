@@ -17,6 +17,34 @@ import {
 } from "../../../Recoil/atoms";
 import CalendarBoard from "./CalendarBoard";
 
+const backgroundVariants = {
+  normal: {
+    backgroundColor: "rgba(0, 0, 0, 0)",
+    backdropFilter: "blur(0px)",
+  },
+  animate: {
+    backgroundColor: "rgba(0, 0, 0, 0.2)",
+    backdropFilter: "blur(1.5px)",
+    transition: {
+      duration: 0.5,
+      type: "linear",
+    },
+  },
+};
+const popupVariants = {
+  normal: {
+    opacity: 0,
+  },
+  animate: {
+    opacity: 1,
+    transition: {
+      delay: 0.2,
+      duration: 0.7,
+      type: "linear",
+    },
+  },
+};
+
 const CreateTodo = ({ mode }: { mode: string }) => {
   const navigate = useNavigate();
   const [project, setProject] = useRecoilState(projectState);
@@ -57,33 +85,6 @@ const CreateTodo = ({ mode }: { mode: string }) => {
     };
   }, []);
 
-  const backgroundVariants = {
-    normal: {
-      backgroundColor: "rgba(0, 0, 0, 0)",
-      backdropFilter: "blur(0px)",
-    },
-    animate: {
-      backgroundColor: "rgba(0, 0, 0, 0.2)",
-      backdropFilter: "blur(1.5px)",
-      transition: {
-        duration: 1,
-        type: "linear",
-      },
-    },
-  };
-  const popupVariants = {
-    normal: {
-      opacity: 0,
-    },
-    animate: {
-      opacity: 1,
-      transition: {
-        delay: 0.3,
-        duration: 1,
-        type: "linear",
-      },
-    },
-  };
   const onOverlayClicked = () => {
     if (mode === "CREATE") {
       setIsCreate(false);

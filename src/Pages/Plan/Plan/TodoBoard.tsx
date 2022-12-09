@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import TodoCard from "./TodoCard";
-import { cardEditState, toDoState } from "../../../Recoil/atoms";
+import { cardEditState, projectState, toDoState } from "../../../Recoil/atoms";
 import { useRecoilState } from "recoil";
 import { motion } from "framer-motion";
 
@@ -21,12 +21,33 @@ function TodoBord() {
   };
   const [toDos, setToDos] = useRecoilState(toDoState);
   const [isEdit, setIsEdit] = useRecoilState(cardEditState);
+  const [project, setProject] = useRecoilState(projectState);
   useEffect(() => {
     return setIsEdit(false);
   }, []);
+
   return (
     <Wrapper isEdit={isEdit}>
       <Container>
+        {toDos.length <= 0 && (
+          <GuidBox variants={cardVariants} initial="normal" animate="animate">
+            {project.length <= 0 ? (
+              <GuidText>
+                프로젝트를 만들고
+                <br />
+                플랜을 진행하세요
+              </GuidText>
+            ) : (
+              <GuidText>
+                TO-DO를 추가하고
+                <br />
+                인터벌 플랜을
+                <br />
+                완성해주세요
+              </GuidText>
+            )}
+          </GuidBox>
+        )}
         {toDos?.map((toDo, index) => (
           <CardWrapper
             variants={cardVariants}
@@ -81,4 +102,16 @@ const CardWrapper = styled(motion.div)`
   &:last-child {
     padding-bottom: 23px;
   }
+`;
+const GuidBox = styled(motion.div)`
+  display: flex;
+  width: 100%;
+  padding-top: 23px;
+  padding-left: 15px;
+`;
+const GuidText = styled.h4`
+  font-size: 32px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: #e0e0e0;
 `;

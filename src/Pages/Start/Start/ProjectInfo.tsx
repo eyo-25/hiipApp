@@ -4,7 +4,8 @@ import styled from "styled-components";
 import { clickDateState, projectState, toDoState } from "../../../Recoil/atoms";
 import DetailInfo from "./DetailInfo";
 import WeeklyDatePicker from "./WeeklyDatePicker";
-import { useLayoutEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
+import { wiseSaying } from "./WiseSaying";
 
 export const fadeinVariants = {
   normal: {
@@ -31,14 +32,29 @@ function ProjectInfo({
   const [project, setProject] = useRecoilState(projectState);
   const [projectDday, setProjectDday] = useState("");
   const [clickDate, setClickDate] = useRecoilState(clickDateState);
+  const [wiseSayingArry, setWiseSayingArry] = useState<string[]>([]);
   const Moment = require("moment");
+
+  //초기화
+  useEffect(() => {
+    const randomIndex = Math.floor(Math.random() * (wiseSaying.length + 1));
+    const randomWiseSaying = wiseSaying[randomIndex];
+    const randomWiseSayingArry = (
+      randomWiseSaying || "이대론-가망이 없다"
+    ).split("-");
+    setWiseSayingArry(randomWiseSayingArry);
+    return () => setWiseSayingArry([]);
+  }, [isReady]);
+
   // 디데이 세팅
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (project.length > 0) {
       setProjectDday(() => {
         const dDay = Moment(project[0].endDate).diff(Moment(clickDate), "days");
         return dDay >= 0 ? dDay : 0;
       });
+    } else {
+      setProjectDday("0");
     }
   }, [clickDate, project]);
 
@@ -49,22 +65,44 @@ function ProjectInfo({
         <DetailInfo onBackClick={onBackClick} projectDday={projectDday} />
       ) : (
         <>
-          <MessageBox
-            variants={fadeinVariants}
-            initial="normal"
-            animate="animate"
-          >
+          <>
             {toDos.length > 0 ? (
-              <h4>
-                이대론 <br /> 가망이 없다
-              </h4>
+              <MessageBox
+                variants={fadeinVariants}
+                initial="normal"
+                animate="animate"
+              >
+                {wiseSaying && (
+                  <>
+                    {wiseSayingArry.map((word, i) => (
+                      <WiseSayingText key={i}>
+                        {word}
+                        <br />
+                      </WiseSayingText>
+                    ))}
+                  </>
+                )}
+              </MessageBox>
             ) : (
-              <h4>
-                D-DAY를 설정하고 <br />
-                TO-DO를 추가하세요.
-              </h4>
+              <MessageBox>
+                {project.length <= 0 ? (
+                  <WiseSayingText>
+                    프로젝트를 만들고
+                    <br />
+                    플랜을 진행하세요
+                  </WiseSayingText>
+                ) : (
+                  <WiseSayingText>
+                    TO-DO를 추가하고
+                    <br />
+                    인터벌 플랜을
+                    <br />
+                    완성해주세요
+                  </WiseSayingText>
+                )}
+              </MessageBox>
             )}
-          </MessageBox>
+          </>
           <DdayBox variants={fadeinVariants} initial="normal" animate="animate">
             <p>{projectDday}</p>
             <span>D.day</span>
@@ -95,13 +133,6 @@ const MessageBox = styled(motion.div)`
   margin: 0 auto;
   padding-top: 8vh;
   color: white;
-  h4 {
-    text-align: center;
-    line-height: 1.5;
-    color: white;
-    font-size: 3vh;
-    font-weight: 400;
-  }
 `;
 export const DdayBox = styled(motion.div)`
   display: flex;
@@ -121,4 +152,11 @@ export const DdayBox = styled(motion.div)`
     letter-spacing: -10px;
     margin-right: 8px;
   }
+`;
+const WiseSayingText = styled.h4`
+  text-align: center;
+  line-height: 1.5;
+  color: white;
+  font-size: 3vh;
+  font-weight: 400;
 `;

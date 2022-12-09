@@ -19,6 +19,9 @@ function Header() {
         const dDay = Moment(project[0].endDate).diff(Moment(), "days");
         return dDay >= 0 ? dDay : 0;
       });
+    } else {
+      setProjectTitle("HIIP");
+      setProjectDday("0");
     }
   }, []);
 

@@ -25,6 +25,7 @@ const bottomVariants = {
 function TodoBord({ isReady }: { isReady: boolean }) {
   const [toDos, setToDos] = useRecoilState(toDoState);
   const topRef = useRef<any>(null);
+
   //레디 상태해제시 스크롤
   useEffect(() => {
     if (!isReady) {

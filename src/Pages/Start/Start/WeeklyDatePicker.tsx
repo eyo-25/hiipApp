@@ -16,6 +16,8 @@ function WeeklyDatePicker() {
   useEffect(() => {
     if (project.length > 0) {
       setProjectTitle(project[0].projectTitle);
+    } else {
+      setProjectTitle("HIIP");
     }
   }, [project]);
 

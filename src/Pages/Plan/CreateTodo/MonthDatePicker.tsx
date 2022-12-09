@@ -8,8 +8,6 @@ import {
 } from "../../../Recoil/atoms";
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import moment from "moment";
-import { Blue, Red } from "../../../Styles/Colors";
 
 interface IMonthDatePicker {
   setStartToggle: React.Dispatch<React.SetStateAction<boolean>>;

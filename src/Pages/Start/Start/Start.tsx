@@ -76,6 +76,8 @@ function Start() {
   const onPlayClick = () => {
     if (project.length <= 0) {
       navigate("/plan/createProject");
+    } else if (toDos.length <= 0) {
+      navigate("/plan");
     }
     //타이머로 이꾸
   };
