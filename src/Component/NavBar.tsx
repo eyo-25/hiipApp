@@ -7,11 +7,15 @@ import { ReactComponent as Icon3 } from "../Assets/Icons/peedback.svg";
 import { ReactComponent as Icon4 } from "../Assets/Icons/mypage.svg";
 import { Dark_Gray } from "../Styles/Colors";
 import TabBar from "./TabBar";
+import { useRecoilState } from "recoil";
+import { inputFocusState } from "../Recoil/atoms";
+import { isMobile } from "react-device-detect";
 
 function NavBar() {
+  const [inputToggle, setInputToggle] = useRecoilState(inputFocusState);
   const [istab, setIstab] = useState(false);
   const navigate = useNavigate();
-  const onClick = (address: string) => {
+  const onNavClick = (address: string) => {
     navigate(address);
   };
   const planMatch = useMatch("/plan/*");
@@ -23,41 +27,49 @@ function NavBar() {
       setIstab(true);
     }
   }, []);
+
   return (
-    <Wrapper>
-      {istab ? <TabBar /> : null}
-      <NavContainer istab={istab}>
-        <Nav>
-          <Items>
-            <Item
-              isActive={planMatch !== null}
-              onClick={() => onClick("/plan")}
-            >
-              <Icon1 />
-              <Link to="/plan">계획</Link>
-            </Item>
-            <Item isActive={startMatch !== null} onClick={() => onClick("/")}>
-              <Icon2 />
-              <Link to="/">실행</Link>
-            </Item>
-            <Item
-              isActive={feedbackMatch !== null}
-              onClick={() => onClick("/feedback")}
-            >
-              <Icon3 />
-              <Link to="/feedBack">피드백</Link>
-            </Item>
-            <Item
-              isActive={mypageMatch !== null}
-              onClick={() => onClick("/mypage")}
-            >
-              <Icon4 />
-              <Link to="/mypage">MY</Link>
-            </Item>
-          </Items>
-        </Nav>
-      </NavContainer>
-    </Wrapper>
+    <>
+      {!(inputToggle && isMobile) && (
+        <Wrapper>
+          {istab ? <TabBar /> : null}
+          <NavContainer istab={istab}>
+            <Nav>
+              <Items>
+                <Item
+                  isActive={planMatch !== null}
+                  onClick={() => onNavClick("/plan")}
+                >
+                  <Icon1 />
+                  <Link to="/plan">계획</Link>
+                </Item>
+                <Item
+                  isActive={startMatch !== null}
+                  onClick={() => onNavClick("/")}
+                >
+                  <Icon2 />
+                  <Link to="/">실행</Link>
+                </Item>
+                <Item
+                  isActive={feedbackMatch !== null}
+                  onClick={() => onNavClick("/feedback")}
+                >
+                  <Icon3 />
+                  <Link to="/feedBack">피드백</Link>
+                </Item>
+                <Item
+                  isActive={mypageMatch !== null}
+                  onClick={() => onNavClick("/mypage")}
+                >
+                  <Icon4 />
+                  <Link to="/mypage">MY</Link>
+                </Item>
+              </Items>
+            </Nav>
+          </NavContainer>
+        </Wrapper>
+      )}
+    </>
   );
 }
 

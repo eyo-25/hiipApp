@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useRecoilState } from "recoil";
 import styled from "styled-components";
@@ -12,6 +12,7 @@ import {
 } from "../../../Recoil/atoms";
 import { Dark_Gray } from "../../../Styles/Colors";
 import CalendarBoard from "./CalendarBoard";
+import { isAndroid } from "react-device-detect";
 
 const calendarVariants = {
   normal: {
@@ -32,7 +33,7 @@ function CreateProject() {
   const [projectTitle, setProjectTitle] = useRecoilState(projectTitleState);
   const [startDate, setStartDate] = useRecoilState(startDateState);
   const [endDate, setEndDate] = useRecoilState(endDateState);
-
+  const inputRef = useRef<any>(null);
   const reset = () => {
     setProjectTitle("");
     setInputToggle(false);
@@ -54,43 +55,55 @@ function CreateProject() {
       alert("D-DAY를 설정해주세요");
       return;
     }
-    navigate("/plan/intervalSetting");
+    navigate("/plan/intervalSetting/create");
+  };
+  const onKeyPress = (e: any) => {
+    if (e.keyCode === 13 || e.key === "Enter") {
+      inputRef.current.blur();
+    }
   };
   useEffect(() => {
     reset();
   }, []);
   return (
-    <Applayout>
-      <ContentContainer>
-        <Wrapper>
-          <TitleBox>
-            <h4>프로젝트 제목은 무엇인가요?</h4>
-            <TitleInput
-              value={projectTitle}
-              onChange={projectChange}
-              required
-              onFocus={() => setInputToggle(true)}
-              onBlur={() => setInputToggle(false)}
-            />
-          </TitleBox>
-          {!inputToggle && (
-            <BottomBox
-              variants={calendarVariants}
-              initial="normal"
-              animate="animate"
-            >
-              <CalendarBox>
-                <h4>D-DAY가 언제이신가요?</h4>
-                <CalendarBoard />
-              </CalendarBox>
-              <ButtonBox>
-                <NextButton onClick={onNextClick}>다음</NextButton>
-              </ButtonBox>
-            </BottomBox>
-          )}
-        </Wrapper>
-      </ContentContainer>
-    </Applayout>
+    <ContentContainer>
+      <Wrapper>
+        <TitleBox>
+          <MainTitle>프로젝트 제목은 무엇인가요?</MainTitle>
+          <TitleInput
+            ref={inputRef}
+            value={projectTitle}
+            onChange={projectChange}
+            required
+            onFocus={() => setInputToggle(true)}
+            onBlur={() => setInputToggle(false)}
+            onKeyPress={onKeyPress}
+          />
+        </TitleBox>
+        <BottomBox
+          variants={calendarVariants}
+          initial="normal"
+          animate="animate"
+        >
+          <CalendarBox>
+            <MainTitle>D-DAY가 언제이신가요?</MainTitle>
+            <CalendarBoard />
+          </CalendarBox>
+          <ButtonBox>
+            {!(inputToggle && isAndroid) && (
+              <NextButton
+                onClick={onNextClick}
+                variants={calendarVariants}
+                initial="normal"
+                animate="animate"
+              >
+                다음
+              </NextButton>
+            )}
+          </ButtonBox>
+        </BottomBox>
+      </Wrapper>
+    </ContentContainer>
   );
 }
 
@@ -116,19 +129,31 @@ const TitleBox = styled.div`
   display: flex;
   justify-content: flex-end;
   flex-direction: column;
-  padding-top: 45px;
-  border-bottom: 1px solid ${Dark_Gray};
-  h4 {
-    font-size: 20px;
-    margin-bottom: 2.6vh;
-    @media screen and (max-height: 667px) {
-      margin-bottom: 20px;
-    }
+  border-bottom: 1.5px solid ${Dark_Gray};
+`;
+const MainTitle = styled.h4`
+  font-size: 20px;
+  margin-top: 30px;
+  margin-bottom: 15px;
+  @media screen and (min-height: 640px) {
+    margin-top: 40px;
+    margin-bottom: 20px;
+  }
+  @media screen and (min-height: 740px) {
+    margin-top: 50px;
+    margin-bottom: 23px;
+  }
+  @media screen and (min-height: 800px) {
+    margin-top: 60px;
+    margin-bottom: 24px;
+  }
+  @media screen and (min-height: 900px) {
+    margin-top: 9.5vh;
   }
 `;
 const TitleInput = styled.input`
   border: none;
-  height: 40px;
+  height: 30px;
   margin-bottom: 5px;
 `;
 const BottomBox = styled(motion.div)`
@@ -140,28 +165,23 @@ const BottomBox = styled(motion.div)`
 `;
 const CalendarBox = styled.div`
   display: flex;
-  justify-content: center;
   flex-direction: column;
   width: 100%;
-  height: 90%;
-  h4 {
-    font-size: 20px;
-    margin-bottom: 20px;
-  }
 `;
 const ButtonBox = styled.div`
   display: flex;
   align-items: flex-start;
   justify-content: center;
+  align-items: center;
   width: 100%;
-  height: 10%;
-  min-height: 60px;
+  height: 100%;
 `;
-const NextButton = styled.div`
+const NextButton = styled(motion.div)`
+  cursor: pointer;
   display: flex;
   justify-content: center;
   align-items: center;
   font-size: 23px;
   font-weight: 500;
-  cursor: pointer;
+  margin-bottom: 10px;
 `;

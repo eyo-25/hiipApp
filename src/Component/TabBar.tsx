@@ -1,42 +1,60 @@
 import { motion } from "framer-motion";
-import { useMatch } from "react-router-dom";
+import { useMatch, useNavigate } from "react-router-dom";
+import { useRecoilState } from "recoil";
 import styled from "styled-components";
+import { projectState } from "../Recoil/atoms";
 import { Dark_Gray } from "../Styles/Colors";
 
-const tabVariants = {
-  normal: {
-    height: "0vh",
-  },
-  animate: {
-    height: "4vh",
-    transition: {
-      duration: 0.5,
-    },
-  },
-};
-const fadeinVariants = {
-  normal: {
-    opacity: 0,
-  },
-  animate: {
-    opacity: 1,
-    transition: {
-      delay: 0.5,
-      duration: 0.6,
-      type: "linear",
-    },
-  },
-};
-
 function TabBar() {
-  const intervalMatch = useMatch("/plan/intervalSetting");
+  const [project, setProject] = useRecoilState(projectState);
+  const navigate = useNavigate();
+  const createMatch = useMatch("/plan/createProject");
+  const isCreateMatch = createMatch !== null;
+  const tabVariants = {
+    normal: {
+      height: isCreateMatch ? "4vh" : "0vh",
+    },
+    animate: {
+      height: "4vh",
+      transition: {
+        duration: 0.5,
+      },
+    },
+  };
+  const fadeinVariants = {
+    normal: {
+      opacity: isCreateMatch ? 1 : 0,
+    },
+    animate: {
+      opacity: 1,
+      transition: {
+        delay: 0.5,
+        duration: 0.6,
+        type: "linear",
+      },
+    },
+  };
+  const onTabClick = (address: string) => {
+    navigate(address);
+  };
+  const onIntervalClick = () => {
+    if (project.length <= 0) {
+      return;
+    } else {
+      navigate("/plan/intervalSetting/edit");
+    }
+  };
+  const planMatch = useMatch("/plan/*");
+  const intervalMatch = useMatch("/plan/intervalSetting/*");
   return (
     <TabContainer variants={tabVariants} initial="normal" animate="animate">
       <Tab variants={fadeinVariants} initial="normal" animate="animate">
-        <Tabs>
-          <TabsTitle isActive={intervalMatch === null}>프로젝트</TabsTitle>
+        <Tabs onClick={() => onTabClick("/plan")}>
+          <TabsTitle isActive={planMatch !== null && intervalMatch === null}>
+            프로젝트
+          </TabsTitle>
         </Tabs>
-        <Tabs>
+        <Tabs onClick={onIntervalClick}>
           <TabsTitle isActive={intervalMatch !== null}>인터벌</TabsTitle>
         </Tabs>
       </Tab>
@@ -61,6 +79,7 @@ const Tab = styled(motion.ul)`
   width: 85%;
   height: 100%;
   margin: 0 auto;
+  cursor: pointer;
 `;
 const Tabs = styled.li`
   display: flex;

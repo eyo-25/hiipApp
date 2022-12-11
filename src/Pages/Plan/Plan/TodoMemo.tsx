@@ -56,7 +56,6 @@ const TodoMemo = () => {
   //클릭함수
   const reset = () => {
     setIsEdit(false);
-    setIsSelect(false);
   };
   const onOverlayClicked = (e: any) => {
     if (toDos[index].memo !== memoText) {

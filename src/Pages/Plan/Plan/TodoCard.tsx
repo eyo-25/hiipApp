@@ -7,15 +7,12 @@ import {
   selectState,
   cardEditState,
   isTodoEditState,
-  toDoState,
   selectTodoState,
   isWeekState,
   startDateState,
   endDateState,
-  loadState,
 } from "../../../Recoil/atoms";
 import { Blue, Dark_Gray, Dark_Gray2 } from "../../../Styles/Colors";
-import { scrollIntoView } from "seamless-scroll-polyfill";
 import { useMatch, useNavigate } from "react-router-dom";
 import { ReactComponent as EditBtn } from "../../../Assets/Icons/editbtn.svg";
 import { ReactComponent as DeletBtn } from "../../../Assets/Icons/deletbtn.svg";
@@ -54,7 +51,6 @@ function TodoCard({ todoObj, index }: ITodoCard) {
   const [btnPopup, setBtnPopup] = useState(false);
   const [startDate, setStartDate] = useRecoilState(startDateState);
   const [endDate, setEndDate] = useRecoilState(endDateState);
-  const [isLoad, setIsLoad] = useRecoilState(loadState);
   const planMatch = useMatch("/plan/createTodo");
   const cardWrapperRef = useRef<any>(null);
   const cardRef = useRef<any>();
@@ -93,15 +89,6 @@ function TodoCard({ todoObj, index }: ITodoCard) {
       setIsClicked(false);
     }
   }, [isSelect]);
-  // useEffect(() => {
-  //   if (isEdit && isClicked) {
-  //     setTimeout(() => {
-  //       scrollIntoView(cardWrapperRef.current as any, {
-  //         behavior: "smooth",
-  //       });
-  //     }, 500);
-  //   }
-  // }, [isEdit]);
   const cardVariants = {
     normal: {
       height: "162px",
@@ -296,6 +283,7 @@ function TodoCard({ todoObj, index }: ITodoCard) {
           onMouseOut={counterStop}
           onTouchEnd={counterStop}
           onClick={onCardClick}
+          onDoubleClick={onDubleClick}
           onMouseDown={startCounter}
           onTouchStart={startCounter}
         />

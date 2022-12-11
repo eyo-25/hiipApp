@@ -1,12 +1,11 @@
 import styled from "styled-components";
-import Applayout from "../../Component/Applayout";
-import Header from "../../Component/Header";
+import Header from "../../../Component/Header";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import Button from "../../Component/Button";
-import CalendarBoard from "./Calendar/CalendarBoard";
-import { Light_Gray } from "../../Styles/Colors";
-import TodoBord from "./Plan/TodoBoard";
+import Button from "../../../Component/Button";
+import CalendarBoard from "../Calendar/CalendarBoard";
+import { Light_Gray } from "../../../Styles/Colors";
+import TodoBord from "./TodoBoard";
 import { useRecoilState } from "recoil";
 import {
   isCreateState,
@@ -19,13 +18,13 @@ import {
   startDateState,
   endDateState,
   isWeekState,
-} from "../../Recoil/atoms";
-import TodoMemo from "./Plan/TodoMemo";
+} from "../../../Recoil/atoms";
+import TodoMemo from "./TodoMemo";
 import { useNavigate } from "react-router-dom";
 import { onSnapshot, query } from "firebase/firestore";
-import { authService, dbService } from "../../firebase";
+import { authService, dbService } from "../../../firebase";
 import { onAuthStateChanged } from "firebase/auth";
-import CreateTodo from "./CreateTodo/CreateTodo";
+import CreateTodo from "../CreateTodo/CreateTodo";
 
 function Plan() {
   const navigate = useNavigate();
@@ -186,7 +185,7 @@ function Plan() {
   };
 
   return (
-    <Applayout>
+    <>
       <Header />
       <ContentContainer onMouseDown={onMouseDown} onMouseUp={onMouseUp}>
         <CalendarBox
@@ -211,7 +210,7 @@ function Plan() {
       {isEdit && <TodoMemo />}
       {isCreate && <CreateTodo mode={"CREATE"} />}
       {isTodoEdit && <CreateTodo mode={"EDIT"} />}
-    </Applayout>
+    </>
   );
 }
 

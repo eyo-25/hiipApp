@@ -5,13 +5,14 @@ import Auth from "../Pages/Auth/Auth";
 import FeedBack from "../Pages/FeedBack/FeedBack";
 import MyPage from "../Pages/MyPage/MyPage";
 import IntervalSetting from "../Pages/Plan/Project/IntervalSetting";
-import Plan from "../Pages/Plan/Plan";
+import Plan from "../Pages/Plan/Plan/Plan";
 import CreateProject from "../Pages/Plan/Project/CreateProject";
 import Home from "../Pages/Start/Home";
 import Loader from "../Component/Loader";
 import { useRecoilState } from "recoil";
 import { homeSplashState, loadState } from "../Recoil/atoms";
 import Start from "../Pages/Start/Start/Start";
+import Index from "../Pages/Plan";
 
 interface AppRouterProps {
   isLoggedIn: boolean;
@@ -24,36 +25,25 @@ export default function AppRouter({ isLoggedIn, userObj }: AppRouterProps) {
   if (!isLoggedIn) {
     return (
       <BrowserRouter basename={process.env.PUBLIC_URL}>
+        {isLoad && <Loader />}
         <Routes>
           <Route path={"/"} element={<Auth />}></Route>
         </Routes>
       </BrowserRouter>
     );
   }
-  // if (isHomeSplash) {
-  //   return (
-  //     <BrowserRouter basename={process.env.PUBLIC_URL}>
-  //       <Routes>
-  //         <Route
-  //           path={"/"}
-  //           element={<HomeSplash setHomeSplash={setHomeSplash} />}
-  //         />
-  //       </Routes>
-  //     </BrowserRouter>
-  //   );
-  // }
   return (
     <BrowserRouter basename={process.env.PUBLIC_URL}>
       {isLoad && <Loader />}
       <Routes>
         <Route path={"/"} element={<Home />}></Route>
-        <Route path={"/plan"} element={<Plan />}>
+        <Route path={"/plan"} element={<Index />}>
           <Route path={"/plan/memo/:todoId"} element={<Plan />} />
           <Route path={"/plan/createTodo"} element={<Plan />} />
           <Route path={"/plan/editTodo/:todoId"} element={<Plan />} />
+          <Route path={"/plan/createProject"} element={<Plan />} />
+          <Route path={"/plan/intervalSetting/:purpose"} element={<Plan />} />
         </Route>
-        <Route path={"/plan/createProject"} element={<CreateProject />} />
-        <Route path={"/plan/intervalSetting"} element={<IntervalSetting />} />
         <Route path={"/feedback"} element={<FeedBack />}></Route>
         <Route path={"/mypage"} element={<MyPage userObj={userObj} />}>
           <Route

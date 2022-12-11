@@ -5,20 +5,21 @@ import { cardEditState, projectState, toDoState } from "../../../Recoil/atoms";
 import { useRecoilState } from "recoil";
 import { motion } from "framer-motion";
 
+const cardVariants = {
+  normal: {
+    opacity: 0,
+  },
+  animate: {
+    opacity: 1,
+    transition: {
+      delay: 1,
+      duration: 0.8,
+      type: "linear",
+    },
+  },
+};
+
 function TodoBord() {
-  const cardVariants = {
-    normal: {
-      opacity: 0,
-    },
-    animate: {
-      opacity: 1,
-      transition: {
-        delay: 1,
-        duration: 0.8,
-        type: "linear",
-      },
-    },
-  };
   const [toDos, setToDos] = useRecoilState(toDoState);
   const [isEdit, setIsEdit] = useRecoilState(cardEditState);
   const [project, setProject] = useRecoilState(projectState);
@@ -26,8 +27,20 @@ function TodoBord() {
     return setIsEdit(false);
   }, []);
 
+  const onTouch = (e: any) => {
+    console.log("a");
+    if (e.touches.length > 1) {
+      e.preventDefault();
+    }
+  };
+
   return (
-    <Wrapper isEdit={isEdit}>
+    <Wrapper
+      isEdit={isEdit}
+      onTouchMove={onTouch}
+      onTouchStart={onTouch}
+      onTouchEnd={onTouch}
+    >
       <Container>
         {toDos.length <= 0 && (
           <GuidBox variants={cardVariants} initial="normal" animate="animate">
@@ -59,7 +72,7 @@ function TodoBord() {
           </CardWrapper>
         ))}
       </Container>
-      <Background />
+      <Background onTouchStart={onTouch} onTouchEnd={onTouch} />
     </Wrapper>
   );
 }

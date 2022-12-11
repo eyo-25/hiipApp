@@ -67,21 +67,24 @@ const Container = styled(motion.div)`
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-top: 2.2vh;
+  padding-top: 10px;
   max-width: 400px;
   margin: 0 auto;
   position: relative;
-  @media screen and (max-height: 800px) {
-    padding-top: 1.6vh;
-  }
 `;
 const MonthBox = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  width: 90%;
+  width: 91%;
   font-weight: 600;
-  margin-bottom: 1.8vh;
+  margin-bottom: 15px;
+  @media screen and (min-height: 700px) {
+    margin-bottom: 20px;
+  }
+  @media screen and (min-height: 780px) {
+    margin-bottom: 25px;
+  }
 `;
 const MonthText = styled.div`
   display: flex;
@@ -89,9 +92,6 @@ const MonthText = styled.div`
   align-items: center;
   padding-bottom: 2px;
   border-radius: 50%;
-  @media screen and (max-height: 800px) {
-    font-size: 14px;
-  }
 `;
 const DayContainer = styled.div`
   display: grid;
@@ -104,23 +104,18 @@ const DayBox = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-bottom: 1vh;
+  margin-bottom: 5px;
+  @media screen and (min-height: 700px) {
+    margin-bottom: 10px;
+  }
 `;
 const PrevBtn = styled(IoChevronBack)`
   width: 20px;
   height: 20px;
   cursor: pointer;
-  @media screen and (max-height: 800px) {
-    width: 16px;
-    height: 16px;
-  }
 `;
 const NextBtn = styled(IoChevronForward)`
   width: 20px;
   height: 20px;
   cursor: pointer;
-  @media screen and (max-height: 800px) {
-    width: 16px;
-    height: 16px;
-  }
 `;

@@ -40,6 +40,7 @@ body {
   font-family: "NotoSansKR";
   line-height: 1;
 
+  touch-action: pan-y;
   position: relative;
   margin: 0 auto;
   max-width: 414px;

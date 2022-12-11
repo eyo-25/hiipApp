@@ -39,58 +39,65 @@ function MyPage({ userObj }: any) {
   return (
     <Applayout>
       <Header />
-      <Container>
-        <ProfileBox>
-          <ProfileImg
-            onClick={onEditClick}
-            src={localPhotoURL !== null ? localPhotoURL : GUEST_ICON}
-          />
-          <UserText>
-            <UserNameBox>
-              <h4 onClick={onEditClick}>
-                {localNickname ? localNickname : `HIIP 회원`}
-              </h4>
-              <UserRank>Beginner</UserRank>
-            </UserNameBox>
-            <p>{localEmail ? localEmail : "이메일을 등록해 주세요"}</p>
-          </UserText>
-        </ProfileBox>
-        <Items>
-          <Item onClick={onEditClick}>
-            <div>프로필 관리</div>
-            <IoChevronForward />
-          </Item>
-          <Item>
-            <div>친구 관리</div>
-            <IoChevronForward />
-          </Item>
-          <Item>
-            <div>알림 관리</div>
-            <IoChevronForward />
-          </Item>
-        </Items>
-        <Items>
-          <Item>
-            <div>고객센터</div>
-            <IoChevronForward />
-          </Item>
-          <Item>
-            <div>제작자 소개</div>
-            <IoChevronForward />
-          </Item>
-          <Item onClick={onLogOutClick}>
-            <span>로그아웃</span>
-            <IoChevronForward />
-          </Item>
-        </Items>
-        {editMatch && <EditProfile userObj={userObj} />}
-      </Container>
+      <Wrapper>
+        <Container>
+          <ProfileBox>
+            <ProfileImg
+              onClick={onEditClick}
+              src={localPhotoURL !== null ? localPhotoURL : GUEST_ICON}
+            />
+            <UserText>
+              <UserNameBox>
+                <h4 onClick={onEditClick}>
+                  {localNickname ? localNickname : `HIIP 회원`}
+                </h4>
+                <UserRank>Beginner</UserRank>
+              </UserNameBox>
+              <p>{localEmail ? localEmail : "이메일을 등록해 주세요"}</p>
+            </UserText>
+          </ProfileBox>
+          <Items>
+            <Item onClick={onEditClick}>
+              <div>프로필 관리</div>
+              <IoChevronForward />
+            </Item>
+            <Item>
+              <div>친구 관리</div>
+              <IoChevronForward />
+            </Item>
+            <Item>
+              <div>알림 관리</div>
+              <IoChevronForward />
+            </Item>
+          </Items>
+          <Items>
+            <Item>
+              <div>고객센터</div>
+              <IoChevronForward />
+            </Item>
+            <Item>
+              <div>제작자 소개</div>
+              <IoChevronForward />
+            </Item>
+            <Item onClick={onLogOutClick}>
+              <span>로그아웃</span>
+              <IoChevronForward />
+            </Item>
+          </Items>
+          {editMatch && <EditProfile userObj={userObj} />}
+        </Container>
+      </Wrapper>
     </Applayout>
   );
 }
 
 export default MyPage;
 
+const Wrapper = styled.div`
+  width: 100%;
+  height: 100%;
+  background-color: white;
+`;
 const Container = styled.div`
   display: flex;
   flex-direction: column;

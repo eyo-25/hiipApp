@@ -3,8 +3,20 @@ import { useEffect } from "react";
 import { useRecoilState } from "recoil";
 import styled from "styled-components";
 import Background from "../Assets/image/start_background2.png";
-import { homeSplashState } from "../Recoil/atoms";
+import { homeSplashState, loadState } from "../Recoil/atoms";
 
+const imgVariants = {
+  normal: {
+    opacity: 0,
+  },
+  animate: {
+    opacity: 1,
+    transition: {
+      duration: 0.5,
+      type: "linear",
+    },
+  },
+};
 const gradientVariants = {
   normal: {
     opacity: 0,
@@ -14,12 +26,12 @@ const gradientVariants = {
     opacity: 1,
     width: "80%",
     transition: {
+      delay: 0.5,
       duration: 0.5,
       type: "linear",
     },
   },
 };
-
 const textVariants = {
   normal: {
     opacity: 0,
@@ -27,7 +39,7 @@ const textVariants = {
   animate: {
     opacity: 1,
     transition: {
-      delay: 0.5,
+      delay: 1,
       duration: 0.5,
       type: "linear",
     },
@@ -35,27 +47,38 @@ const textVariants = {
 };
 
 function HomeSplash() {
+  const [isLoad, setIsLoad] = useRecoilState(loadState);
   const [isHomeSplash, setIsHomeSplash] = useRecoilState(homeSplashState);
   useEffect(() => {
-    setTimeout(() => {
-      setIsHomeSplash(false);
-    }, 2000);
-  }, []);
+    if (!isLoad) {
+      setTimeout(() => {
+        setIsHomeSplash(false);
+      }, 2000);
+    }
+  }, [isLoad]);
   return (
     <Container>
-      <BackgroundImg />
-      <GradationBox
-        variants={gradientVariants}
+      <BackgroundImg
+        variants={imgVariants}
         initial="normal"
         animate="animate"
-      >
-        <TextBox variants={textVariants} initial="normal" animate="animate">
-          <h4>High</h4>
-          <h4>Intensity</h4>
-          <h4>Interval</h4>
-          <h4>Planing</h4>
-        </TextBox>
-      </GradationBox>
+      />
+      {!isLoad && (
+        <>
+          <GradationBox
+            variants={gradientVariants}
+            initial="normal"
+            animate="animate"
+          >
+            <TextBox variants={textVariants} initial="normal" animate="animate">
+              <h4>High</h4>
+              <h4>Intensity</h4>
+              <h4>Interval</h4>
+              <h4>Planing</h4>
+            </TextBox>
+          </GradationBox>
+        </>
+      )}
     </Container>
   );
 }
@@ -73,7 +96,7 @@ const Container = styled.div`
   z-index: 20;
 `;
 
-const BackgroundImg = styled.div`
+const BackgroundImg = styled(motion.div)`
   width: 100%;
   height: 100%;
   background-image: ${(props) =>

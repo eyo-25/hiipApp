@@ -5,6 +5,8 @@ import { useState } from "react";
 import { authService, dbService, firebaseInstance } from "../../../firebase";
 import { ReactComponent as HiipIcon } from "../../../Assets/Icons/HIIPLogo.svg";
 import { Dark_Gray, Dark_Gray2 } from "../../../Styles/Colors";
+import { loadState } from "../../../Recoil/atoms";
+import { useRecoilState } from "recoil";
 
 interface IAuthFormProps {
   newCount: boolean;
@@ -12,6 +14,7 @@ interface IAuthFormProps {
 }
 
 const AuthForm = ({ close, newCount }: IAuthFormProps) => {
+  const [isLoad, setIsLoad] = useRecoilState(loadState);
   const { register, handleSubmit, getValues } = useForm();
   const closeClick = () => {
     close(false);
@@ -22,6 +25,7 @@ const AuthForm = ({ close, newCount }: IAuthFormProps) => {
     const nickname = getValues("nickname");
     try {
       if (newCount) {
+        setIsLoad(true);
         await firebaseInstance
           .auth()
           .createUserWithEmailAndPassword(email, password)
@@ -36,10 +40,14 @@ const AuthForm = ({ close, newCount }: IAuthFormProps) => {
                 "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS_qBTDzBVonLHd5Ejk0i-61YlcHI54KTgOMhIRea9jwACihT9hxQaj2P87_XAv87DEkAY&usqp=CAU",
               uid: result.user.uid,
             });
-          });
+          })
+          .then(() => setIsLoad(false));
         close(false);
       } else {
-        await signInWithEmailAndPassword(authService, email, password);
+        setIsLoad(true);
+        await signInWithEmailAndPassword(authService, email, password).then(
+          () => setIsLoad(false)
+        );
       }
     } catch (error: any) {
       alert("아이디와 비밀번호를 정확히 입력해주세요");

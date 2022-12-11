@@ -40,12 +40,13 @@ function Start() {
     };
   }, []);
 
-  // 슬라이드 애니메이션
+  //애니메이션
   const bottomVariants = {
     normal: {
       height: "0vh",
       opacity: 0,
       transition: {
+        delay: 0.5,
         duration: 0.8,
         type: "linear",
       },
@@ -199,6 +200,7 @@ const BackContainer = styled.div<{ isFadeout: boolean }>`
   align-items: center;
   width: 100%;
   height: 100%;
+  background-color: black;
 `;
 const ProjectContainer = styled.div`
   position: absolute;
@@ -226,7 +228,7 @@ const BackgroundCover = styled(motion.div)`
   width: 100%;
   height: 100%;
 `;
-const BackgroundImg = styled.div`
+const BackgroundImg = styled(motion.div)`
   position: absolute;
   top: 0;
   width: 100%;

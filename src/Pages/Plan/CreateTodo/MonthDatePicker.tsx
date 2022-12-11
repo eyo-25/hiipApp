@@ -37,8 +37,6 @@ function MonthDatePicker({
     });
   }, []);
 
-  // 현재월
-  let calendarMonth = Number(Moment(clickDate).format("MM"));
   // 현재월의 마지막 일
   let calendarMonthLastDate = Number(
     Moment(clickDate).endOf("month").format("DD")

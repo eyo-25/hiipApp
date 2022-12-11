@@ -7,6 +7,7 @@ import {
 } from "../../../Recoil/atoms";
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { Red } from "../../../Styles/Colors";
 
 function MonthDatePicker() {
   const Moment = require("moment");
@@ -74,6 +75,9 @@ function MonthDatePicker() {
   }, [clickDate]);
 
   const onDateClick = (clickedDate: string) => {
+    if (clickedDate < Moment().format("YYYY-MM-DD")) {
+      return;
+    }
     let newClick = click >= 3 ? 1 : click + 1;
     setClick(newClick);
     setClickDate(clickedDate);
@@ -111,16 +115,44 @@ function MonthDatePicker() {
       {monthArray.map((date: string, index: number) => (
         <DateBox key={index}>
           <HoverBox
-            clicked={clickDate === Moment(date).format("YYYY-MM-DD")}
+            isDeadLine={date === startDate || date === endDate}
+            isSame={startDate === endDate && endDate === date}
             onClick={() => onDateClick(date)}
           >
             <DateText
-              nowMonth={Number(Moment(date).format("MM")) !== calendarMonth}
+              nowMonth={
+                Number(Moment(date).format("MM")) !== calendarMonth ||
+                date < Moment().format("YYYY-MM-DD")
+              }
             >
               {Number(Moment(date).format("DD"))}
             </DateText>
             {((startDate <= date && date <= endDate) || startDate === date) && (
-              <DateBar isSame={startDate === endDate} />
+              <BarBox>
+                <DateBar
+                  isEdge={
+                    0 === Moment(date).day() ||
+                    startDate === date ||
+                    startDate === ""
+                  }
+                >
+                  <RightBar />
+                  <LeftBar />
+                </DateBar>
+                <PointBox>
+                  <BarPoint />
+                </PointBox>
+                <DateBar
+                  isEdge={
+                    6 === Moment(date).day() ||
+                    endDate === date ||
+                    endDate === ""
+                  }
+                >
+                  <RightBar />
+                  <LeftBar />
+                </DateBar>
+              </BarBox>
             )}
           </HoverBox>
         </DateBox>
@@ -143,13 +175,19 @@ const DateBox = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  height: calc(var(--vh, 1vh) * 4.7);
+  height: 35px;
   cursor: pointer;
-  @media screen and (max-height: 600px) {
-    height: 30px;
+  @media screen and (min-height: 700px) {
+    height: 40px;
+  }
+  @media screen and (min-height: 780px) {
+    height: 44px;
+  }
+  @media screen and (min-height: 840px) {
+    height: 47px;
   }
 `;
-const HoverBox = styled.div<{ clicked: boolean }>`
+const HoverBox = styled.div<{ isDeadLine: boolean; isSame: boolean }>`
   display: flex;
   justify-content: center;
   align-items: center;
@@ -157,23 +195,58 @@ const HoverBox = styled.div<{ clicked: boolean }>`
   border-radius: 50%;
   width: 25px;
   height: 25px;
-  color: ${(props) => props.clicked && "white"};
-  background-color: ${(props) => props.clicked && "black"};
+  color: ${(props) => props.isDeadLine && "white"};
+  background-color: ${(props) =>
+    props.isSame ? Red : props.isDeadLine ? "black" : null};
   @media screen and (max-height: 800px) {
     width: 23px;
     height: 23px;
+  }
+  @media screen and (max-height: 700px) {
+    width: 20px;
+    height: 20px;
   }
 `;
 const DateText = styled.div<{ nowMonth: boolean }>`
   color: ${(props) => props.nowMonth && "#c4c4c4"};
 `;
-const DateBar = styled.div<{ isSame: boolean }>`
+const BarBox = styled.div`
   position: absolute;
   display: flex;
-  justify-content: center;
+  flex-direction: center;
   align-items: center;
   bottom: 0;
   width: 100%;
-  height: 4px;
-  background-color: ${(props) => (props.isSame ? "#FFC500" : "#0002ff")};
+  height: 5px;
+`;
+const DateBar = styled.div<{ isEdge: boolean }>`
+  display: flex;
+  height: 100%;
+  width: 50%;
+  background-color: ${(props) => (props.isEdge ? "white" : "#0002ff")};
+  justify-content: ${(props) => (props.isEdge ? "flex-start" : "flex-end")};
+`;
+const RightBar = styled.div`
+  height: 100%;
+  width: 50%;
+`;
+const LeftBar = styled.div`
+  height: 100%;
+  width: 50%;
+`;
+const PointBox = styled.div`
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+`;
+const BarPoint = styled.div`
+  background-color: Blue;
+  width: 5px;
+  height: 100%;
+  margin: 0 auto;
+  z-index: 99;
+  height: 100%;
+  border-radius: 50%;
 `;

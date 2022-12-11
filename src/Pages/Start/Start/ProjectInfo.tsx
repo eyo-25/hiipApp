@@ -84,7 +84,11 @@ function ProjectInfo({
                 )}
               </MessageBox>
             ) : (
-              <MessageBox>
+              <MessageBox
+                variants={fadeinVariants}
+                initial="normal"
+                animate="animate"
+              >
                 {project.length <= 0 ? (
                   <WiseSayingText>
                     프로젝트를 만들고

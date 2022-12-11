@@ -27,7 +27,7 @@ interface iMemoProps {
 
 function MemoCard({ memoText, setMemoText, onSaveClick }: iMemoProps) {
   const [toDos, setToDos] = useRecoilState(toDoState);
-  const autoFocusRef = useRef<any>(null);
+  const inputRef = useRef<any>(null);
   const params = useParams();
   const todoId = params.todoId;
   const index = toDos.findIndex((item) => item.id === todoId);
@@ -93,7 +93,7 @@ function MemoCard({ memoText, setMemoText, onSaveClick }: iMemoProps) {
           <MemoForm>
             <MemoInput
               placeholder="계획 실천 후 피드백이나 &#13;&#10;실천 중 메모를 적어주세요"
-              ref={autoFocusRef}
+              ref={inputRef}
               required
               value={memoText}
               onChange={onTextChange}

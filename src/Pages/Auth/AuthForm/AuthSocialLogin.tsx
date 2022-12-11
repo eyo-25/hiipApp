@@ -8,8 +8,11 @@ import { authService, dbService } from "../../../firebase";
 import { ReactComponent as GoogleIcon } from "../../../Assets/Icons/googleLogo.svg";
 import { IoLogoGithub } from "react-icons/io5";
 import { Dark_Gray } from "../../../Styles/Colors";
+import { useRecoilState } from "recoil";
+import { loadState } from "../../../Recoil/atoms";
 
 const AuthSocialLogin = () => {
+  const [isLoad, setIsLoad] = useRecoilState(loadState);
   const onSocialClick = async (event: React.MouseEvent<HTMLButtonElement>) => {
     const {
       currentTarget: { name },
@@ -20,13 +23,18 @@ const AuthSocialLogin = () => {
     } else if (name === "github") {
       provider = new GithubAuthProvider();
     }
+    setIsLoad(true);
     await signInWithPopup(authService, provider).then((result) => {
-      dbService.collection("user").doc(result.user.uid).set({
-        email: result.user.email,
-        nickname: result.user.displayName,
-        photoURL: result.user.photoURL,
-        uid: result.user.uid,
-      });
+      dbService
+        .collection("user")
+        .doc(result.user.uid)
+        .set({
+          email: result.user.email,
+          nickname: result.user.displayName,
+          photoURL: result.user.photoURL,
+          uid: result.user.uid,
+        })
+        .then(() => setIsLoad(false));
     });
   };
   return (
