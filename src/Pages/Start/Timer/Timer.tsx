@@ -1,10 +1,10 @@
 import { useRecoilState } from "recoil";
 import TimerSplash from "../../../Component/TimerSplash";
 import { timerSplashState, timeState } from "../../../Recoil/atoms";
-import TimerBoard from "./Timer/TimerBoard";
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { dbService } from "../../../firebase";
+import TimerBoard from "./Timer/TimerBoard";
 
 function Timer() {
   const [isTimerSplash, setIsTimerSplash] = useRecoilState(timerSplashState);

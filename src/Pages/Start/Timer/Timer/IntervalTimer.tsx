@@ -2,15 +2,15 @@ import { AnimatePresence, motion } from "framer-motion";
 import React, { useEffect, useState } from "react";
 import { useRecoilState } from "recoil";
 import styled from "styled-components";
-import { useCounter } from "../../../../hooks/useCounter";
-import { counterState, timeState } from "../../../../Recoil/atoms";
+import {
+  isBreakState,
+  isPauseState,
+  timeState,
+} from "../../../../Recoil/atoms";
 
 const TimerUpVarients = {
   start: {
     opacity: 0,
-  },
-  breakStart: {
-    opacity: 1,
   },
   end: {
     opacity: 1,
@@ -19,7 +19,10 @@ const TimerUpVarients = {
       type: "ease",
     },
   },
-  breakEnd: {
+  countStart: {
+    opacity: 1,
+  },
+  countEnd: {
     opacity: 1,
     transition: {
       duration: 1,
@@ -31,16 +34,45 @@ const TimerUpVarients = {
   },
 };
 
-function IntervalTimer({ count, start }: { count: number; start: () => void }) {
+interface IIntervalTimer {
+  count: number;
+  start: () => void;
+  stop: () => void;
+  reset: () => void;
+  done: () => void;
+}
+
+function IntervalTimer({ count, start, stop, reset, done }: IIntervalTimer) {
   const [timeObj, setTimeObj] = useRecoilState(timeState);
-  const [counterStatus, setCounterStatus] = useRecoilState(counterState);
+  const [isBreakSet, setIsBreakSet] = useRecoilState(isBreakState);
+  const [isPause, setIsPause] = useRecoilState(isPauseState);
   const [intervalSet, setIntervalSet] = useState(0);
   const [minutes, setMinutes] = useState(0);
   const [secounds, setSecounds] = useState(0);
   const [mSecounds, setMSecounds] = useState(0);
 
+  //count를 시간으로 변환하여 표현
   const timer = () => {
+    if (intervalSet <= 0) return;
     if (intervalSet !== 0) {
+      if (count <= 0) {
+        if (intervalSet === 1) {
+          done();
+          return;
+        }
+        setIsBreakSet(true);
+        setTimeObj((prev) => {
+          return {
+            ...prev,
+            FocusSet: timeObj.FocusSet - 1,
+            min: timeObj.setFocusMin,
+            sec: timeObj.setFocusSec,
+            mSec: 0,
+          };
+        });
+        reset();
+        return;
+      }
       const mathMin = Math.floor(count / 60 / 100);
       const mathSec = Math.floor((count - mathMin * 60 * 100) / 100);
       setMinutes(mathMin);
@@ -62,21 +94,21 @@ function IntervalTimer({ count, start }: { count: number; start: () => void }) {
     setIntervalSet(timeObj.FocusSet);
     setMinutes(timeObj.min);
     setSecounds(timeObj.sec);
-    setCounterStatus(false);
+    setIsPause(false);
     setTimeout(() => {
       start();
     }, 700);
     return () => {
-      setCounterStatus(false);
+      setIsPause(false);
+      stop();
     };
   }, []);
 
   useEffect(timer, [count]);
 
   return (
-    <>
-      <InfoWrapper>{/* {intervalSet}SET */}</InfoWrapper>
-      {!counterStatus && (
+    <div>
+      {!isPause && (
         <CounterWrapper
           variants={TimerUpVarients}
           initial="start"
@@ -85,8 +117,8 @@ function IntervalTimer({ count, start }: { count: number; start: () => void }) {
           <AnimatePresence>
             <CounterBox
               variants={TimerUpVarients}
-              initial="breakStart"
-              animate="breakEnd"
+              initial="countStart"
+              animate="countEnd"
               exit="exit"
               layoutId="count"
             >
@@ -97,11 +129,11 @@ function IntervalTimer({ count, start }: { count: number; start: () => void }) {
           </AnimatePresence>
         </CounterWrapper>
       )}
-      {counterStatus && (
+      {isPause && (
         <CounterWrapper
           variants={TimerUpVarients}
           initial="start"
-          animate="end"
+          animate="countEnd"
         >
           <BreakBox>
             <h4>PAUSE</h4>
@@ -112,8 +144,8 @@ function IntervalTimer({ count, start }: { count: number; start: () => void }) {
           <AnimatePresence>
             <BreakBox
               variants={TimerUpVarients}
-              initial="breakStart"
-              animate="breakEnd"
+              initial="countStart"
+              animate="countEnd"
               exit="exit"
               layoutId="count"
             >
@@ -130,28 +162,12 @@ function IntervalTimer({ count, start }: { count: number; start: () => void }) {
           </BreakBox>
         </CounterWrapper>
       )}
-    </>
+    </div>
   );
 }
 
 export default React.memo(IntervalTimer);
 
-const InfoWrapper = styled.div`
-  height: 42%;
-  //임시
-  text-align: center;
-  font-size: 20px;
-  padding-top: 40%;
-  @media screen and (max-height: 800px) {
-    height: 38%;
-  }
-  @media screen and (max-height: 750px) {
-    height: 35%;
-  }
-  @media screen and (max-height: 600px) {
-    height: 26%;
-  }
-`;
 const CounterWrapper = styled(motion.div)`
   display: flex;
   flex-direction: column;

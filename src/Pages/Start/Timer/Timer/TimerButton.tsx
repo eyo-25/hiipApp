@@ -1,7 +1,7 @@
 import { useRecoilState } from "recoil";
 import { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
-import { counterState } from "../../../../Recoil/atoms";
+import { isBreakState, isPauseState } from "../../../../Recoil/atoms";
 import { AnimatePresence, motion } from "framer-motion";
 import { ReactComponent as PauseIcon } from "../../../../Assets/Icons/pause.svg";
 import { IoPlaySharp, IoStopSharp } from "react-icons/io5";
@@ -43,8 +43,16 @@ const boxVarients = {
   },
 };
 
-function TimerButton({ stop, start }: { stop: () => void; start: () => void }) {
-  const [counterStatus, setCounterStatus] = useRecoilState(counterState);
+interface ITimerButton {
+  start: () => void;
+  stop: () => void;
+  breakStop: () => void;
+  breakStart: () => void;
+}
+
+function TimerButton({ stop, start, breakStop, breakStart }: ITimerButton) {
+  const [isBreakSet, setIsBreakSet] = useRecoilState(isBreakState);
+  const [isPause, setIsPause] = useRecoilState(isPauseState);
   const countRef = useRef(1);
   const navigate = useNavigate();
 
@@ -61,17 +69,28 @@ function TimerButton({ stop, start }: { stop: () => void; start: () => void }) {
   const onPauseClick = () => {
     if (1 <= countRef.current) return;
     countRef.current = 0;
-    stop();
-    setCounterStatus(true);
+    if (isBreakSet) {
+      breakStop();
+    } else {
+      stop();
+    }
+    setIsPause(true);
   };
   const onStartClick = () => {
     if (1 <= countRef.current) return;
     countRef.current += 1;
-    setCounterStatus(false);
-    setTimeout(() => {
-      start();
-      countRef.current = 0;
-    }, 300);
+    setIsPause(false);
+    if (isBreakSet) {
+      setTimeout(() => {
+        breakStart();
+        countRef.current = 0;
+      }, 300);
+    } else {
+      setTimeout(() => {
+        start();
+        countRef.current = 0;
+      }, 300);
+    }
   };
   const onDoneClick = () => {
     navigate("/");
@@ -79,7 +98,7 @@ function TimerButton({ stop, start }: { stop: () => void; start: () => void }) {
   return (
     <Wrapper>
       <AnimatePresence>
-        {!counterStatus && (
+        {!isPause && (
           <ButtonWrapper
             onClick={onPauseClick}
             variants={boxVarients}
@@ -96,7 +115,7 @@ function TimerButton({ stop, start }: { stop: () => void; start: () => void }) {
         )}
       </AnimatePresence>
       <AnimatePresence>
-        {counterStatus && (
+        {isPause && (
           <>
             <ButtonWrapper
               key="stop"

@@ -1,22 +1,9 @@
-import { useEffect, useState } from "react";
-import styled from "styled-components";
-import Applayout from "../../Component/Applayout";
-import Button from "../../Component/Button";
-import { Normal_Gray } from "../../Styles/Colors";
-import { motion } from "framer-motion";
-import Background from "../../Assets/image/start_background2.png";
-import TodoBord from "./Start/TodoBord";
+import { useEffect } from "react";
 import { useRecoilState } from "recoil";
-import {
-  clickDateState,
-  homeSplashState,
-  projectState,
-  toDoState,
-} from "../../Recoil/atoms";
+import { homeSplashState, projectState, toDoState } from "../../Recoil/atoms";
 import { onSnapshot, query } from "firebase/firestore";
 import { authService, dbService } from "../../firebase";
 import { onAuthStateChanged } from "firebase/auth";
-import { useNavigate } from "react-router-dom";
 import HomeSplash from "../../Component/HomeSplash";
 import Start from "./Start/Start";
 

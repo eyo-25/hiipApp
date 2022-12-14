@@ -1,12 +1,13 @@
 import { useRecoilState } from "recoil";
 import styled from "styled-components";
-import { counterState, timeState } from "../../../../Recoil/atoms";
-import IntervalTimer from "../IntervalTimer/IntervalTimer";
+import { isBreakState, timeState } from "../../../../Recoil/atoms";
+import IntervalTimer from "./IntervalTimer";
 import Background from "../../../../Assets/image/bull.png";
 import { motion } from "framer-motion";
 import TimerButton from "./TimerButton";
 import { useEffect } from "react";
 import { useCounter } from "../../../../hooks/useCounter";
+import BreakTimer from "./BreakTimer";
 
 const bottomVariants = {
   normal: {
@@ -25,27 +26,64 @@ const bottomVariants = {
 };
 
 function TimerBoard() {
+  const [isBreakSet, setIsBreakSet] = useRecoilState(isBreakState);
   const [timeObj, setTimeObj] = useRecoilState(timeState);
-  const [counterStatus, setCounterStatus] = useRecoilState(counterState);
   const { count, start, stop, reset, done } = useCounter(
     timeObj.min,
     timeObj.sec
   );
+  const {
+    count: breakCount,
+    start: breakStart,
+    stop: breakStop,
+    reset: breakReset,
+    done: breakDone,
+  } = useCounter(timeObj.breakMin, timeObj.breakSec);
 
   useEffect(() => {
-    return () => reset();
+    setIsBreakSet(false);
+    return () => {
+      reset();
+      breakReset();
+      setIsBreakSet(false);
+    };
   }, []);
 
   return (
     <Container>
       <ContentsWrapper>
-        <IntervalTimer count={count} start={start} />
+        <InfoWrapper>
+          {count}
+          {breakCount}
+        </InfoWrapper>
+        {!isBreakSet && (
+          <IntervalTimer
+            count={count}
+            start={start}
+            stop={stop}
+            reset={reset}
+            done={done}
+          />
+        )}
+        {isBreakSet && (
+          <BreakTimer
+            count={breakCount}
+            start={breakStart}
+            stop={breakStop}
+            reset={breakReset}
+            done={breakDone}
+          />
+        )}
       </ContentsWrapper>
       <ButtonWrapper>
-        <TimerButton stop={stop} start={start} />
+        <TimerButton
+          stop={stop}
+          breakStop={breakStop}
+          start={start}
+          breakStart={breakStart}
+        />
       </ButtonWrapper>
       <BottomGradient
-        isPause={counterStatus}
         variants={bottomVariants}
         initial="normal"
         animate="animate"
@@ -75,14 +113,13 @@ const BackgroundImg = styled.div`
   left: 0;
   width: 100%;
   height: 100%;
-  background-image: ${(props) =>
-      "linear-gradient(rgba(0, 0, 0, 0), 40%, rgba(0, 0, 0, 0.4)),"}
+  background-image: linear-gradient(rgba(0, 0, 0, 0), 40%, rgba(0, 0, 0, 0.4)),
     url(${Background});
   background-repeat: no-repeat;
   background-size: cover;
   background-position: 50%;
 `;
-const BottomGradient = styled(motion.div)<{ isPause: boolean }>`
+const BottomGradient = styled(motion.div)`
   z-index: 5;
   position: absolute;
   bottom: 0;
@@ -113,5 +150,21 @@ const ButtonWrapper = styled.div`
   }
   @media screen and (max-height: 700px) {
     height: 25%;
+  }
+`;
+const InfoWrapper = styled.div`
+  height: 42%;
+  //임시
+  text-align: center;
+  font-size: 20px;
+  padding-top: 40%;
+  @media screen and (max-height: 800px) {
+    height: 38%;
+  }
+  @media screen and (max-height: 750px) {
+    height: 35%;
+  }
+  @media screen and (max-height: 600px) {
+    height: 26%;
   }
 `;

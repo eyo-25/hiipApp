@@ -53,12 +53,10 @@ function Start() {
   };
   const bgVariants = {
     normal: {
-      background: "linear-gradient(rgba(0, 0, 0, 0), 40%, rgba(0, 0, 0, 0.4))",
+      background: "rgbargba(0, 0, 0, 0.4)",
     },
     animate: {
-      background: isFadeout
-        ? "linear-gradient(rgba(0, 0, 0, 0.5), 40%, rgba(0, 0, 0, 0.9))"
-        : "linear-gradient(rgba(0, 0, 0, 0), 40%, rgba(0, 0, 0, 0.4))",
+      background: isFadeout ? "rgba(0, 0, 0, 0.8)" : "rgba(0, 0, 0, 0.4)",
       transition: {
         duration: 0.5,
         type: "linear",

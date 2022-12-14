@@ -98,8 +98,7 @@ const Container = styled.div`
 const BackgroundImg = styled(motion.div)`
   width: 100%;
   height: 100%;
-  background-image: ${(props) =>
-      "linear-gradient(rgba(0, 0, 0, 0), 40%, rgba(0, 0, 0, 0.4)),"}
+  background-image: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.5)),
     url(${Background});
   background-repeat: no-repeat;
   background-size: cover;

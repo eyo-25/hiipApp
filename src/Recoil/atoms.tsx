@@ -103,8 +103,12 @@ export const timerSplashState = atom<boolean>({
   key: "timerSplashState",
   default: true,
 });
-export const counterState = atom<boolean>({
-  key: "counterState",
+export const isBreakState = atom<boolean>({
+  key: "isBreakState",
+  default: false,
+});
+export const isPauseState = atom<boolean>({
+  key: "isPauseState",
   default: false,
 });
 interface ItimeState {
