@@ -12,7 +12,7 @@ const imgVariants = {
   animate: {
     opacity: 1,
     transition: {
-      duration: 0.5,
+      duration: 0.6,
       type: "linear",
     },
   },
@@ -27,7 +27,7 @@ const gradientVariants = {
     width: "80%",
     transition: {
       delay: 0.5,
-      duration: 0.5,
+      duration: 0.8,
       type: "linear",
     },
   },
@@ -40,7 +40,7 @@ const textVariants = {
     opacity: 1,
     transition: {
       delay: 1,
-      duration: 0.5,
+      duration: 0.8,
       type: "linear",
     },
   },
@@ -95,7 +95,6 @@ const Container = styled.div`
   background-color: black;
   z-index: 20;
 `;
-
 const BackgroundImg = styled(motion.div)`
   width: 100%;
   height: 100%;
@@ -106,7 +105,6 @@ const BackgroundImg = styled(motion.div)`
   background-size: cover;
   background-position: 65%;
 `;
-
 const GradationBox = styled(motion.div)`
   position: absolute;
   height: 100%;
@@ -119,7 +117,6 @@ const GradationBox = styled(motion.div)`
     rgba(0, 2, 255, 0.6)
   );
 `;
-
 const TextBox = styled(motion.div)`
   display: flex;
   flex-direction: column;
@@ -132,12 +129,4 @@ const TextBox = styled(motion.div)`
     font-size: 5.8vh;
     color: white;
   }
-`;
-
-const NavBox = styled(motion.div)`
-  position: relative;
-  width: 100%;
-  position: fixed;
-  bottom: 0;
-  z-index: 12;
 `;

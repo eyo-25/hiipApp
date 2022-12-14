@@ -13,6 +13,7 @@ import { useRecoilState } from "recoil";
 import { homeSplashState, loadState } from "../Recoil/atoms";
 import Start from "../Pages/Start/Start/Start";
 import Index from "../Pages/Plan";
+import Timer from "../Pages/Start/Timer/Timer";
 
 interface AppRouterProps {
   isLoggedIn: boolean;
@@ -37,6 +38,7 @@ export default function AppRouter({ isLoggedIn, userObj }: AppRouterProps) {
       {isLoad && <Loader />}
       <Routes>
         <Route path={"/"} element={<Home />}></Route>
+        <Route path={"/timer/:todoId"} element={<Timer />} />
         <Route path={"/plan"} element={<Index />}>
           <Route path={"/plan/memo/:todoId"} element={<Plan />} />
           <Route path={"/plan/createTodo"} element={<Plan />} />

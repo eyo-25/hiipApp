@@ -50,6 +50,7 @@ const AuthForm = ({ close, newCount }: IAuthFormProps) => {
         );
       }
     } catch (error: any) {
+      setIsLoad(false);
       alert("아이디와 비밀번호를 정확히 입력해주세요");
     }
   };

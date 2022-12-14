@@ -98,3 +98,47 @@ export const createSubTitleState = atom({
   key: "createSubTitleState",
   default: "",
 });
+//timer
+export const timerSplashState = atom<boolean>({
+  key: "timerSplashState",
+  default: true,
+});
+export const counterState = atom<boolean>({
+  key: "counterState",
+  default: false,
+});
+interface ItimeState {
+  FocusSet: number;
+  breakMin: number;
+  breakSec: number;
+  breakSet: number;
+  min: number;
+  sec: number;
+  mSec: number;
+  setBreakMin: number;
+  setBreakSec: number;
+  setBreakSet: number;
+  setFocusMin: number;
+  setFocusSec: number;
+  setFocusSet: number;
+  stopDate: string;
+}
+export const timeState = atom<ItimeState>({
+  key: "timeState",
+  default: {
+    FocusSet: 0,
+    breakMin: 0,
+    breakSec: 0,
+    breakSet: 0,
+    min: 0,
+    sec: 0,
+    mSec: 0,
+    setBreakMin: 0,
+    setBreakSec: 0,
+    setBreakSet: 0,
+    setFocusMin: 0,
+    setFocusSec: 0,
+    setFocusSet: 0,
+    stopDate: "",
+  },
+});

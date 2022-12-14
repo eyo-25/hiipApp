@@ -34,7 +34,7 @@ const AuthSocialLogin = () => {
           photoURL: result.user.photoURL,
           uid: result.user.uid,
         })
-        .then(() => setIsLoad(false));
+        setIsLoad(false)
     });
   };
   return (

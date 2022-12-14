@@ -146,6 +146,14 @@ function IntervalSetting() {
   //전송함수
   const onSubmit = async () => {
     if (params.purpose === "edit") {
+      if (
+        focusMin === project[0].focusMin &&
+        breakMin === project[0].breakMin &&
+        defaultSet === project[0].defaultSet
+      ) {
+        navigate("/plan");
+        return;
+      }
       const ok = window.confirm("프로젝트를 수정하시겠습니까?");
       if (ok) {
         await updateProjectSubmit();

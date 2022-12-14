@@ -45,22 +45,23 @@ const Wrapper = styled.div<{ isplan: boolean }>`
   right: 0;
   bottom: ${(props) => (props.isplan ? "18vh" : "15vh")};
   z-index: 50;
-  width: 78px;
-  @media screen and (max-height: 800px) {
+  height: 86px;
+  width: 86px;
+  @media screen and (max-height: 700px) {
     width: 70px;
     height: 70px;
+  }
+  @media screen and (max-height: 800px) {
+    height: 76px;
+    width: 76px;
   }
 `;
 const BtnBox = styled(motion.div)`
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 78px;
-  width: 78px;
-  @media screen and (max-height: 800px) {
-    width: 70px;
-    height: 70px;
-  }
+  height: 100%;
+  width: 100%;
   border-radius: 50%;
   border: none;
   margin: 0 auto;

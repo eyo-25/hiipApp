@@ -14,7 +14,6 @@ import {
   toDoState,
 } from "../../Recoil/atoms";
 import { onSnapshot, query } from "firebase/firestore";
-import ProjectInfo from "./Start/ProjectInfo";
 import { authService, dbService } from "../../firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
@@ -25,7 +24,6 @@ function Home() {
   const [isHomeSplash, setIsHomeSplash] = useRecoilState(homeSplashState);
   const [project, setProject] = useRecoilState(projectState);
   const [toDos, setToDos] = useRecoilState(toDoState);
-  const navigate = useNavigate();
 
   //프로젝트 변경 감지
   useEffect(() => {

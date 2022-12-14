@@ -98,6 +98,7 @@ function CreateInput({
         setBreakSec: 5,
         min: 0,
         sec: 10,
+        mSec: 0,
         breakMin: 0,
         breakSec: 5,
       };

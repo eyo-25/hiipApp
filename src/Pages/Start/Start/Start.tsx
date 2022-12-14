@@ -3,16 +3,8 @@ import styled from "styled-components";
 import { motion } from "framer-motion";
 import Background from "../../../Assets/image/start_background2.png";
 import { useRecoilState } from "recoil";
-import { onSnapshot, query } from "firebase/firestore";
-import { onAuthStateChanged } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
-import {
-  clickDateState,
-  homeSplashState,
-  projectState,
-  toDoState,
-} from "../../../Recoil/atoms";
-import { authService, dbService } from "../../../firebase";
+import { clickDateState, projectState, toDoState } from "../../../Recoil/atoms";
 import Applayout from "../../../Component/Applayout";
 import ProjectInfo from "./ProjectInfo";
 import TodoBord from "./TodoBord";
@@ -20,7 +12,6 @@ import Button from "../../../Component/Button";
 import { Normal_Gray } from "../../../Styles/Colors";
 
 function Start() {
-  const [isHomeSplash, setHomeSplash] = useRecoilState(homeSplashState);
   const [project, setProject] = useRecoilState(projectState);
   const [toDos, setToDos] = useRecoilState(toDoState);
   const [isReady, setIsReady] = useState(false);
@@ -77,10 +68,11 @@ function Start() {
   const onPlayClick = () => {
     if (project.length <= 0) {
       navigate("/plan/createProject");
-    } else if (toDos.length <= 0) {
+    } else if (0 < toDos.length) {
+      navigate(`/timer/${toDos[0].id}`);
+    } else {
       navigate("/plan");
     }
-    //타이머로 이꾸
   };
   const onBackClick = () => {
     setIsReady(false);
@@ -228,7 +220,7 @@ const BackgroundCover = styled(motion.div)`
   width: 100%;
   height: 100%;
 `;
-const BackgroundImg = styled(motion.div)`
+const BackgroundImg = styled.div`
   position: absolute;
   top: 0;
   width: 100%;

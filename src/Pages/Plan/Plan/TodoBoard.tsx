@@ -28,7 +28,6 @@ function TodoBord() {
   }, []);
 
   const onTouch = (e: any) => {
-    console.log("a");
     if (e.touches.length > 1) {
       e.preventDefault();
     }
