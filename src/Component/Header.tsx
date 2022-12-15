@@ -9,14 +9,14 @@ function Header() {
   const [projectTitle, setProjectTitle] = useState("");
   const [projectDday, setProjectDday] = useState("");
   const planMatch = useMatch("/plan/*");
-  const mypageMatch = useMatch("/mypage/*");
   const Moment = require("moment");
+  const now = Moment().format("YYYY-MM-DD");
 
   useLayoutEffect(() => {
     if (project.length > 0) {
       setProjectTitle(project[0].projectTitle);
       setProjectDday(() => {
-        const dDay = Moment(project[0].endDate).diff(Moment(), "days");
+        const dDay = Moment(project[0].endDate).diff(Moment(now), "days");
         return dDay >= 0 ? dDay : 0;
       });
     } else {

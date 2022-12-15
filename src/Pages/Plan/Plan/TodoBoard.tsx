@@ -1,7 +1,13 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import TodoCard from "./TodoCard";
-import { cardEditState, projectState, toDoState } from "../../../Recoil/atoms";
+import {
+  cardEditState,
+  projectState,
+  selectState,
+  selectTodoState,
+  toDoState,
+} from "../../../Recoil/atoms";
 import { useRecoilState } from "recoil";
 import { motion } from "framer-motion";
 
@@ -23,23 +29,20 @@ function TodoBord() {
   const [toDos, setToDos] = useRecoilState(toDoState);
   const [isEdit, setIsEdit] = useRecoilState(cardEditState);
   const [project, setProject] = useRecoilState(projectState);
+  const [isSelect, setIsSelect] = useRecoilState(selectState);
   useEffect(() => {
     return setIsEdit(false);
   }, []);
 
-  const onTouch = (e: any) => {
-    if (e.touches.length > 1) {
-      e.preventDefault();
-    }
+  const onBackClick = () => {
+    setIsSelect(false);
+    // if (e.touches.length > 1) {
+    //   e.preventDefault();
+    // }
   };
 
   return (
-    <Wrapper
-      isEdit={isEdit}
-      onTouchMove={onTouch}
-      onTouchStart={onTouch}
-      onTouchEnd={onTouch}
-    >
+    <Wrapper isEdit={isEdit}>
       <Container>
         {toDos.length <= 0 && (
           <GuidBox variants={cardVariants} initial="normal" animate="animate">
@@ -71,7 +74,7 @@ function TodoBord() {
           </CardWrapper>
         ))}
       </Container>
-      <Background onTouchStart={onTouch} onTouchEnd={onTouch} />
+      <Background onClick={onBackClick} />
     </Wrapper>
   );
 }

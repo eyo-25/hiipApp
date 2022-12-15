@@ -119,12 +119,25 @@ function BreakTimer({ count, start, stop, reset, done }: IBreakTimer) {
               initial="countStart"
               animate="countEnd"
               exit="exit"
-              layoutId="count"
+            >
+              <h4>
+                <span>{breakSet}</span>SET
+              </h4>
+              <h4>BREAK</h4>
+            </CounterBox>
+            <BreakBox>
+              <h5>다음 세트까지</h5>
+            </BreakBox>
+            <BreakBox
+              variants={TimerUpVarients}
+              initial="countStart"
+              animate="countEnd"
+              exit="exit"
             >
               <p>{minutes < 10 ? `0${minutes}` : minutes}</p>
               <p>:</p>
               <p>{secounds < 10 ? `0${secounds}` : secounds}</p>
-            </CounterBox>
+            </BreakBox>
           </AnimatePresence>
         </CounterWrapper>
       )}
@@ -140,19 +153,16 @@ function BreakTimer({ count, start, stop, reset, done }: IBreakTimer) {
           <BreakBox>
             <h5>다음 세트까지</h5>
           </BreakBox>
-          <AnimatePresence>
-            <BreakBox
-              variants={TimerUpVarients}
-              initial="countStart"
-              animate="countEnd"
-              exit="exit"
-              layoutId="count"
-            >
-              <p>{minutes < 10 ? `0${minutes}` : minutes}</p>
-              <p>:</p>
-              <p>{secounds < 10 ? `0${secounds}` : secounds}</p>
-            </BreakBox>
-          </AnimatePresence>
+          <BreakBox
+            variants={TimerUpVarients}
+            initial="countStart"
+            animate="countEnd"
+            exit="exit"
+          >
+            <p>{minutes < 10 ? `0${minutes}` : minutes}</p>
+            <p>:</p>
+            <p>{secounds < 10 ? `0${secounds}` : secounds}</p>
+          </BreakBox>
           <BreakBox>
             <h5>진행된 SET</h5>
           </BreakBox>
@@ -182,21 +192,22 @@ const CounterWrapper = styled(motion.div)`
   }
 `;
 const CounterBox = styled(motion.div)`
-  margin-top: 3.5vh;
   display: flex;
+  flex-direction: column;
   justify-content: center;
-  p {
-    display: flex;
+  text-align: center;
+  margin-bottom: 7.8vh;
+  h4 {
     font-family: "Roboto";
     font-weight: 900;
-    font-size: 85px;
-    letter-spacing: -3px;
-    &:nth-child(2) {
-      margin-bottom: 10px;
-      font-size: 75px;
-      padding-left: 7px;
-      padding-right: 5px;
+    font-size: 65px;
+    line-height: 1.1;
+    @media screen and (max-height: 700px) {
+      font-size: 60px;
     }
+  }
+  span {
+    margin-right: 4px;
   }
 `;
 const BreakBox = styled(motion.div)`

@@ -19,10 +19,10 @@ const TimerUpVarients = {
       type: "ease",
     },
   },
-  countStart: {
+  pauseStart: {
     opacity: 1,
   },
-  countEnd: {
+  pauseEnd: {
     opacity: 1,
     transition: {
       duration: 1,
@@ -120,7 +120,6 @@ function IntervalTimer({ count, start, stop, reset, done }: IIntervalTimer) {
               initial="countStart"
               animate="countEnd"
               exit="exit"
-              layoutId="count"
             >
               <p>{minutes < 10 ? `0${minutes}` : minutes}</p>
               <p>:</p>
@@ -132,8 +131,8 @@ function IntervalTimer({ count, start, stop, reset, done }: IIntervalTimer) {
       {isPause && (
         <CounterWrapper
           variants={TimerUpVarients}
-          initial="start"
-          animate="countEnd"
+          initial="pauseStart"
+          animate="pauseEnd"
         >
           <BreakBox>
             <h4>PAUSE</h4>
@@ -142,13 +141,7 @@ function IntervalTimer({ count, start, stop, reset, done }: IIntervalTimer) {
             <h5>다음 휴식까지</h5>
           </BreakBox>
           <AnimatePresence>
-            <BreakBox
-              variants={TimerUpVarients}
-              initial="countStart"
-              animate="countEnd"
-              exit="exit"
-              layoutId="count"
-            >
+            <BreakBox>
               <p>{minutes < 10 ? `0${minutes}` : minutes}</p>
               <p>:</p>
               <p>{secounds < 10 ? `0${secounds}` : secounds}</p>
@@ -158,7 +151,7 @@ function IntervalTimer({ count, start, stop, reset, done }: IIntervalTimer) {
             <h5>진행된 SET</h5>
           </BreakBox>
           <BreakBox>
-            <p>{intervalSet}</p>
+            <p style={{ marginBottom: 0 }}>{intervalSet}</p>
           </BreakBox>
         </CounterWrapper>
       )}

@@ -21,9 +21,6 @@ import {
 } from "../../../Recoil/atoms";
 import TodoMemo from "./TodoMemo";
 import { useNavigate } from "react-router-dom";
-import { onSnapshot, query } from "firebase/firestore";
-import { authService, dbService } from "../../../firebase";
-import { onAuthStateChanged } from "firebase/auth";
 import CreateTodo from "../CreateTodo/CreateTodo";
 
 function Plan() {
@@ -47,7 +44,7 @@ function Plan() {
       height: "0%",
     },
     animate: {
-      height: isWeek ? "21%" : "100%",
+      height: isWeek ? "20%" : "100%",
       transition: {
         duration: 0.9,
         type: "linear",
@@ -87,55 +84,6 @@ function Plan() {
       setEndDate("");
     }
   }, [toDos, selectTodo]);
-
-  // //프로젝트 변경 감지
-  // useEffect(() => {
-  //   const uid = JSON.parse(localStorage.getItem("user") as any).uid;
-  //   const q = query(dbService.collection("project").where("uid", "==", uid));
-  //   const addId = onSnapshot(q, (querySnapshot) => {
-  //     const newArray = querySnapshot.docs.map((doc: any) => {
-  //       return {
-  //         id: doc.id,
-  //         ...doc.data(),
-  //       };
-  //     });
-  //     setProject(newArray);
-  //   });
-  //   onAuthStateChanged(authService, (user) => {
-  //     if (user == null) {
-  //       addId();
-  //     }
-  //   });
-  // }, []);
-
-  // //투두 변경 감지(snapshot)
-  // useEffect(() => {
-  //   if (0 < toDos.length) {
-  //     const projectIndex = project.findIndex(
-  //       (item: any) => item.select === "true"
-  //     );
-  //     const q = query(
-  //       dbService
-  //         .collection("plan")
-  //         .where("projectId", "==", project[projectIndex].id)
-  //         .orderBy("index", "desc")
-  //     );
-  //     const addId = onSnapshot(q, (querySnapshot) => {
-  //       const newArray = querySnapshot.docs.map((doc: any) => {
-  //         return {
-  //           id: doc.id,
-  //           ...doc.data(),
-  //         };
-  //       });
-  //       setToDos(newArray);
-  //     });
-  //     onAuthStateChanged(authService, (user) => {
-  //       if (user == null) {
-  //         addId();
-  //       }
-  //     });
-  //   }
-  // }, [toDos, project]);
 
   const closedEdit = () => {
     if (isEdit) {

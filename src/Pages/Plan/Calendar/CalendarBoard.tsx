@@ -95,19 +95,21 @@ export default React.memo(CalendarBoard);
 
 const Wrapper = styled.div`
   width: 100%;
-  height: 13.5vh;
+  height: 100%;
   cursor: pointer;
 `;
 const Container = styled(motion.div)`
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-top: 1.6vh;
   max-width: 400px;
   margin: 0 auto;
-  position: relative;
-  @media screen and (max-height: 700px) {
-    padding-top: 1vh;
+  width: 100%;
+  height: 100%;
+  padding-top: 0.8vh;
+  @media screen and (max-height: 900px) {
+    padding-top: 0;
   }
 `;
 const MonthBox = styled.div`
@@ -136,10 +138,12 @@ const DayContainer = styled.div`
   font-weight: 600;
 `;
 const DayBox = styled.div<{ isWeek: boolean }>`
+  grid-template-columns: repeat(7, 1fr);
+  grid-template-rows: repeat(6, 1fr);
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-bottom: 0.6vh;
+  margin-bottom: 0.7vh;
 `;
 const PrevBtn = styled(IoChevronBack)`
   width: 20px;

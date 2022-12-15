@@ -1,6 +1,10 @@
 import { useRecoilState } from "recoil";
 import styled from "styled-components";
-import { isBreakState, timeState } from "../../../../Recoil/atoms";
+import {
+  isBreakState,
+  isPauseState,
+  timeState,
+} from "../../../../Recoil/atoms";
 import IntervalTimer from "./IntervalTimer";
 import Background from "../../../../Assets/image/bull.png";
 import { motion } from "framer-motion";
@@ -16,10 +20,10 @@ const bottomVariants = {
   },
   animate: {
     opacity: 1,
-    height: "100%",
+    height: "80%",
     transition: {
-      delay: 0.1,
-      duration: 0.8,
+      delat: 0.1,
+      duration: 1,
       type: "linear",
     },
   },
@@ -27,6 +31,7 @@ const bottomVariants = {
 
 function TimerBoard() {
   const [isBreakSet, setIsBreakSet] = useRecoilState(isBreakState);
+  const [isPause, setIsPause] = useRecoilState(isPauseState);
   const [timeObj, setTimeObj] = useRecoilState(timeState);
   const { count, start, stop, reset, done } = useCounter(
     timeObj.min,
@@ -41,6 +46,7 @@ function TimerBoard() {
   } = useCounter(timeObj.breakMin, timeObj.breakSec);
 
   useEffect(() => {
+    setIsPause(false);
     setIsBreakSet(false);
     return () => {
       reset();
@@ -77,6 +83,8 @@ function TimerBoard() {
       </ContentsWrapper>
       <ButtonWrapper>
         <TimerButton
+          count={count}
+          breakCount={breakCount}
           stop={stop}
           breakStop={breakStop}
           start={start}
@@ -87,6 +95,7 @@ function TimerBoard() {
         variants={bottomVariants}
         initial="normal"
         animate="animate"
+        iscolor={isPause ? "Red" : "Blue"}
       />
       <BackgroundImg />
     </Container>
@@ -119,52 +128,40 @@ const BackgroundImg = styled.div`
   background-size: cover;
   background-position: 50%;
 `;
-const BottomGradient = styled(motion.div)`
+const BottomGradient = styled(motion.div)<{ iscolor: string }>`
   z-index: 5;
   position: absolute;
   bottom: 0;
   width: 100%;
-  background: linear-gradient(rgba(0, 0, 0, 0), 80%, Blue);
+  background: linear-gradient(
+    rgba(0, 0, 0, 0),
+    70%,
+    ${(props) => props.iscolor}
+  );
 `;
 const ContentsWrapper = styled.div`
   position: relative;
   z-index: 10;
-  height: 72%;
+  height: 70%;
   width: 100%;
   color: white;
-  @media screen and (max-height: 800px) {
-    height: 73.5%;
-  }
-  @media screen and (max-height: 700px) {
-    height: 75%;
-  }
 `;
 const ButtonWrapper = styled.div`
   position: relative;
   display: flex;
-  height: 28%;
+  height: 30%;
   width: 100%;
   z-index: 10;
-  @media screen and (max-height: 800px) {
-    height: 26.5%;
-  }
-  @media screen and (max-height: 700px) {
-    height: 25%;
-  }
 `;
 const InfoWrapper = styled.div`
   height: 42%;
   //임시
   text-align: center;
   font-size: 20px;
-  padding-top: 40%;
   @media screen and (max-height: 800px) {
-    height: 38%;
-  }
-  @media screen and (max-height: 750px) {
     height: 35%;
   }
-  @media screen and (max-height: 600px) {
-    height: 26%;
+  @media screen and (max-height: 750px) {
+    height: 30%;
   }
 `;
