@@ -12,6 +12,7 @@ import TimerButton from "./TimerButton";
 import { useEffect } from "react";
 import { useCounter } from "../../../../hooks/useCounter";
 import BreakTimer from "./BreakTimer";
+import TimerInfo from "./TimerInfo";
 
 const bottomVariants = {
   normal: {
@@ -59,8 +60,7 @@ function TimerBoard() {
     <Container>
       <ContentsWrapper>
         <InfoWrapper>
-          {count}
-          {breakCount}
+          <TimerInfo count={count} breakCount={breakCount} />
         </InfoWrapper>
         {!isBreakSet && (
           <IntervalTimer
@@ -155,13 +155,10 @@ const ButtonWrapper = styled.div`
 `;
 const InfoWrapper = styled.div`
   height: 42%;
-  //임시
-  text-align: center;
-  font-size: 20px;
   @media screen and (max-height: 800px) {
-    height: 35%;
+    height: 38%;
   }
   @media screen and (max-height: 750px) {
-    height: 30%;
+    height: 35%;
   }
 `;

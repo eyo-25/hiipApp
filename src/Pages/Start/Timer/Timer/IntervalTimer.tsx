@@ -58,13 +58,22 @@ function IntervalTimer({ count, start, stop, reset, done }: IIntervalTimer) {
       if (count <= 0) {
         if (intervalSet === 1) {
           done();
+          setTimeObj((prev) => {
+            return {
+              ...prev,
+              focusSet: timeObj.focusSet - 1,
+              min: 0,
+              sec: 0,
+              mSec: 0,
+            };
+          });
           return;
         }
         setIsBreakSet(true);
         setTimeObj((prev) => {
           return {
             ...prev,
-            FocusSet: timeObj.FocusSet - 1,
+            focusSet: timeObj.focusSet - 1,
             min: timeObj.setFocusMin,
             sec: timeObj.setFocusSec,
             mSec: 0,
@@ -91,7 +100,7 @@ function IntervalTimer({ count, start, stop, reset, done }: IIntervalTimer) {
 
   //초기화
   useEffect(() => {
-    setIntervalSet(timeObj.FocusSet);
+    setIntervalSet(timeObj.focusSet);
     setMinutes(timeObj.min);
     setSecounds(timeObj.sec);
     setIsPause(false);
@@ -109,12 +118,12 @@ function IntervalTimer({ count, start, stop, reset, done }: IIntervalTimer) {
   return (
     <div>
       {!isPause && (
-        <CounterWrapper
-          variants={TimerUpVarients}
-          initial="start"
-          animate="end"
-        >
-          <AnimatePresence>
+        <AnimatePresence>
+          <CounterWrapper
+            variants={TimerUpVarients}
+            initial="start"
+            animate="end"
+          >
             <CounterBox
               variants={TimerUpVarients}
               initial="countStart"
@@ -125,8 +134,8 @@ function IntervalTimer({ count, start, stop, reset, done }: IIntervalTimer) {
               <p>:</p>
               <p>{secounds < 10 ? `0${secounds}` : secounds}</p>
             </CounterBox>
-          </AnimatePresence>
-        </CounterWrapper>
+          </CounterWrapper>
+        </AnimatePresence>
       )}
       {isPause && (
         <CounterWrapper
@@ -140,13 +149,11 @@ function IntervalTimer({ count, start, stop, reset, done }: IIntervalTimer) {
           <BreakBox>
             <h5>다음 휴식까지</h5>
           </BreakBox>
-          <AnimatePresence>
-            <BreakBox>
-              <p>{minutes < 10 ? `0${minutes}` : minutes}</p>
-              <p>:</p>
-              <p>{secounds < 10 ? `0${secounds}` : secounds}</p>
-            </BreakBox>
-          </AnimatePresence>
+          <BreakBox>
+            <p>{minutes < 10 ? `0${minutes}` : minutes}</p>
+            <p>:</p>
+            <p>{secounds < 10 ? `0${secounds}` : secounds}</p>
+          </BreakBox>
           <BreakBox>
             <h5>진행된 SET</h5>
           </BreakBox>
@@ -170,9 +177,6 @@ const CounterWrapper = styled(motion.div)`
   }
   @media screen and (max-height: 750px) {
     height: 65%;
-  }
-  @media screen and (max-height: 600px) {
-    height: 74%;
   }
 `;
 const CounterBox = styled(motion.div)`
@@ -198,9 +202,6 @@ const BreakBox = styled(motion.div)`
   justify-content: center;
   h5 {
     margin-bottom: 10px;
-    @media screen and (max-height: 650px) {
-      margin-bottom: 5px;
-    }
   }
   h4 {
     font-family: "Roboto";
@@ -210,6 +211,7 @@ const BreakBox = styled(motion.div)`
     margin-bottom: 4.7vh;
     @media screen and (max-height: 650px) {
       margin-bottom: 20px;
+      font-size: 65px;
     }
   }
   p {

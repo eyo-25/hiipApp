@@ -214,11 +214,14 @@ const BarButtonWrapper = styled(motion.div)`
   width: 100%;
   height: 100%;
   padding-top: 86px;
+  @media screen and (max-height: 800px) {
+    padding-top: 76px;
+  }
   @media screen and (max-height: 700px) {
     padding-top: 70px;
   }
-  @media screen and (max-height: 800px) {
-    padding-top: 76px;
+  @media screen and (max-height: 600px) {
+    padding-top: 65px;
   }
 `;
 const BarContainer = styled(motion.div)`
@@ -270,13 +273,17 @@ const CircleButtonWrapper = styled(motion.div)`
   z-index: 50;
   height: 86px;
   width: 86px;
+  @media screen and (max-height: 800px) {
+    height: 76px;
+    width: 76px;
+  }
   @media screen and (max-height: 700px) {
     width: 70px;
     height: 70px;
   }
-  @media screen and (max-height: 800px) {
-    height: 76px;
-    width: 76px;
+  @media screen and (max-height: 600px) {
+    width: 65px;
+    height: 65px;
   }
 `;
 const BtnBox = styled(motion.div)<{ bg: string }>`

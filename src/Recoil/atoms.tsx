@@ -112,7 +112,7 @@ export const isPauseState = atom<boolean>({
   default: false,
 });
 interface ItimeState {
-  FocusSet: number;
+  focusSet: number;
   breakMin: number;
   breakSec: number;
   breakSet: number;
@@ -130,7 +130,7 @@ interface ItimeState {
 export const timeState = atom<ItimeState>({
   key: "timeState",
   default: {
-    FocusSet: 0,
+    focusSet: 0,
     breakMin: 0,
     breakSec: 0,
     breakSet: 0,

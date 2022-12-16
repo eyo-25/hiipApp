@@ -58,6 +58,15 @@ function BreakTimer({ count, start, stop, reset, done }: IBreakTimer) {
         setIsBreakSet(false);
         if (breakSet === 1) {
           done();
+          setTimeObj((prev) => {
+            return {
+              ...prev,
+              breakSet: timeObj.breakSet - 1,
+              breakMin: 0,
+              breakSec: 0,
+              mSec: 0,
+            };
+          });
           return;
         }
         setTimeObj((prev) => {
@@ -108,12 +117,12 @@ function BreakTimer({ count, start, stop, reset, done }: IBreakTimer) {
   return (
     <div>
       {!isPause && (
-        <CounterWrapper
-          variants={TimerUpVarients}
-          initial="start"
-          animate="end"
-        >
-          <AnimatePresence>
+        <AnimatePresence>
+          <CounterWrapper
+            variants={TimerUpVarients}
+            initial="start"
+            animate="end"
+          >
             <CounterBox
               variants={TimerUpVarients}
               initial="countStart"
@@ -138,8 +147,8 @@ function BreakTimer({ count, start, stop, reset, done }: IBreakTimer) {
               <p>:</p>
               <p>{secounds < 10 ? `0${secounds}` : secounds}</p>
             </BreakBox>
-          </AnimatePresence>
-        </CounterWrapper>
+          </CounterWrapper>
+        </AnimatePresence>
       )}
       {isPause && (
         <CounterWrapper
@@ -187,9 +196,6 @@ const CounterWrapper = styled(motion.div)`
   @media screen and (max-height: 750px) {
     height: 65%;
   }
-  @media screen and (max-height: 600px) {
-    height: 74%;
-  }
 `;
 const CounterBox = styled(motion.div)`
   display: flex;
@@ -197,6 +203,9 @@ const CounterBox = styled(motion.div)`
   justify-content: center;
   text-align: center;
   margin-bottom: 7.8vh;
+  @media screen and (max-height: 700px) {
+    margin-bottom: 5vh;
+  }
   h4 {
     font-family: "Roboto";
     font-weight: 900;
@@ -227,6 +236,7 @@ const BreakBox = styled(motion.div)`
     margin-bottom: 4.7vh;
     @media screen and (max-height: 650px) {
       margin-bottom: 20px;
+      font-size: 65px;
     }
   }
   p {

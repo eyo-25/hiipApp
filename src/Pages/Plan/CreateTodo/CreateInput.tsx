@@ -88,7 +88,7 @@ function CreateInput({
       const defaultTimeObj = {
         setFocusSet: count,
         setBreakSet: count - 1 <= 0 ? 0 : count - 1,
-        FocusSet: count,
+        focusSet: count,
         breakSet: count - 1 <= 0 ? 0 : count - 1,
         stopDate: "",
         //테스트 끝나면 분만 적용
@@ -137,7 +137,7 @@ function CreateInput({
       const editTimeObj = {
         setFocusSet: count,
         setBreakSet: count - 1 <= 0 ? 0 : count - 1,
-        FocusSet: count,
+        focusSet: count,
         breakSet: count - 1 <= 0 ? 0 : count - 1,
       };
       const updateTimeFbase = () =>
