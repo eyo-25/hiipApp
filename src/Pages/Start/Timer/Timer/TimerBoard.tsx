@@ -1,6 +1,7 @@
 import { useRecoilState } from "recoil";
 import styled from "styled-components";
 import {
+  inputFocusState,
   isBreakState,
   isPauseState,
   timeState,
@@ -13,6 +14,7 @@ import { useEffect } from "react";
 import { useCounter } from "../../../../hooks/useCounter";
 import BreakTimer from "./BreakTimer";
 import TimerInfo from "./TimerInfo";
+import { isAndroid } from "react-device-detect";
 
 const bottomVariants = {
   normal: {
@@ -32,6 +34,7 @@ const bottomVariants = {
 
 function TimerBoard() {
   const [isBreakSet, setIsBreakSet] = useRecoilState(isBreakState);
+  const [inputToggle, setInputToggle] = useRecoilState(inputFocusState);
   const [isPause, setIsPause] = useRecoilState(isPauseState);
   const [timeObj, setTimeObj] = useRecoilState(timeState);
   const { count, start, stop, reset, done } = useCounter(
@@ -48,7 +51,6 @@ function TimerBoard() {
 
   useEffect(() => {
     setIsPause(false);
-    setIsBreakSet(false);
     return () => {
       reset();
       breakReset();
@@ -81,16 +83,18 @@ function TimerBoard() {
           />
         )}
       </ContentsWrapper>
-      <ButtonWrapper>
-        <TimerButton
-          count={count}
-          breakCount={breakCount}
-          stop={stop}
-          breakStop={breakStop}
-          start={start}
-          breakStart={breakStart}
-        />
-      </ButtonWrapper>
+      {!(isAndroid && inputToggle) && (
+        <ButtonWrapper>
+          <TimerButton
+            count={count}
+            breakCount={breakCount}
+            stop={stop}
+            breakStop={breakStop}
+            start={start}
+            breakStart={breakStart}
+          />
+        </ButtonWrapper>
+      )}
       <BottomGradient
         variants={bottomVariants}
         initial="normal"

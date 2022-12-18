@@ -1,36 +1,32 @@
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import React, { useEffect, useState } from "react";
 import { useRecoilState } from "recoil";
 import styled from "styled-components";
 import {
+  inputFocusState,
   isBreakState,
   isPauseState,
   timeState,
 } from "../../../../Recoil/atoms";
+import { dbService } from "../../../../firebase";
+import { useParams } from "react-router-dom";
 
-const TimerUpVarients = {
+const TextUpVarients = {
   start: {
     opacity: 0,
+    y: 4,
+  },
+  coundStart: {
+    opacity: 0,
+    y: 6,
   },
   end: {
     opacity: 1,
+    y: 0,
     transition: {
       duration: 0.5,
-      type: "ease",
+      type: "spling",
     },
-  },
-  countStart: {
-    opacity: 1,
-  },
-  countEnd: {
-    opacity: 1,
-    transition: {
-      duration: 1,
-      type: "ease",
-    },
-  },
-  exit: {
-    opacity: 1,
   },
 };
 interface IBreakTimer {
@@ -49,38 +45,51 @@ function BreakTimer({ count, start, stop, reset, done }: IBreakTimer) {
   const [minutes, setMinutes] = useState(0);
   const [secounds, setSecounds] = useState(0);
   const [mSecounds, setMSecounds] = useState(0);
+  const [inputToggle, setInputToggle] = useRecoilState(inputFocusState);
+  const params = useParams();
+  const todoId = params.todoId;
+
+  //파이어베이스 timer 업데이트
+  async function updateBreakSubmit(type: string) {
+    const isTime = type === "count";
+    const isDone = type === "done";
+    try {
+      await dbService
+        .collection("plan")
+        .doc(todoId)
+        .collection("timer")
+        .doc("time")
+        .update({
+          breakSet: isDone ? 0 : timeObj.breakSet - 1,
+          breakMin: isDone ? 0 : timeObj.setBreakMin,
+          breakSec: isDone ? 0 : timeObj.setBreakSec,
+        });
+    } catch (e) {
+      alert("타이머 ERROR.");
+    }
+  }
 
   //count를 시간으로 변환하여 표현
-  const timer = () => {
+  const timer = async () => {
     if (breakSet <= 0) return;
-    if (breakSet !== 0) {
-      if (count <= 0) {
-        setIsBreakSet(false);
-        if (breakSet === 1) {
-          done();
-          setTimeObj((prev) => {
-            return {
-              ...prev,
-              breakSet: timeObj.breakSet - 1,
-              breakMin: 0,
-              breakSec: 0,
-              mSec: 0,
-            };
-          });
-          return;
-        }
-        setTimeObj((prev) => {
-          return {
-            ...prev,
-            breakSet: timeObj.breakSet - 1,
-            breakMin: timeObj.setBreakMin,
-            breakSec: timeObj.setBreakSec,
-            mSec: 0,
-          };
-        });
-        reset();
-        return;
-      }
+    //done
+    if (breakSet === 1 && count <= 0) {
+      await updateBreakSubmit("done");
+      done();
+      setTimeObj((prev) => {
+        return {
+          ...prev,
+          breakSet: 0,
+          breakMin: 0,
+          breakSec: 0,
+          mSec: 0,
+        };
+      });
+      setIsBreakSet(false);
+      return;
+    }
+    //count
+    if (1 <= breakSet && 0 < count) {
       const mathMin = Math.floor(count / 60 / 100);
       const mathSec = Math.floor((count - mathMin * 60 * 100) / 100);
       setMinutes(mathMin);
@@ -95,6 +104,21 @@ function BreakTimer({ count, start, stop, reset, done }: IBreakTimer) {
         };
       });
     }
+    //NextSet
+    if (1 < breakSet && count <= 0) {
+      await updateBreakSubmit("next");
+      setIsBreakSet(false);
+      setTimeObj((prev) => {
+        return {
+          ...prev,
+          breakSet: timeObj.breakSet - 1,
+          breakMin: timeObj.setBreakMin,
+          breakSec: timeObj.setBreakSet,
+          mSec: 0,
+        };
+      });
+      reset();
+    }
   };
 
   //초기화
@@ -105,69 +129,54 @@ function BreakTimer({ count, start, stop, reset, done }: IBreakTimer) {
     setIsPause(false);
     setTimeout(() => {
       start();
-    }, 700);
+    }, 600);
     return () => {
       setIsPause(false);
       stop();
     };
   }, []);
 
-  useEffect(timer, [count]);
+  useEffect(() => {
+    timer();
+  }, [count]);
 
   return (
     <div>
       {!isPause && (
-        <AnimatePresence>
-          <CounterWrapper
-            variants={TimerUpVarients}
-            initial="start"
+        <CounterWrapper>
+          <CounterBox
+            variants={TextUpVarients}
+            initial="coundStart"
             animate="end"
           >
-            <CounterBox
-              variants={TimerUpVarients}
-              initial="countStart"
-              animate="countEnd"
-              exit="exit"
-            >
-              <h4>
-                <span>{breakSet}</span>SET
-              </h4>
-              <h4>BREAK</h4>
-            </CounterBox>
-            <BreakBox>
-              <h5>다음 세트까지</h5>
-            </BreakBox>
-            <BreakBox
-              variants={TimerUpVarients}
-              initial="countStart"
-              animate="countEnd"
-              exit="exit"
-            >
-              <p>{minutes < 10 ? `0${minutes}` : minutes}</p>
-              <p>:</p>
-              <p>{secounds < 10 ? `0${secounds}` : secounds}</p>
-            </BreakBox>
-          </CounterWrapper>
-        </AnimatePresence>
-      )}
-      {isPause && (
-        <CounterWrapper
-          variants={TimerUpVarients}
-          initial="start"
-          animate="countEnd"
-        >
+            <h4>
+              <span>{timeObj.setFocusSet - timeObj.focusSet}</span>SET
+            </h4>
+            <h4>BREAK</h4>
+          </CounterBox>
           <BreakBox>
+            <h5>다음 세트까지</h5>
+          </BreakBox>
+          <BreakBox variants={TextUpVarients} initial="start" animate="end">
+            <p>{minutes < 10 ? `0${minutes}` : minutes}</p>
+            <p>:</p>
+            <p>{secounds < 10 ? `0${secounds}` : secounds}</p>
+          </BreakBox>
+        </CounterWrapper>
+      )}
+      {isPause && !inputToggle && (
+        <CounterWrapper>
+          <BreakBox
+            variants={TextUpVarients}
+            initial="coundStart"
+            animate="end"
+          >
             <h4>PAUSE</h4>
           </BreakBox>
           <BreakBox>
             <h5>다음 세트까지</h5>
           </BreakBox>
-          <BreakBox
-            variants={TimerUpVarients}
-            initial="countStart"
-            animate="countEnd"
-            exit="exit"
-          >
+          <BreakBox variants={TextUpVarients} initial="start" animate="end">
             <p>{minutes < 10 ? `0${minutes}` : minutes}</p>
             <p>:</p>
             <p>{secounds < 10 ? `0${secounds}` : secounds}</p>
@@ -175,8 +184,8 @@ function BreakTimer({ count, start, stop, reset, done }: IBreakTimer) {
           <BreakBox>
             <h5>진행된 SET</h5>
           </BreakBox>
-          <BreakBox>
-            <p>{breakSet}</p>
+          <BreakBox variants={TextUpVarients} initial="start" animate="end">
+            <p>{timeObj.setFocusSet - timeObj.focusSet}</p>
           </BreakBox>
         </CounterWrapper>
       )}
@@ -250,7 +259,7 @@ const BreakBox = styled(motion.div)`
       margin-bottom: 15px;
     }
     &:nth-child(2) {
-      margin-top: 2px;
+      margin-top: 5px;
       font-size: 35px;
       padding-left: 3px;
       padding-right: 2px;

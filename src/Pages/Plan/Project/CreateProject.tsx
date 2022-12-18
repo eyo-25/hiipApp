@@ -3,7 +3,6 @@ import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useRecoilState } from "recoil";
 import styled from "styled-components";
-import Applayout from "../../../Component/Applayout";
 import {
   endDateState,
   inputFocusState,
@@ -64,6 +63,10 @@ function CreateProject() {
   };
   useEffect(() => {
     reset();
+    return () => {
+      setInputToggle(false);
+      inputRef.current = null;
+    };
   }, []);
   return (
     <ContentContainer>

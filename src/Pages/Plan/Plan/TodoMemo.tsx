@@ -9,7 +9,7 @@ import {
   toDoState,
   loadState,
 } from "../../../Recoil/atoms";
-import { useEffect, useState, useRef } from "react";
+import { useState } from "react";
 import MemoCard from "./MemoCard";
 
 const memoVariants = {

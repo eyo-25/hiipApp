@@ -15,9 +15,7 @@ import {
   isTodoEditState,
   loadState,
   projectState,
-  selectTodoState,
   startDateState,
-  toDoState,
 } from "../../../Recoil/atoms";
 
 interface ICreateInput {
@@ -36,10 +34,8 @@ function CreateInput({
   mode,
 }: ICreateInput) {
   const navigate = useNavigate();
-  const [toDos, setToDos] = useRecoilState(toDoState);
   const [project, setProject] = useRecoilState(projectState);
   const [isCreate, setIsCreate] = useRecoilState(isCreateState);
-  const [selectTodo, setSelectTodo] = useRecoilState(selectTodoState);
   const [startDate, setStartDate] = useRecoilState(createStartDateState);
   const [endDate, setEndDate] = useRecoilState(createEndDateState);
   const [startDate2, setStartDate2] = useRecoilState(startDateState);

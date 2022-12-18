@@ -2,6 +2,7 @@ import { useRecoilState } from "recoil";
 import styled from "styled-components";
 import { isBreakState, timeState } from "../../../../Recoil/atoms";
 import React, { useEffect, useState } from "react";
+import { Blue, Red } from "../../../../Styles/Colors";
 
 interface IProgressBar {
   count: number;
@@ -11,7 +12,8 @@ interface IProgressBar {
 function ProgressBar({ count, breakCount }: IProgressBar) {
   const [timeObj, setTimeObj] = useRecoilState(timeState);
   const [isBreakSet, setIsBreakSet] = useRecoilState(isBreakState);
-  const [progressArray, setProgressArray] = useState<any[]>([]);
+  const [progressArray, setProgressArray] = useState<number[]>([]);
+  // const [totalProgress, setTotalProgress] = useState<number>(0);
 
   //배열생성
   useEffect(() => {
@@ -36,15 +38,12 @@ function ProgressBar({ count, breakCount }: IProgressBar) {
   const totalBreakCount =
     timeObj.setBreakMin * 60 * 100 + timeObj.setBreakSec * 100;
   //현재 포커스 퍼센트
-  const nowFocusPercent = Math.floor(
-    ((totalFocusCount - count) / totalFocusCount) * 100
-  );
+  const nowFocusPercent = ((totalFocusCount - count) / totalFocusCount) * 100;
   //현재 브레이크 퍼센트
-  const nowBreakPercent = Math.floor(
-    ((totalBreakCount - breakCount) / totalBreakCount) * 100
-  );
+  const nowBreakPercent =
+    ((totalBreakCount - breakCount) / totalBreakCount) * 100;
 
-  // progress ui
+  // progress 게이지
   //토탈카운트(총넓이)
   const totalCount =
     totalFocusCount * timeObj.setFocusSet +
@@ -73,20 +72,42 @@ function ProgressBar({ count, breakCount }: IProgressBar) {
     });
   }, [count, breakCount]);
 
-  // console.log(progressArray);
-  console.log(timeObj);
+  //카운트 감지해서 배열 배정
+  // useEffect(() => {
+  //   const totalPercent = progressArray.length * 100;
+  //   if (progressArray.length > 0) {
+  //     const sum = progressArray.reduce((a, b) => a + b);
+  //     setTotalProgress(() => {
+  //       if (sum !== 0 && totalPercent !== 0) {
+  //         return (sum / totalPercent) * 100;
+  //       } else {
+  //         return 0;
+  //       }
+  //     });
+  //   }
+  // }, [progressArray]);
 
   return (
     <Container>
       {progressArray.map((data, index) => {
         return (
           <ProgressBox
+            key={index}
             style={{
               width: `${(index + 1) % 2 === 0 ? breakWidth : focusWidth}%`,
             }}
             isBreak={(index + 1) % 2 === 0}
           >
-            <ProgressGauge />
+            <ProgressGauge
+              style={{
+                width: `${data}%`,
+              }}
+              isBreak={(index + 1) % 2 === 0}
+            >
+              <ProgressEdge
+                isNowSet={index === nowSet && totalSet !== nowSet}
+              />
+            </ProgressGauge>
           </ProgressBox>
         );
       })}
@@ -103,18 +124,26 @@ const Container = styled.div`
   width: 100%;
   margin-bottom: 20px;
 `;
-const ProgressBox = styled.div<{
-  isBreak: boolean;
-}>`
+const ProgressBox = styled.div<{ isBreak: boolean }>`
   position: relative;
   display: flex;
   height: 100%;
   background-color: ${(props) =>
     props.isBreak ? "rgba(0,0,0,0)" : "rgba(255,255,255,1)"};
 `;
-const ProgressGauge = styled.div`
+const ProgressGauge = styled.div<{ isBreak: boolean }>`
   position: absolute;
   top: 0;
   display: flex;
-  height: 5px;
+  height: 100%;
+  background-color: ${(props) => (props.isBreak ? Red : Blue)};
+`;
+const ProgressEdge = styled.div<{ isNowSet: boolean }>`
+  display: ${(props) => (props.isNowSet ? "inline" : "none")};
+  position: absolute;
+  right: -1px;
+  bottom: -0.05px;
+  width: 2px;
+  height: 100%;
+  background-color: Red;
 `;

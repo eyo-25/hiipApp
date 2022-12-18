@@ -157,6 +157,9 @@ const MemoInput = styled.textarea`
   &::-webkit-scrollbar {
     width: 0;
   }
+  &:focus {
+    outline: 0;
+  }
 `;
 const TodoTopBox = styled.div`
   position: relative;

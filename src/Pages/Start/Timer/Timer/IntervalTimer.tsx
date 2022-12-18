@@ -1,36 +1,32 @@
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import { useRecoilState } from "recoil";
 import styled from "styled-components";
+import { dbService } from "../../../../firebase";
 import {
+  inputFocusState,
   isBreakState,
   isPauseState,
   timeState,
 } from "../../../../Recoil/atoms";
 
-const TimerUpVarients = {
+const TextUpVarients = {
   start: {
     opacity: 0,
+    y: 4,
+  },
+  coundStart: {
+    opacity: 0,
+    y: 6,
   },
   end: {
     opacity: 1,
+    y: 0,
     transition: {
       duration: 0.5,
-      type: "ease",
+      type: "spling",
     },
-  },
-  pauseStart: {
-    opacity: 1,
-  },
-  pauseEnd: {
-    opacity: 1,
-    transition: {
-      duration: 1,
-      type: "ease",
-    },
-  },
-  exit: {
-    opacity: 1,
   },
 };
 
@@ -46,42 +42,53 @@ function IntervalTimer({ count, start, stop, reset, done }: IIntervalTimer) {
   const [timeObj, setTimeObj] = useRecoilState(timeState);
   const [isBreakSet, setIsBreakSet] = useRecoilState(isBreakState);
   const [isPause, setIsPause] = useRecoilState(isPauseState);
+  const [inputToggle, setInputToggle] = useRecoilState(inputFocusState);
   const [intervalSet, setIntervalSet] = useState(0);
   const [minutes, setMinutes] = useState(0);
   const [secounds, setSecounds] = useState(0);
   const [mSecounds, setMSecounds] = useState(0);
+  const params = useParams();
+  const todoId = params.todoId;
+
+  //파이어베이스 timer 업데이트
+  async function updateTimeSubmit(type: string) {
+    const isDone = type === "done";
+    try {
+      await dbService
+        .collection("plan")
+        .doc(todoId)
+        .collection("timer")
+        .doc("time")
+        .update({
+          focusSet: isDone ? 0 : timeObj.focusSet - 1,
+          min: isDone ? 0 : timeObj.setFocusMin,
+          sec: isDone ? 0 : timeObj.setFocusSec,
+        });
+    } catch (e) {
+      alert("타이머 ERROR.");
+    }
+  }
 
   //count를 시간으로 변환하여 표현
-  const timer = () => {
+  const timer = async () => {
     if (intervalSet <= 0) return;
-    if (intervalSet !== 0) {
-      if (count <= 0) {
-        if (intervalSet === 1) {
-          done();
-          setTimeObj((prev) => {
-            return {
-              ...prev,
-              focusSet: timeObj.focusSet - 1,
-              min: 0,
-              sec: 0,
-              mSec: 0,
-            };
-          });
-          return;
-        }
-        setIsBreakSet(true);
-        setTimeObj((prev) => {
-          return {
-            ...prev,
-            focusSet: timeObj.focusSet - 1,
-            min: timeObj.setFocusMin,
-            sec: timeObj.setFocusSec,
-            mSec: 0,
-          };
-        });
-        reset();
-        return;
-      }
+    //done
+    if (intervalSet === 1 && count <= 0) {
+      await updateTimeSubmit("done");
+      done();
+      setTimeObj((prev) => {
+        return {
+          ...prev,
+          focusSet: timeObj.focusSet - 1,
+          min: 0,
+          sec: 0,
+          mSec: 0,
+        };
+      });
+      return;
+    }
+    //count
+    if (1 <= intervalSet && 0 < count) {
       const mathMin = Math.floor(count / 60 / 100);
       const mathSec = Math.floor((count - mathMin * 60 * 100) / 100);
       setMinutes(mathMin);
@@ -96,6 +103,21 @@ function IntervalTimer({ count, start, stop, reset, done }: IIntervalTimer) {
         };
       });
     }
+    //NextSet
+    if (1 < intervalSet && count <= 0) {
+      await updateTimeSubmit("next");
+      setIsBreakSet(true);
+      setTimeObj((prev) => {
+        return {
+          ...prev,
+          focusSet: timeObj.focusSet - 1,
+          min: timeObj.setFocusMin,
+          sec: timeObj.setFocusSec,
+          mSec: 0,
+        };
+      });
+      reset();
+    }
   };
 
   //초기화
@@ -106,50 +128,45 @@ function IntervalTimer({ count, start, stop, reset, done }: IIntervalTimer) {
     setIsPause(false);
     setTimeout(() => {
       start();
-    }, 700);
+    }, 600);
     return () => {
       setIsPause(false);
       stop();
     };
   }, []);
 
-  useEffect(timer, [count]);
+  useEffect(() => {
+    timer();
+  }, [count]);
 
   return (
     <div>
       {!isPause && (
-        <AnimatePresence>
-          <CounterWrapper
-            variants={TimerUpVarients}
-            initial="start"
+        <CounterWrapper
+          variants={TextUpVarients}
+          initial="coundStart"
+          animate="end"
+        >
+          <CounterBox>
+            <p>{minutes < 10 ? `0${minutes}` : minutes}</p>
+            <p>:</p>
+            <p>{secounds < 10 ? `0${secounds}` : secounds}</p>
+          </CounterBox>
+        </CounterWrapper>
+      )}
+      {isPause && !inputToggle && (
+        <CounterWrapper>
+          <BreakBox
+            variants={TextUpVarients}
+            initial="coundStart"
             animate="end"
           >
-            <CounterBox
-              variants={TimerUpVarients}
-              initial="countStart"
-              animate="countEnd"
-              exit="exit"
-            >
-              <p>{minutes < 10 ? `0${minutes}` : minutes}</p>
-              <p>:</p>
-              <p>{secounds < 10 ? `0${secounds}` : secounds}</p>
-            </CounterBox>
-          </CounterWrapper>
-        </AnimatePresence>
-      )}
-      {isPause && (
-        <CounterWrapper
-          variants={TimerUpVarients}
-          initial="pauseStart"
-          animate="pauseEnd"
-        >
-          <BreakBox>
             <h4>PAUSE</h4>
           </BreakBox>
           <BreakBox>
             <h5>다음 휴식까지</h5>
           </BreakBox>
-          <BreakBox>
+          <BreakBox variants={TextUpVarients} initial="start" animate="end">
             <p>{minutes < 10 ? `0${minutes}` : minutes}</p>
             <p>:</p>
             <p>{secounds < 10 ? `0${secounds}` : secounds}</p>
@@ -157,8 +174,10 @@ function IntervalTimer({ count, start, stop, reset, done }: IIntervalTimer) {
           <BreakBox>
             <h5>진행된 SET</h5>
           </BreakBox>
-          <BreakBox>
-            <p style={{ marginBottom: 0 }}>{intervalSet}</p>
+          <BreakBox variants={TextUpVarients} initial="start" animate="end">
+            <p style={{ marginBottom: 0 }}>
+              {timeObj.setFocusSet - timeObj.focusSet}
+            </p>
           </BreakBox>
         </CounterWrapper>
       )}
@@ -190,7 +209,7 @@ const CounterBox = styled(motion.div)`
     font-size: 85px;
     letter-spacing: -3px;
     &:nth-child(2) {
-      margin-bottom: 10px;
+      margin-bottom: 5px;
       font-size: 75px;
       padding-left: 7px;
       padding-right: 5px;
@@ -210,8 +229,8 @@ const BreakBox = styled(motion.div)`
     letter-spacing: -1px;
     margin-bottom: 4.7vh;
     @media screen and (max-height: 650px) {
-      margin-bottom: 20px;
       font-size: 65px;
+      margin-bottom: 20px;
     }
   }
   p {

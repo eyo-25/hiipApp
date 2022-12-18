@@ -2,6 +2,7 @@ import { useRecoilState } from "recoil";
 import { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import {
+  inputFocusState,
   isBreakState,
   isPauseState,
   timeState,
@@ -9,7 +10,8 @@ import {
 import { AnimatePresence, motion } from "framer-motion";
 import { ReactComponent as PauseIcon } from "../../../../Assets/Icons/pause.svg";
 import { IoPlaySharp, IoStopSharp } from "react-icons/io5";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { dbService } from "../../../../firebase";
 
 const boxVarients = {
   normal: {
@@ -87,10 +89,45 @@ function TimerButton({
   const [timeObj, setTimeObj] = useRecoilState(timeState);
   const [isBreakSet, setIsBreakSet] = useRecoilState(isBreakState);
   const [isPause, setIsPause] = useRecoilState(isPauseState);
+  const [inputToggle, setInputToggle] = useRecoilState(inputFocusState);
   const breakTotal = timeObj.setBreakMin * 60 * 100 + timeObj.setBreakSec * 100;
   const focusTotal = timeObj.setFocusMin * 60 * 100 + timeObj.setFocusSec * 100;
   const countRef = useRef(1);
   const navigate = useNavigate();
+  const params = useParams();
+  const todoId = params.todoId;
+
+  //파이어베이스 timer 업데이트
+  async function updateTimeSubmit(type: string) {
+    const isFocus = type === "focus";
+    try {
+      if (isFocus) {
+        await dbService
+          .collection("plan")
+          .doc(todoId)
+          .collection("timer")
+          .doc("time")
+          .update({
+            focusSet: timeObj.focusSet,
+            min: timeObj.min,
+            sec: timeObj.sec,
+          });
+      } else {
+        await dbService
+          .collection("plan")
+          .doc(todoId)
+          .collection("timer")
+          .doc("time")
+          .update({
+            breakSet: timeObj.breakSet,
+            breakMin: timeObj.breakMin,
+            breakSec: timeObj.breakSec,
+          });
+      }
+    } catch (e) {
+      alert("타이머 ERROR.");
+    }
+  }
 
   useEffect(() => {
     //애니메이션 기다리고 정지가능
@@ -102,29 +139,31 @@ function TimerButton({
     };
   }, []);
 
-  const onPauseClick = () => {
-    if (1 <= countRef.current) return;
-    if (isBreakSet && 0 < breakCount && breakTotal !== breakCount) {
+  const onPauseClick = async () => {
+    if (1 <= countRef.current && inputToggle) return;
+    if (isBreakSet && 50 < breakCount && breakTotal !== breakCount) {
       countRef.current = 0;
       breakStop();
       setIsPause(true);
-    } else if (!isBreakSet && 0 < count && count !== focusTotal) {
+      await updateTimeSubmit("break");
+    } else if (!isBreakSet && 50 < count && count !== focusTotal) {
       countRef.current = 0;
       stop();
       setIsPause(true);
+      await updateTimeSubmit("focus");
     }
   };
 
   const onStartClick = () => {
-    if (1 <= countRef.current) return;
+    if (1 <= countRef.current && inputToggle) return;
     countRef.current += 1;
-    if (isBreakSet && 0 < breakCount && breakTotal !== breakCount) {
+    if (isBreakSet && 50 < breakCount && breakTotal !== breakCount) {
       setIsPause(false);
       setTimeout(() => {
         breakStart();
         countRef.current = 0;
       }, 300);
-    } else if (!isBreakSet && 0 < count && count !== focusTotal) {
+    } else if (!isBreakSet && 50 < count && count !== focusTotal) {
       setIsPause(false);
       setTimeout(() => {
         start();
