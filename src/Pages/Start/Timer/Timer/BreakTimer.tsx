@@ -6,7 +6,7 @@ import {
   inputFocusState,
   isBreakState,
   isPauseState,
-  timeState,
+  timerState,
 } from "../../../../Recoil/atoms";
 import { dbService } from "../../../../firebase";
 import { useParams } from "react-router-dom";
@@ -35,17 +35,17 @@ const TextUpVarients = {
 };
 
 function BreakTimer() {
-  const [timeObj, setTimeObj] = useRecoilState(timeState);
+  const [timerObj, setTimeObj] = useRecoilState(timerState);
   const [isBreakSet, setIsBreakSet] = useRecoilState(isBreakState);
   const [isPause, setIsPause] = useRecoilState(isPauseState);
-  const [breakSet, setBreakSet] = useState(0);
-  const [minutes, setMinutes] = useState(0);
-  const [secounds, setSecounds] = useState(0);
+  const [breakSet, setBreakSet] = useState(timerObj.breakSet);
+  const [minutes, setMinutes] = useState(timerObj.breakMin);
+  const [secounds, setSecounds] = useState(timerObj.breakSec);
   const [mSecounds, setMSecounds] = useState(0);
   const [inputToggle, setInputToggle] = useRecoilState(inputFocusState);
   const { count, start, stop, reset, done } = useCounter(
-    timeObj.breakMin,
-    timeObj.breakSec
+    timerObj.breakMin,
+    timerObj.breakSec
   );
   const params = useParams();
   const todoId = params.todoId;
@@ -59,11 +59,11 @@ function BreakTimer() {
         .collection("plan")
         .doc(todoId)
         .collection("timer")
-        .doc("time")
+        .doc(timerObj.id)
         .update({
-          breakSet: isDone ? 0 : timeObj.breakSet - 1,
-          breakMin: isDone ? 0 : timeObj.setBreakMin,
-          breakSec: isDone ? 0 : timeObj.setBreakSec,
+          breakSet: isDone ? 0 : timerObj.breakSet - 1,
+          breakMin: isDone ? 0 : timerObj.setBreakMin,
+          breakSec: isDone ? 0 : timerObj.setBreakSec,
         });
     } catch (e) {
       alert("타이머 ERROR.");
@@ -112,9 +112,9 @@ function BreakTimer() {
       setTimeObj((prev) => {
         return {
           ...prev,
-          breakSet: timeObj.breakSet - 1,
-          breakMin: timeObj.setBreakMin,
-          breakSec: timeObj.setBreakSet,
+          breakSet: timerObj.breakSet - 1,
+          breakMin: timerObj.setBreakMin,
+          breakSec: timerObj.setBreakSet,
           mSec: 0,
         };
       });
@@ -124,9 +124,9 @@ function BreakTimer() {
 
   //초기화
   useEffect(() => {
-    setBreakSet(timeObj.breakSet);
-    setMinutes(timeObj.breakMin);
-    setSecounds(timeObj.breakSec);
+    setBreakSet(timerObj.breakSet);
+    setMinutes(timerObj.breakMin);
+    setSecounds(timerObj.breakSec);
     setIsPause(false);
     setTimeout(() => {
       start();
@@ -156,7 +156,7 @@ function BreakTimer() {
               animate="end"
             >
               <h4>
-                <span>{timeObj.setFocusSet - timeObj.focusSet}</span>SET
+                <span>{timerObj.setFocusSet - timerObj.focusSet}</span>SET
               </h4>
               <h4>BREAK</h4>
             </CounterBox>
@@ -191,7 +191,7 @@ function BreakTimer() {
               <h5>진행된 SET</h5>
             </BreakBox>
             <BreakBox variants={TextUpVarients} initial="start" animate="end">
-              <p>{timeObj.setFocusSet - timeObj.focusSet}</p>
+              <p>{timerObj.setFocusSet - timerObj.focusSet}</p>
             </BreakBox>
           </CounterWrapper>
         )}

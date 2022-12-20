@@ -4,12 +4,18 @@ import { motion } from "framer-motion";
 import Background from "../../../Assets/image/start_background2.png";
 import { useRecoilState } from "recoil";
 import { useNavigate } from "react-router-dom";
-import { clickDateState, projectState, toDoState } from "../../../Recoil/atoms";
+import {
+  clickDateState,
+  loadState,
+  projectState,
+  toDoState,
+} from "../../../Recoil/atoms";
 import Applayout from "../../../Component/Applayout";
 import ProjectInfo from "./ProjectInfo";
 import TodoBord from "./TodoBord";
 import Button from "../../../Component/Button";
 import { Normal_Gray } from "../../../Styles/Colors";
+import { dbService } from "../../../firebase";
 
 function Start() {
   const [project, setProject] = useRecoilState(projectState);
@@ -19,6 +25,7 @@ function Start() {
   const [mouseDownClientY, setMouseDownClientY] = useState(0);
   const [mouseUpClientY, setMouseUpClientY] = useState(0);
   const [clickDate, setClickDate] = useRecoilState(clickDateState);
+  const [isLoad, setIsLoad] = useRecoilState(loadState);
   const [tochedY, setTochedY] = useState(0);
   const navigate = useNavigate();
   const Moment = require("moment");
@@ -63,7 +70,8 @@ function Start() {
       },
     },
   };
-  const onPlayClick = () => {
+
+  const onPlayClick = async () => {
     if (project.length <= 0) {
       navigate("/plan/createProject");
     } else if (0 < toDos.length) {

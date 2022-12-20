@@ -1,6 +1,6 @@
 import { useRecoilState } from "recoil";
 import styled from "styled-components";
-import { isBreakState, timeState } from "../../../../Recoil/atoms";
+import { isBreakState, timerState } from "../../../../Recoil/atoms";
 import React, { useEffect, useState } from "react";
 import { Blue, Red } from "../../../../Styles/Colors";
 
@@ -10,7 +10,7 @@ interface IProgressBar {
 }
 
 function ProgressBar({ count, breakCount }: IProgressBar) {
-  const [timeObj, setTimeObj] = useRecoilState(timeState);
+  const [timerObj, setTimerObj] = useRecoilState(timerState);
   const [isBreakSet, setIsBreakSet] = useRecoilState(isBreakState);
   const [progressArray, setProgressArray] = useState<number[]>([]);
   // const [totalProgress, setTotalProgress] = useState<number>(0);
@@ -28,15 +28,15 @@ function ProgressBar({ count, breakCount }: IProgressBar) {
 
   // progress 배열
   //총 세트
-  const totalSet = timeObj.setFocusSet + timeObj.setBreakSet;
+  const totalSet = timerObj.setFocusSet + timerObj.setBreakSet;
   //현재 세트
-  const nowSet = totalSet - (timeObj.focusSet + timeObj.breakSet);
+  const nowSet = totalSet - (timerObj.focusSet + timerObj.breakSet);
   //포커스 총 카운트
   const totalFocusCount =
-    timeObj.setFocusMin * 60 * 100 + timeObj.setFocusSec * 100;
+    timerObj.setFocusMin * 60 * 100 + timerObj.setFocusSec * 100;
   //브레이크 총 카운트
   const totalBreakCount =
-    timeObj.setBreakMin * 60 * 100 + timeObj.setBreakSec * 100;
+    timerObj.setBreakMin * 60 * 100 + timerObj.setBreakSec * 100;
   //현재 포커스 퍼센트
   const nowFocusPercent = ((totalFocusCount - count) / totalFocusCount) * 100;
   //현재 브레이크 퍼센트
@@ -46,8 +46,8 @@ function ProgressBar({ count, breakCount }: IProgressBar) {
   // progress 게이지
   //토탈카운트(총넓이)
   const totalCount =
-    totalFocusCount * timeObj.setFocusSet +
-    totalBreakCount * timeObj.setBreakSet;
+    totalFocusCount * timerObj.setFocusSet +
+    totalBreakCount * timerObj.setBreakSet;
   //포커스 넓이
   const focusWidth = (totalFocusCount / totalCount) * 100;
   //브레이크 넓이

@@ -5,7 +5,7 @@ import {
   inputFocusState,
   isBreakState,
   isPauseState,
-  timeState,
+  timerState,
 } from "../../../../Recoil/atoms";
 import { AnimatePresence, motion } from "framer-motion";
 import { ReactComponent as PauseIcon } from "../../../../Assets/Icons/pause.svg";
@@ -78,12 +78,14 @@ interface ITimerButton {
 }
 
 function TimerButton({ stop, start, count }: ITimerButton) {
-  const [timeObj, setTimeObj] = useRecoilState(timeState);
+  const [timerObj, setTimerObj] = useRecoilState(timerState);
   const [isBreakSet, setIsBreakSet] = useRecoilState(isBreakState);
   const [isPause, setIsPause] = useRecoilState(isPauseState);
   const [inputToggle, setInputToggle] = useRecoilState(inputFocusState);
-  const breakTotal = timeObj.setBreakMin * 60 * 100 + timeObj.setBreakSec * 100;
-  const focusTotal = timeObj.setFocusMin * 60 * 100 + timeObj.setFocusSec * 100;
+  const breakTotal =
+    timerObj.setBreakMin * 60 * 100 + timerObj.setBreakSec * 100;
+  const focusTotal =
+    timerObj.setFocusMin * 60 * 100 + timerObj.setFocusSec * 100;
   const countRef = useRef(1);
   const navigate = useNavigate();
   const params = useParams();
@@ -98,22 +100,22 @@ function TimerButton({ stop, start, count }: ITimerButton) {
           .collection("plan")
           .doc(todoId)
           .collection("timer")
-          .doc("time")
+          .doc(timerObj.id)
           .update({
-            focusSet: timeObj.focusSet,
-            min: timeObj.min,
-            sec: timeObj.sec,
+            focusSet: timerObj.focusSet,
+            min: timerObj.min,
+            sec: timerObj.sec,
           });
       } else {
         await dbService
           .collection("plan")
           .doc(todoId)
           .collection("timer")
-          .doc("time")
+          .doc(timerObj.id)
           .update({
-            breakSet: timeObj.breakSet,
-            breakMin: timeObj.breakMin,
-            breakSec: timeObj.breakSec,
+            breakSet: timerObj.breakSet,
+            breakMin: timerObj.breakMin,
+            breakSec: timerObj.breakSec,
           });
       }
     } catch (e) {
@@ -149,23 +151,35 @@ function TimerButton({ stop, start, count }: ITimerButton) {
   const onStartClick = () => {
     if (1 <= countRef.current && inputToggle) return;
     countRef.current += 1;
-    if (isBreakSet && 50 < count && breakTotal !== count) {
+    if (
+      isBreakSet &&
+      50 < count &&
+      breakTotal !== count &&
+      countRef.current <= 1
+    ) {
       setIsPause(false);
       setTimeout(() => {
         start();
         countRef.current = 0;
-      }, 300);
-    } else if (!isBreakSet && 50 < count && count !== focusTotal) {
+      }, 500);
+    }
+    if (
+      !isBreakSet &&
+      50 < count &&
+      count !== focusTotal &&
+      countRef.current <= 1
+    ) {
       setIsPause(false);
       setTimeout(() => {
         start();
         countRef.current = 0;
-      }, 300);
+      }, 500);
     }
   };
   const onDoneClick = () => {
     navigate("/");
   };
+
   return (
     <Wrapper>
       <AnimatePresence>

@@ -36,6 +36,7 @@ function Index() {
       }
     });
   }, []);
+
   //투두 변경 감지(snapshot)
   useEffect(() => {
     if (0 < project.length) {

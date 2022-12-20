@@ -112,6 +112,8 @@ export const isPauseState = atom<boolean>({
   default: false,
 });
 interface ItimeState {
+  date: string;
+  stopDate: string;
   focusSet: number;
   breakMin: number;
   breakSec: number;
@@ -125,11 +127,13 @@ interface ItimeState {
   setFocusMin: number;
   setFocusSec: number;
   setFocusSet: number;
-  stopDate: string;
+  id: string;
 }
-export const timeState = atom<ItimeState>({
-  key: "timeState",
+export const timerState = atom<ItimeState>({
+  key: "timerState",
   default: {
+    date: Moment().format("YYYY-MM-DD"),
+    stopDate: Moment(new Date()).format("YYYY-MM-DD HH:mm:ss"),
     focusSet: 0,
     breakMin: 0,
     breakSec: 0,
@@ -143,6 +147,6 @@ export const timeState = atom<ItimeState>({
     setFocusMin: 0,
     setFocusSec: 0,
     setFocusSet: 0,
-    stopDate: "",
+    id: "",
   },
 });

@@ -81,34 +81,12 @@ function CreateInput({
         uId: uid,
         projectId: project[projectIndex].id,
       };
-      const defaultTimeObj = {
-        setFocusSet: count,
-        setBreakSet: count - 1 <= 0 ? 0 : count - 1,
-        focusSet: count,
-        breakSet: count - 1 <= 0 ? 0 : count - 1,
-        stopDate: "",
-        //테스트 끝나면 분만 적용
-        setFocusMin: 0,
-        setFocusSec: 10,
-        setBreakMin: 0,
-        setBreakSec: 5,
-        min: 0,
-        sec: 10,
-        mSec: 0,
-        breakMin: 0,
-        breakSec: 5,
-      };
-      const createTodoFbase = async () =>
-        (await dbService.collection("plan").add(planObj))
-          .collection("timer")
-          .doc("time")
-          .set(defaultTimeObj);
+      const createTodoFbase = () => dbService.collection("plan").add(planObj);
       const increaseIndexCounteFbase = () =>
         dbService
           .collection("project")
           .doc(project[projectIndex].id)
           .update({ indexcount: project[projectIndex].indexcount + 1 });
-
       await Promise.all([createTodoFbase(), increaseIndexCounteFbase()]);
     } catch (e) {
       setIsLoad(false);

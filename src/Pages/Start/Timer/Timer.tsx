@@ -4,16 +4,19 @@ import {
   isBreakState,
   isPauseState,
   timerSplashState,
-  timeState,
+  timerState,
+  toDoState,
 } from "../../../Recoil/atoms";
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
-import { dbService } from "../../../firebase";
+import { authService, dbService } from "../../../firebase";
 import { motion } from "framer-motion";
 import IntervalTimer from "./Timer/IntervalTimer";
 import BreakTimer from "./Timer/BreakTimer";
 import styled from "styled-components";
 import Background from "../../../Assets/image/bull.png";
+import { onAuthStateChanged } from "firebase/auth";
+import { onSnapshot, query } from "firebase/firestore";
 
 const bottomVariants = {
   normal: {
@@ -33,45 +36,101 @@ const bottomVariants = {
 
 function Timer() {
   const [isTimerSplash, setIsTimerSplash] = useRecoilState(timerSplashState);
-  const [timeObj, setTimeObj] = useRecoilState(timeState);
+  const [timerObj, setTimerObj] = useRecoilState(timerState);
   const [isBreakSet, setIsBreakSet] = useRecoilState(isBreakState);
   const [isPause, setIsPause] = useRecoilState(isPauseState);
+  const [toDos, setToDos] = useRecoilState(toDoState);
   const params = useParams();
   const todoId = params.todoId;
+  const index = toDos.findIndex((item) => item.id === todoId);
+  const Moment = require("moment");
 
-  //타이머 get함수
+  const timeObj = useRef<any>({});
+  const now = Moment(new Date()).format("YYYY-MM-DD");
+  const defaultSet = toDos[index].defaultSet;
+  const newObj = {
+    date: Moment(new Date()).format("YYYY-MM-DD"),
+    stopDate: Moment(new Date()).format("YYYY-MM-DD HH:mm:ss"),
+    setFocusSet: defaultSet,
+    setBreakSet: defaultSet - 1 <= 0 ? 0 : defaultSet - 1,
+    focusSet: defaultSet,
+    breakSet: defaultSet - 1 <= 0 ? 0 : defaultSet - 1,
+    //테스트 끝나면 분만 적용
+    setFocusMin: 0,
+    setFocusSec: 10,
+    setBreakMin: 0,
+    setBreakSec: 5,
+    min: 0,
+    sec: 10,
+    mSec: 0,
+    breakMin: 0,
+    breakSec: 5,
+  };
+
+  //오늘날짜 타이머 체크후 없으면 생성
   async function getTimeObj() {
     try {
       await dbService
         .collection("plan")
-        .doc(`${todoId}`)
+        .doc(todoId)
         .collection("timer")
-        .doc("time")
+        .where("date", "==", now)
         .get()
         .then((result: any) => {
-          setTimeObj(result.data());
-          if (
-            result.data().breakSet >= result.data().focusSet &&
-            result.data().focusSet !== 0
-          ) {
-            setIsBreakSet(true);
-          } else {
-            setIsBreakSet(false);
-          }
+          result.forEach((timerData: any) => {
+            timeObj.current = timerData.data();
+          });
         });
-    } catch (e) {
+    } catch {
       alert("Timer를 불러오는데 오류가 발생하였습니다. 다시 시도하여 주세요");
+    } finally {
+      if (Object.keys(timeObj.current).length <= 0) {
+        await dbService
+          .collection("plan")
+          .doc(todoId)
+          .collection("timer")
+          .add(newObj);
+      }
     }
   }
 
   useEffect(() => {
-    getTimeObj();
+    const q = query(
+      dbService
+        .collection("plan")
+        .doc(todoId)
+        .collection("timer")
+        .where("date", "==", now)
+    );
+    const addId = onSnapshot(q, (querySnapshot) => {
+      const newArray = querySnapshot.docs.map((doc: any) => {
+        return {
+          id: doc.id,
+          ...doc.data(),
+        };
+      });
+      setTimerObj({ ...newArray[0] });
+    });
+    onAuthStateChanged(authService, (user) => {
+      if (user == null) {
+        addId();
+      }
+    });
+  }, []);
+
+  useEffect(() => {
     setIsPause(false);
+    getTimeObj();
+    if (timerObj.focusSet <= timerObj.breakSet && timerObj.breakSet !== 0) {
+      setIsBreakSet(true);
+    }
     return () => {
       setIsTimerSplash(true);
       setIsBreakSet(false);
+      timeObj.current = {};
     };
   }, []);
+
   if (isTimerSplash) {
     return <TimerSplash />;
   }

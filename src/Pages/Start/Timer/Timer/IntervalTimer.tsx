@@ -10,7 +10,7 @@ import {
   inputFocusState,
   isBreakState,
   isPauseState,
-  timeState,
+  timerState,
 } from "../../../../Recoil/atoms";
 import TimerButton from "./TimerButton";
 import TimerInfo from "./TimerInfo";
@@ -35,17 +35,17 @@ const TextUpVarients = {
 };
 
 function IntervalTimer() {
-  const [timeObj, setTimeObj] = useRecoilState(timeState);
+  const [timerObj, setTimerObj] = useRecoilState(timerState);
   const [isBreakSet, setIsBreakSet] = useRecoilState(isBreakState);
   const [isPause, setIsPause] = useRecoilState(isPauseState);
   const [inputToggle, setInputToggle] = useRecoilState(inputFocusState);
-  const [intervalSet, setIntervalSet] = useState(0);
-  const [minutes, setMinutes] = useState(0);
-  const [secounds, setSecounds] = useState(0);
+  const [intervalSet, setIntervalSet] = useState(timerObj.focusSet);
+  const [minutes, setMinutes] = useState(timerObj.min);
+  const [secounds, setSecounds] = useState(timerObj.sec);
   const [mSecounds, setMSecounds] = useState(0);
   const { count, start, stop, reset, done } = useCounter(
-    timeObj.min,
-    timeObj.sec
+    timerObj.min,
+    timerObj.sec
   );
   const params = useParams();
   const todoId = params.todoId;
@@ -58,11 +58,11 @@ function IntervalTimer() {
         .collection("plan")
         .doc(todoId)
         .collection("timer")
-        .doc("time")
+        .doc(timerObj.id)
         .update({
-          focusSet: isDone ? 0 : timeObj.focusSet - 1,
-          min: isDone ? 0 : timeObj.setFocusMin,
-          sec: isDone ? 0 : timeObj.setFocusSec,
+          focusSet: isDone ? 0 : timerObj.focusSet - 1,
+          min: isDone ? 0 : timerObj.setFocusMin,
+          sec: isDone ? 0 : timerObj.setFocusSec,
         });
     } catch (e) {
       alert("타이머 ERROR.");
@@ -76,10 +76,10 @@ function IntervalTimer() {
     if (intervalSet === 1 && count <= 0) {
       await updateTimeSubmit("done");
       done();
-      setTimeObj((prev) => {
+      setTimerObj((prev) => {
         return {
           ...prev,
-          focusSet: timeObj.focusSet - 1,
+          focusSet: timerObj.focusSet - 1,
           min: 0,
           sec: 0,
           mSec: 0,
@@ -94,7 +94,7 @@ function IntervalTimer() {
       setMinutes(mathMin);
       setSecounds(mathSec);
       setMSecounds(Math.floor(count - (mathSec * 100 + mathMin * 60 * 100)));
-      setTimeObj((prev) => {
+      setTimerObj((prev) => {
         return {
           ...prev,
           min: mathMin,
@@ -107,12 +107,12 @@ function IntervalTimer() {
     if (1 < intervalSet && count <= 0) {
       await updateTimeSubmit("next");
       setIsBreakSet(true);
-      setTimeObj((prev) => {
+      setTimerObj((prev) => {
         return {
           ...prev,
-          focusSet: timeObj.focusSet - 1,
-          min: timeObj.setFocusMin,
-          sec: timeObj.setFocusSec,
+          focusSet: timerObj.focusSet - 1,
+          min: timerObj.setFocusMin,
+          sec: timerObj.setFocusSec,
           mSec: 0,
         };
       });
@@ -122,9 +122,9 @@ function IntervalTimer() {
 
   //초기화
   useEffect(() => {
-    setIntervalSet(timeObj.focusSet);
-    setMinutes(timeObj.min);
-    setSecounds(timeObj.sec);
+    setIntervalSet(timerObj.focusSet);
+    setMinutes(timerObj.min);
+    setSecounds(timerObj.sec);
     setIsPause(false);
     setTimeout(() => {
       start();
@@ -181,7 +181,7 @@ function IntervalTimer() {
             </BreakBox>
             <BreakBox variants={TextUpVarients} initial="start" animate="end">
               <p style={{ marginBottom: 0 }}>
-                {timeObj.setFocusSet - timeObj.focusSet}
+                {timerObj.setFocusSet - timerObj.focusSet}
               </p>
             </BreakBox>
           </CounterWrapper>
