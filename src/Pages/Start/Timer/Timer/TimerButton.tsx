@@ -21,8 +21,8 @@ const boxVarients = {
   animate: {
     opacity: 1,
     transition: {
-      delay: 0.2,
-      duration: 0.5,
+      duration: 0.7,
+      type: "linear",
     },
   },
   left: {
@@ -44,10 +44,12 @@ const boxVarients = {
     opacity: 0,
     transition: {
       duration: 0.3,
+      type: "linear",
     },
   },
   click: { scale: 0.9 },
 };
+
 const barVariants = {
   normal: {
     opacity: 0,
@@ -63,7 +65,7 @@ const barVariants = {
   exit: {
     opacity: 0,
     transition: {
-      duration: 0.5,
+      duration: 0.6,
       type: "linear",
     },
   },
@@ -72,20 +74,10 @@ const barVariants = {
 interface ITimerButton {
   start: () => void;
   stop: () => void;
-  breakStop: () => void;
-  breakStart: () => void;
   count: number;
-  breakCount: number;
 }
 
-function TimerButton({
-  stop,
-  start,
-  breakStop,
-  breakStart,
-  count,
-  breakCount,
-}: ITimerButton) {
+function TimerButton({ stop, start, count }: ITimerButton) {
   const [timeObj, setTimeObj] = useRecoilState(timeState);
   const [isBreakSet, setIsBreakSet] = useRecoilState(isBreakState);
   const [isPause, setIsPause] = useRecoilState(isPauseState);
@@ -141,12 +133,12 @@ function TimerButton({
 
   const onPauseClick = async () => {
     if (1 <= countRef.current && inputToggle) return;
-    if (isBreakSet && 50 < breakCount && breakTotal !== breakCount) {
+    if (isBreakSet && 100 < count && breakTotal !== count) {
       countRef.current = 0;
-      breakStop();
+      stop();
       setIsPause(true);
       await updateTimeSubmit("break");
-    } else if (!isBreakSet && 50 < count && count !== focusTotal) {
+    } else if (!isBreakSet && 100 < count && count !== focusTotal) {
       countRef.current = 0;
       stop();
       setIsPause(true);
@@ -157,10 +149,10 @@ function TimerButton({
   const onStartClick = () => {
     if (1 <= countRef.current && inputToggle) return;
     countRef.current += 1;
-    if (isBreakSet && 50 < breakCount && breakTotal !== breakCount) {
+    if (isBreakSet && 50 < count && breakTotal !== count) {
       setIsPause(false);
       setTimeout(() => {
-        breakStart();
+        start();
         countRef.current = 0;
       }, 300);
     } else if (!isBreakSet && 50 < count && count !== focusTotal) {

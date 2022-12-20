@@ -18,6 +18,7 @@ import { Dark_Gray2 } from "../../../Styles/Colors";
 import { useRecoilState } from "recoil";
 import { toDoState } from "../../../Recoil/atoms";
 import { useParams } from "react-router-dom";
+import { dbService } from "../../../firebase";
 
 interface iMemoProps {
   memoText: string;
@@ -33,7 +34,19 @@ function MemoCard({ memoText, setMemoText, onSaveClick }: iMemoProps) {
   const index = toDos.findIndex((item) => item.id === todoId);
   const [intervalArray, setIntervalArray] = useState<number[]>([]);
 
+  //타이머 get함수
+  // async function getTimeObj() {
+  //   try {
+  //     await dbService.collection("plan").where("필드", "==", "값").get();
+  //   } catch {
+  //     console.log("a");
+  //   }
+  // }
+
   useEffect(() => {
+    // getTimeObj().catch(() => {
+    //   console.log("머임");
+    // });
     setIntervalArray((prev) => {
       const set = toDos[index].defaultSet;
       const copy = [...prev];
