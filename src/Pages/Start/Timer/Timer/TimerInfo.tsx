@@ -10,10 +10,10 @@ import {
   loadState,
   toDoState,
 } from "../../../../Recoil/atoms";
-import ProgressBar from "./ProgressBar";
 import { IoCloseSharp } from "react-icons/io5";
 import { dbService } from "../../../../firebase";
 import { useParams } from "react-router-dom";
+import { ProgressBar } from "./ProgressBar";
 
 interface ITimerInfo {
   count: number;
