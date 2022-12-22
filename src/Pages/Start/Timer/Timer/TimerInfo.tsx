@@ -15,11 +15,6 @@ import { dbService } from "../../../../firebase";
 import { useParams } from "react-router-dom";
 import { ProgressBar } from "./ProgressBar";
 
-interface ITimerInfo {
-  count: number;
-  breakCount: number;
-}
-
 const FadeInVarients = {
   start: {
     opacity: 0,
@@ -33,7 +28,12 @@ const FadeInVarients = {
   },
 };
 
-function TimerInfo({ count, breakCount }: ITimerInfo) {
+interface ITimerInfo {
+  seconds: number;
+  minutes: number;
+}
+
+function TimerInfo({ seconds, minutes }: ITimerInfo) {
   const [toDos, setToDos] = useRecoilState(toDoState);
   const [isBreakSet, setIsBreakSet] = useRecoilState(isBreakState);
   const [isPause, setIsPause] = useRecoilState(isPauseState);
@@ -98,7 +98,7 @@ function TimerInfo({ count, breakCount }: ITimerInfo) {
     <Container>
       {!isPause && (
         <CounterWrapper variants={FadeInVarients} initial="start" animate="end">
-          <ProgressBar count={count} breakCount={breakCount} />
+          <ProgressBar seconds={seconds} minutes={minutes} />
           {!isBreakSet && (
             <WiseSaying>나중에 울지말고 지금 울면서하자</WiseSaying>
           )}

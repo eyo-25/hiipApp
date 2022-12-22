@@ -40,8 +40,7 @@ function BreakTimer() {
   const [isPause, setIsPause] = useRecoilState(isPauseState);
   const [breakSet, setBreakSet] = useState(timerObj.breakSet);
   const [minutes, setMinutes] = useState(timerObj.breakMin);
-  const [secounds, setSecounds] = useState(timerObj.breakSec);
-  const [mSecounds, setMSecounds] = useState(0);
+  const [seconds, setSeconds] = useState(timerObj.breakSec);
   const [inputToggle, setInputToggle] = useRecoilState(inputFocusState);
   const { count, start, stop, reset, done } = useCounter(
     timerObj.breakMin,
@@ -75,15 +74,15 @@ function BreakTimer() {
     if (breakSet <= 0) return;
     //done
     if (breakSet === 1 && count <= 0) {
-      await updateBreakSubmit("done");
+      setSeconds(0);
       done();
+      await updateBreakSubmit("done");
       setTimeObj((prev) => {
         return {
           ...prev,
           breakSet: 0,
           breakMin: 0,
           breakSec: 0,
-          mSec: 0,
         };
       });
       setIsBreakSet(false);
@@ -91,22 +90,21 @@ function BreakTimer() {
     }
     //count
     if (1 <= breakSet && 0 < count) {
-      const mathMin = Math.floor(count / 60 / 100);
-      const mathSec = Math.floor((count - mathMin * 60 * 100) / 100);
+      const mathMin = Math.floor(count / 60);
+      const mathSec = Math.floor(count - mathMin * 60);
       setMinutes(mathMin);
-      setSecounds(mathSec);
-      setMSecounds(Math.floor(count - (mathSec * 100 + mathMin * 60 * 100)));
+      setSeconds(mathSec);
       setTimeObj((prev) => {
         return {
           ...prev,
           breakMin: mathMin,
           breakSec: mathSec,
-          mSec: Math.floor(count - (mathSec * 100 + mathMin * 60 * 100)),
         };
       });
     }
     //NextSet
     if (1 < breakSet && count <= 0) {
+      setSeconds(0);
       await updateBreakSubmit("next");
       setIsBreakSet(false);
       setTimeObj((prev) => {
@@ -115,7 +113,6 @@ function BreakTimer() {
           breakSet: timerObj.breakSet - 1,
           breakMin: timerObj.setBreakMin,
           breakSec: timerObj.setBreakSet,
-          mSec: 0,
         };
       });
       reset();
@@ -126,7 +123,7 @@ function BreakTimer() {
   useEffect(() => {
     setBreakSet(timerObj.breakSet);
     setMinutes(timerObj.breakMin);
-    setSecounds(timerObj.breakSec);
+    setSeconds(timerObj.breakSec);
     setIsPause(false);
     setTimeout(() => {
       start();
@@ -146,7 +143,7 @@ function BreakTimer() {
     <>
       <ContentsWrapper>
         <InfoWrapper>
-          <TimerInfo count={0} breakCount={count} />
+          <TimerInfo seconds={seconds} minutes={minutes} />
         </InfoWrapper>
         {!isPause && (
           <CounterWrapper>
@@ -166,7 +163,7 @@ function BreakTimer() {
             <BreakBox variants={TextUpVarients} initial="start" animate="end">
               <p>{minutes < 10 ? `0${minutes}` : minutes}</p>
               <p>:</p>
-              <p>{secounds < 10 ? `0${secounds}` : secounds}</p>
+              <p>{seconds < 10 ? `0${seconds}` : seconds}</p>
             </BreakBox>
           </CounterWrapper>
         )}
@@ -185,7 +182,7 @@ function BreakTimer() {
             <BreakBox variants={TextUpVarients} initial="start" animate="end">
               <p>{minutes < 10 ? `0${minutes}` : minutes}</p>
               <p>:</p>
-              <p>{secounds < 10 ? `0${secounds}` : secounds}</p>
+              <p>{seconds < 10 ? `0${seconds}` : seconds}</p>
             </BreakBox>
             <BreakBox>
               <h5>진행된 SET</h5>

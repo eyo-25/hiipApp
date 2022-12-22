@@ -41,8 +41,7 @@ function IntervalTimer() {
   const [inputToggle, setInputToggle] = useRecoilState(inputFocusState);
   const [intervalSet, setIntervalSet] = useState(timerObj.focusSet);
   const [minutes, setMinutes] = useState(timerObj.min);
-  const [secounds, setSecounds] = useState(timerObj.sec);
-  const [mSecounds, setMSecounds] = useState(0);
+  const [seconds, setSeconds] = useState(timerObj.sec);
   const { count, start, stop, reset, done } = useCounter(
     timerObj.min,
     timerObj.sec
@@ -74,37 +73,37 @@ function IntervalTimer() {
     if (intervalSet <= 0) return;
     //done
     if (intervalSet === 1 && count <= 0) {
-      await updateTimeSubmit("done");
+      setSeconds(0);
       done();
       setTimerObj((prev) => {
         return {
           ...prev,
-          focusSet: timerObj.focusSet - 1,
+          focusSet: 0,
           min: 0,
           sec: 0,
-          mSec: 0,
         };
       });
+      await updateTimeSubmit("done");
+      setIsPause(true);
       return;
     }
     //count
-    if (1 <= intervalSet && 0 < count) {
-      const mathMin = Math.floor(count / 60 / 100);
-      const mathSec = Math.floor((count - mathMin * 60 * 100) / 100);
+    if (1 <= intervalSet && 0 <= count) {
+      const mathMin = Math.floor(count / 60);
+      const mathSec = Math.floor(count - mathMin * 60);
       setMinutes(mathMin);
-      setSecounds(mathSec);
-      setMSecounds(Math.floor(count - (mathSec * 100 + mathMin * 60 * 100)));
+      setSeconds(mathSec);
       setTimerObj((prev) => {
         return {
           ...prev,
           min: mathMin,
           sec: mathSec,
-          mSec: Math.floor(count - (mathSec * 100 + mathMin * 60 * 100)),
         };
       });
     }
     //nextSet
     if (1 < intervalSet && count <= 0) {
+      setSeconds(0);
       await updateTimeSubmit("next");
       setIsBreakSet(true);
       setTimerObj((prev) => {
@@ -113,7 +112,6 @@ function IntervalTimer() {
           focusSet: timerObj.focusSet - 1,
           min: timerObj.setFocusMin,
           sec: timerObj.setFocusSec,
-          mSec: 0,
         };
       });
       reset();
@@ -124,8 +122,12 @@ function IntervalTimer() {
   useEffect(() => {
     setIntervalSet(timerObj.focusSet);
     setMinutes(timerObj.min);
-    setSecounds(timerObj.sec);
-    setIsPause(false);
+    setSeconds(timerObj.sec);
+    if (timerObj.focusSet <= 0) {
+      setIsPause(true);
+    } else {
+      setIsPause(false);
+    }
     setTimeout(() => {
       start();
     }, 600);
@@ -144,7 +146,7 @@ function IntervalTimer() {
     <>
       <ContentsWrapper>
         <InfoWrapper>
-          <TimerInfo count={count} breakCount={0} />
+          <TimerInfo minutes={minutes} seconds={seconds} />
         </InfoWrapper>
         {!isPause && (
           <CounterWrapper
@@ -155,7 +157,7 @@ function IntervalTimer() {
             <CounterBox>
               <p>{minutes < 10 ? `0${minutes}` : minutes}</p>
               <p>:</p>
-              <p>{secounds < 10 ? `0${secounds}` : secounds}</p>
+              <p>{seconds < 10 ? `0${seconds}` : seconds}</p>
             </CounterBox>
           </CounterWrapper>
         )}
@@ -174,7 +176,7 @@ function IntervalTimer() {
             <BreakBox variants={TextUpVarients} initial="start" animate="end">
               <p>{minutes < 10 ? `0${minutes}` : minutes}</p>
               <p>:</p>
-              <p>{secounds < 10 ? `0${secounds}` : secounds}</p>
+              <p>{seconds < 10 ? `0${seconds}` : seconds}</p>
             </BreakBox>
             <BreakBox>
               <h5>진행된 SET</h5>

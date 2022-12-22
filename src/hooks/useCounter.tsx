@@ -1,8 +1,8 @@
 import { useState, useRef, useCallback } from "react";
 
 export const useCounter = (setMin: number, setSec: number) => {
-  const [count, setCount] = useState(setMin * 60 * 100 + setSec * 100);
-  const countRef = useRef<number>(setMin * 60 * 100 + setSec * 100);
+  const [count, setCount] = useState(setMin * 60 + setSec);
+  const countRef = useRef<number>(setMin * 60 + setSec);
   const intervalRef = useRef<any>(null);
 
   const start = useCallback(() => {
@@ -14,14 +14,14 @@ export const useCounter = (setMin: number, setSec: number) => {
       } else if (countRef.current < 0) {
         clearInterval(intervalRef.current);
       }
-    }, 10);
+    }, 1000);
   }, []);
   const stop = useCallback(() => {
     if (intervalRef.current === null) return;
     clearInterval(intervalRef.current);
   }, []);
   const reset = useCallback(() => {
-    countRef.current = setMin * 60 * 100 + setSec * 100;
+    countRef.current = setMin * 60 + setSec;
     setCount(countRef.current);
     clearInterval(intervalRef.current);
   }, []);

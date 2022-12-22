@@ -124,10 +124,10 @@ function TimerButton({ stop, start, count }: ITimerButton) {
   }
 
   useEffect(() => {
-    //애니메이션 기다리고 정지가능
+    //시작 애니메이션 기다리고 버튼활성화
     setTimeout(() => {
       countRef.current = 0;
-    }, 700);
+    }, 500);
     return () => {
       countRef.current = 1;
     };
@@ -135,12 +135,12 @@ function TimerButton({ stop, start, count }: ITimerButton) {
 
   const onPauseClick = async () => {
     if (1 <= countRef.current && inputToggle) return;
-    if (isBreakSet && 100 < count && breakTotal !== count) {
+    if (isBreakSet && 0 < count && breakTotal !== count) {
       countRef.current = 0;
       stop();
       setIsPause(true);
       await updateTimeSubmit("break");
-    } else if (!isBreakSet && 100 < count && count !== focusTotal) {
+    } else if (!isBreakSet && 0 < count && count !== focusTotal) {
       countRef.current = 0;
       stop();
       setIsPause(true);
@@ -153,7 +153,7 @@ function TimerButton({ stop, start, count }: ITimerButton) {
     countRef.current += 1;
     if (
       isBreakSet &&
-      50 < count &&
+      0 < count &&
       breakTotal !== count &&
       countRef.current <= 1
     ) {
@@ -161,11 +161,11 @@ function TimerButton({ stop, start, count }: ITimerButton) {
       setTimeout(() => {
         start();
         countRef.current = 0;
-      }, 500);
+      }, 300);
     }
     if (
       !isBreakSet &&
-      50 < count &&
+      0 < count &&
       count !== focusTotal &&
       countRef.current <= 1
     ) {
@@ -173,7 +173,7 @@ function TimerButton({ stop, start, count }: ITimerButton) {
       setTimeout(() => {
         start();
         countRef.current = 0;
-      }, 500);
+      }, 300);
     }
   };
   const onDoneClick = () => {

@@ -1,15 +1,18 @@
 import styled from "styled-components";
 import { Blue, Red } from "../../../../Styles/Colors";
 import { useProgressBar } from "../../../../hooks/useProgressBar";
+import { timerState } from "../../../../Recoil/atoms";
+import { useRecoilState } from "recoil";
 
 interface ITimerInfo {
-  count: number;
-  breakCount: number;
+  seconds: number;
+  minutes: number;
 }
 
-export function ProgressBar({ count, breakCount }: ITimerInfo) {
+export function ProgressBar({ seconds, minutes }: ITimerInfo) {
+  const [timerObj, setTimerObj] = useRecoilState(timerState);
   const { progressArray, breakWidth, focusWidth, totalSet, nowSet } =
-    useProgressBar(count, breakCount);
+    useProgressBar(seconds, minutes);
   return (
     <Container>
       {progressArray.map((data, index) => {
