@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/hiipApp/static/css/main.34ee9472.css",
-    "main.js": "/hiipApp/static/js/main.386c3a44.js",
+    "main.js": "/hiipApp/static/js/main.57b54ccb.js",
     "static/js/156.2dd18260.chunk.js": "/hiipApp/static/js/156.2dd18260.chunk.js",
     "static/js/134.bf775aa6.chunk.js": "/hiipApp/static/js/134.bf775aa6.chunk.js",
     "static/media/start_background2.png": "/hiipApp/static/media/start_background2.7f39d0b5d394d7cd25db.png",
@@ -23,18 +23,17 @@
     "static/media/peedback.svg": "/hiipApp/static/media/peedback.0d337eb36d4d86f4f13d7b6a183a8378.svg",
     "static/media/pause.svg": "/hiipApp/static/media/pause.efcbcc40254588d049109bf72d0042d1.svg",
     "static/media/planing.svg": "/hiipApp/static/media/planing.69da4f161d35af915df342f7caa52e2f.svg",
-    "static/media/save.svg": "/hiipApp/static/media/save.efd6a05a6cffe68d423385323a4e73ed.svg",
     "static/media/plusbtn.svg": "/hiipApp/static/media/plusbtn.e9dfe64e1ee5b802aa870e09f6c7ecd9.svg",
     "static/media/deletbtn.svg": "/hiipApp/static/media/deletbtn.eb349f3375c828110df28980b5ecef0b.svg",
     "static/media/plus.svg": "/hiipApp/static/media/plus.29ef5c87b8ab896d68730bf8b2420968.svg",
     "static/media/minusbtn.svg": "/hiipApp/static/media/minusbtn.9a4b268e15c74bb1d7bd0dd076a3f264.svg",
     "main.34ee9472.css.map": "/hiipApp/static/css/main.34ee9472.css.map",
-    "main.386c3a44.js.map": "/hiipApp/static/js/main.386c3a44.js.map",
+    "main.57b54ccb.js.map": "/hiipApp/static/js/main.57b54ccb.js.map",
     "156.2dd18260.chunk.js.map": "/hiipApp/static/js/156.2dd18260.chunk.js.map",
     "134.bf775aa6.chunk.js.map": "/hiipApp/static/js/134.bf775aa6.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.34ee9472.css",
-    "static/js/main.386c3a44.js"
+    "static/js/main.57b54ccb.js"
   ]
 }
