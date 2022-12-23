@@ -5,14 +5,13 @@ import { timerState } from "../../../../Recoil/atoms";
 import { useRecoilState } from "recoil";
 
 interface ITimerInfo {
-  seconds: number;
-  minutes: number;
+  count: number;
 }
 
-export function ProgressBar({ seconds, minutes }: ITimerInfo) {
+export function ProgressBar({ count }: ITimerInfo) {
   const [timerObj, setTimerObj] = useRecoilState(timerState);
   const { progressArray, breakWidth, focusWidth, totalSet, nowSet } =
-    useProgressBar(seconds, minutes);
+    useProgressBar(count);
   return (
     <Container>
       {progressArray.map((data, index) => {

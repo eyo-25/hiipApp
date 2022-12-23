@@ -99,7 +99,7 @@ function Plan() {
   };
   useEffect(() => {
     const distanceY = mouseDownClientY - mouseUpClientY;
-    if (distanceY < -30) {
+    if (distanceY < -10) {
       setIsWeek(false);
       closedEdit();
     }
@@ -135,13 +135,15 @@ function Plan() {
   return (
     <>
       <Header />
-      <ContentContainer onMouseDown={onMouseDown} onMouseUp={onMouseUp}>
+      <ContentContainer>
         <CalendarBox
           variants={calendarVariants}
           initial="normal"
           animate="animate"
           onTouchEnd={onTouchEnd}
           onTouchStart={onTouchStart}
+          onMouseDown={onMouseDown}
+          onMouseUp={onMouseUp}
           onClick={closedEdit}
         >
           <CalendarBoard />

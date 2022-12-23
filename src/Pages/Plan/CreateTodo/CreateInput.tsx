@@ -16,6 +16,7 @@ import {
   loadState,
   projectState,
   startDateState,
+  toDoState,
 } from "../../../Recoil/atoms";
 
 interface ICreateInput {
@@ -35,6 +36,7 @@ function CreateInput({
 }: ICreateInput) {
   const navigate = useNavigate();
   const [project, setProject] = useRecoilState(projectState);
+  const [toDos, setToDos] = useRecoilState(toDoState);
   const [isCreate, setIsCreate] = useRecoilState(isCreateState);
   const [startDate, setStartDate] = useRecoilState(createStartDateState);
   const [endDate, setEndDate] = useRecoilState(createEndDateState);
@@ -48,6 +50,7 @@ function CreateInput({
   const projectIndex = project.findIndex((item: any) => item.select === "true");
   const params = useParams();
   const todoId = params.todoId;
+  const index = toDos.findIndex((item) => item.id === todoId);
 
   const onCancleClicked = () => {
     if (mode === "CREATE") {
@@ -58,10 +61,22 @@ function CreateInput({
     navigate("/plan");
   };
   const onCountUp = () => {
+    if (mode !== "CREATE" && toDos[index].status !== "ready") {
+      alert(
+        "현재 진행중인 TODO입니다. 해당TODO를 시작하고 '추가'를 통해 세트를 변경해 주세요"
+      );
+      return;
+    }
     if (count >= 10) return;
     setCount((prev) => prev + 1);
   };
   const onCountDown = () => {
+    if (mode !== "CREATE" && toDos[index].status !== "ready") {
+      alert(
+        "현재 진행중인 TODO입니다. 해당TODO를 시작하고 '추가'를 통해 세트를 변경해 주세요"
+      );
+      return;
+    }
     if (count <= 1) return;
     setCount((prev) => prev - 1);
   };
@@ -108,22 +123,7 @@ function CreateInput({
         startDate: startDate,
         endDate: endDate,
       };
-      const editTimeObj = {
-        setFocusSet: count,
-        setBreakSet: count - 1 <= 0 ? 0 : count - 1,
-        focusSet: count,
-        breakSet: count - 1 <= 0 ? 0 : count - 1,
-      };
-      const updateTimeFbase = () =>
-        dbService
-          .collection("plan")
-          .doc(todoId)
-          .collection("timer")
-          .doc("time")
-          .update(editTimeObj);
-      const updateTodoFbase = () =>
-        dbService.collection("plan").doc(todoId).update(editObj);
-      await Promise.all([updateTimeFbase(), updateTodoFbase()]);
+      await dbService.collection("plan").doc(todoId).update(editObj);
     } catch (e) {
       alert(
         "서버 오류가 발생하여 To-Do수정이 실패 하였습니다. 다시 To-Do를 수정해 주세요."

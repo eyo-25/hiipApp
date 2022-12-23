@@ -75,7 +75,15 @@ function Start() {
     if (project.length <= 0) {
       navigate("/plan/createProject");
     } else if (0 < toDos.length) {
-      navigate(`/timer/${toDos[0].id}`);
+      if (toDos[0].status === "ready") {
+        await dbService
+          .collection("plan")
+          .doc(toDos[0].id)
+          .update({ status: "start" });
+        navigate(`/timer/${toDos[0].id}`);
+      } else {
+        navigate(`/timer/${toDos[0].id}`);
+      }
     } else {
       navigate("/plan");
     }

@@ -18,17 +18,14 @@ import { Dark_Gray2 } from "../../../Styles/Colors";
 import { useRecoilState } from "recoil";
 import { toDoState } from "../../../Recoil/atoms";
 import { useParams } from "react-router-dom";
-import { authService, dbService } from "../../../firebase";
-import { onSnapshot, query } from "firebase/firestore";
-import { onAuthStateChanged } from "firebase/auth";
 
 interface iMemoProps {
   memoText: string;
   setMemoText: React.Dispatch<React.SetStateAction<string>>;
-  onSaveClick: () => Promise<void>;
+  onInputBlur: () => Promise<void>;
 }
 
-function MemoCard({ memoText, setMemoText, onSaveClick }: iMemoProps) {
+function MemoCard({ memoText, setMemoText, onInputBlur }: iMemoProps) {
   const [toDos, setToDos] = useRecoilState(toDoState);
   const inputRef = useRef<any>(null);
   const params = useParams();
@@ -100,13 +97,8 @@ function MemoCard({ memoText, setMemoText, onSaveClick }: iMemoProps) {
               required
               value={memoText}
               onChange={onTextChange}
+              onBlur={onInputBlur}
             />
-            <IconBox>
-              <Item onClick={onSaveClick}>
-                <SaveIcon />
-                <p>저장</p>
-              </Item>
-            </IconBox>
           </MemoForm>
         </MemoContainer>
         <IntervalBarBox>

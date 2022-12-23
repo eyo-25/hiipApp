@@ -7,7 +7,6 @@ import {
   inputFocusState,
   isBreakState,
   isPauseState,
-  loadState,
   toDoState,
 } from "../../../../Recoil/atoms";
 import { IoCloseSharp } from "react-icons/io5";
@@ -22,18 +21,17 @@ const FadeInVarients = {
   end: {
     opacity: 1,
     transition: {
-      duration: 0.6,
+      duration: 0.5,
       type: "linear",
     },
   },
 };
 
 interface ITimerInfo {
-  seconds: number;
-  minutes: number;
+  count: number;
 }
 
-function TimerInfo({ seconds, minutes }: ITimerInfo) {
+function TimerInfo({ count }: ITimerInfo) {
   const [toDos, setToDos] = useRecoilState(toDoState);
   const [isBreakSet, setIsBreakSet] = useRecoilState(isBreakState);
   const [isPause, setIsPause] = useRecoilState(isPauseState);
@@ -64,7 +62,7 @@ function TimerInfo({ seconds, minutes }: ITimerInfo) {
     setMemoText(value);
   };
 
-  //파이어베이스 plan > memo수정 요청
+  //파이어베이스 memo 업데이트 함수
   async function saveMemoSubmit() {
     try {
       await dbService
@@ -98,7 +96,7 @@ function TimerInfo({ seconds, minutes }: ITimerInfo) {
     <Container>
       {!isPause && (
         <CounterWrapper variants={FadeInVarients} initial="start" animate="end">
-          <ProgressBar seconds={seconds} minutes={minutes} />
+          <ProgressBar count={count} />
           {!isBreakSet && (
             <WiseSaying>나중에 울지말고 지금 울면서하자</WiseSaying>
           )}

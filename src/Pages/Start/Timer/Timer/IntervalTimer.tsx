@@ -1,19 +1,15 @@
 import { motion } from "framer-motion";
 import React, { useEffect, useState } from "react";
-import { isAndroid } from "react-device-detect";
 import { useParams } from "react-router-dom";
 import { useRecoilState } from "recoil";
 import styled from "styled-components";
 import { dbService } from "../../../../firebase";
-import { useCounter } from "../../../../hooks/useCounter";
 import {
   inputFocusState,
   isBreakState,
   isPauseState,
   timerState,
 } from "../../../../Recoil/atoms";
-import TimerButton from "./TimerButton";
-import TimerInfo from "./TimerInfo";
 
 const TextUpVarients = {
   start: {
@@ -22,7 +18,7 @@ const TextUpVarients = {
   },
   coundStart: {
     opacity: 0,
-    y: 2,
+    y: 6,
   },
   end: {
     opacity: 1,
@@ -34,7 +30,15 @@ const TextUpVarients = {
   },
 };
 
-function IntervalTimer() {
+interface IIntervalTimer {
+  count: number;
+  start: () => void;
+  stop: () => void;
+  reset: () => void;
+  done: () => void;
+}
+
+function IntervalTimer({ count, start, stop, reset, done }: IIntervalTimer) {
   const [timerObj, setTimerObj] = useRecoilState(timerState);
   const [isBreakSet, setIsBreakSet] = useRecoilState(isBreakState);
   const [isPause, setIsPause] = useRecoilState(isPauseState);
@@ -42,10 +46,6 @@ function IntervalTimer() {
   const [intervalSet, setIntervalSet] = useState(timerObj.focusSet);
   const [minutes, setMinutes] = useState(timerObj.min);
   const [seconds, setSeconds] = useState(timerObj.sec);
-  const { count, start, stop, reset, done } = useCounter(
-    timerObj.min,
-    timerObj.sec
-  );
   const params = useParams();
   const todoId = params.todoId;
 
@@ -88,7 +88,7 @@ function IntervalTimer() {
       return;
     }
     //count
-    if (1 <= intervalSet && 0 <= count) {
+    if (1 <= intervalSet && 0 < count) {
       const mathMin = Math.floor(count / 60);
       const mathSec = Math.floor(count - mathMin * 60);
       setMinutes(mathMin);
@@ -128,9 +128,7 @@ function IntervalTimer() {
     } else {
       setIsPause(false);
     }
-    setTimeout(() => {
-      start();
-    }, 600);
+    start();
     return () => {
       setIsPause(false);
       stop();
@@ -144,55 +142,45 @@ function IntervalTimer() {
 
   return (
     <>
-      <ContentsWrapper>
-        <InfoWrapper>
-          <TimerInfo minutes={minutes} seconds={seconds} />
-        </InfoWrapper>
-        {!isPause && (
-          <CounterWrapper
+      {!isPause && (
+        <CounterWrapper
+          variants={TextUpVarients}
+          initial="coundStart"
+          animate="end"
+        >
+          <CounterBox>
+            <p>{minutes < 10 ? `0${minutes}` : minutes}</p>
+            <p>:</p>
+            <p>{seconds < 10 ? `0${seconds}` : seconds}</p>
+          </CounterBox>
+        </CounterWrapper>
+      )}
+      {isPause && !inputToggle && (
+        <CounterWrapper>
+          <BreakBox
             variants={TextUpVarients}
             initial="coundStart"
             animate="end"
           >
-            <CounterBox>
-              <p>{minutes < 10 ? `0${minutes}` : minutes}</p>
-              <p>:</p>
-              <p>{seconds < 10 ? `0${seconds}` : seconds}</p>
-            </CounterBox>
-          </CounterWrapper>
-        )}
-        {isPause && !inputToggle && (
-          <CounterWrapper>
-            <BreakBox
-              variants={TextUpVarients}
-              initial="coundStart"
-              animate="end"
-            >
-              <h4>PAUSE</h4>
-            </BreakBox>
-            <BreakBox>
-              <h5>다음 휴식까지</h5>
-            </BreakBox>
-            <BreakBox variants={TextUpVarients} initial="start" animate="end">
-              <p>{minutes < 10 ? `0${minutes}` : minutes}</p>
-              <p>:</p>
-              <p>{seconds < 10 ? `0${seconds}` : seconds}</p>
-            </BreakBox>
-            <BreakBox>
-              <h5>진행된 SET</h5>
-            </BreakBox>
-            <BreakBox variants={TextUpVarients} initial="start" animate="end">
-              <p style={{ marginBottom: 0 }}>
-                {timerObj.setFocusSet - timerObj.focusSet}
-              </p>
-            </BreakBox>
-          </CounterWrapper>
-        )}
-      </ContentsWrapper>
-      {!(isAndroid && inputToggle) && (
-        <ButtonWrapper>
-          <TimerButton count={count} stop={stop} start={start} />
-        </ButtonWrapper>
+            <h4>{timerObj.focusSet <= 0 ? "FINISH" : "PAUSE"}</h4>
+          </BreakBox>
+          <BreakBox>
+            <h5>다음 휴식까지</h5>
+          </BreakBox>
+          <BreakBox variants={TextUpVarients} initial="start" animate="end">
+            <p>{minutes < 10 ? `0${minutes}` : minutes}</p>
+            <p>:</p>
+            <p>{seconds < 10 ? `0${seconds}` : seconds}</p>
+          </BreakBox>
+          <BreakBox>
+            <h5>진행된 SET</h5>
+          </BreakBox>
+          <BreakBox variants={TextUpVarients} initial="start" animate="end">
+            <p style={{ marginBottom: 0 }}>
+              {timerObj.setFocusSet - timerObj.focusSet}
+            </p>
+          </BreakBox>
+        </CounterWrapper>
       )}
     </>
   );
@@ -200,20 +188,6 @@ function IntervalTimer() {
 
 export default React.memo(IntervalTimer);
 
-const ContentsWrapper = styled.div`
-  position: relative;
-  z-index: 10;
-  height: 70%;
-  width: 100%;
-  color: white;
-`;
-const ButtonWrapper = styled.div`
-  position: relative;
-  display: flex;
-  height: 30%;
-  width: 100%;
-  z-index: 10;
-`;
 const CounterWrapper = styled(motion.div)`
   display: flex;
   flex-direction: column;
@@ -223,15 +197,6 @@ const CounterWrapper = styled(motion.div)`
   }
   @media screen and (max-height: 750px) {
     height: 65%;
-  }
-`;
-const InfoWrapper = styled.div`
-  height: 42%;
-  @media screen and (max-height: 800px) {
-    height: 38%;
-  }
-  @media screen and (max-height: 750px) {
-    height: 35%;
   }
 `;
 const CounterBox = styled(motion.div)`

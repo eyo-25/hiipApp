@@ -2,12 +2,10 @@ import { useRecoilValue } from "recoil";
 import { isBreakState, timerState } from "../Recoil/atoms";
 import { useState, useRef, useCallback, useEffect } from "react";
 
-export const useProgressBar = (seconds: number, minutes: number) => {
+export const useProgressBar = (count: number) => {
   const timerObj = useRecoilValue(timerState);
   const isBreakSet = useRecoilValue(isBreakState);
   const [progressArray, setProgressArray] = useState<number[]>([]);
-
-  console.log(progressArray);
 
   //총 세트
   const totalSet = useRef<number>(timerObj.setFocusSet + timerObj.setBreakSet);
@@ -18,7 +16,7 @@ export const useProgressBar = (seconds: number, minutes: number) => {
   //브레이크 총 카운트
   const totalBreakCount = timerObj.setBreakMin * 60 + timerObj.setBreakSec;
   //현재 총 시간
-  const nowTotalCount = minutes * 60 + seconds;
+  const nowTotalCount = count;
   //토탈카운트(총넓이)
   const totalCount = useRef<number>(
     totalFocusCount.current * timerObj.setFocusSet +
@@ -75,11 +73,11 @@ export const useProgressBar = (seconds: number, minutes: number) => {
       }
       return [...newProgress];
     });
-  }, [seconds, minutes]);
+  }, [count]);
 
   useEffect(() => {
     percentArray();
-  }, [seconds, minutes]);
+  }, [count]);
 
   return { progressArray, breakWidth, focusWidth, totalSet, nowSet };
 };

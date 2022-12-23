@@ -9,8 +9,9 @@ import {
   toDoState,
   loadState,
 } from "../../../Recoil/atoms";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import MemoCard from "./MemoCard";
+import useOnClickOutSide from "../../../hooks/useOnClickOutSide";
 
 const memoVariants = {
   normal: {
@@ -37,19 +38,18 @@ const TodoMemo = () => {
   const todoId = params.todoId;
   const index = toDos.findIndex((item) => item.id === todoId);
   const navigate = useNavigate();
+  const memoRef = useRef<any>();
 
   //파이어베이스 plan > memo수정 요청
   async function saveMemoSubmit() {
-    setIsLoad(true);
     try {
       await dbService
         .collection("plan")
         .doc(`${toDos[index].id}`)
-        .update({ memo: memoText })
-        .then(() => {});
+        .update({ memo: memoText });
     } catch (e) {
       alert(
-        "서버 오류가 발생하여 To-Do생성이 실패 하였습니다. 다시 To-Do를 생성해 주세요."
+        "서버 오류가 발생하여 memo작성이 실패 하였습니다. 다시 memo작성을 생성해 주세요."
       );
     }
   }
@@ -57,54 +57,39 @@ const TodoMemo = () => {
   const reset = () => {
     setIsEdit(false);
   };
-  const onOverlayClicked = (e: any) => {
+  const onInputBlur = async () => {
     if (toDos[index].memo !== memoText) {
-      const ok = window.confirm("입력한 memo를 저장 하시겠습니까?");
-      if (ok) {
-        saveMemoSubmit().then(() => {
-          reset();
-          navigate("/plan");
-          setIsLoad(false);
-        });
-      }
+      await saveMemoSubmit();
+    }
+  };
+
+  useOnClickOutSide(memoRef, () => {
+    if (toDos[index].memo !== memoText) {
+      saveMemoSubmit().then(() => {
+        reset();
+        navigate("/plan");
+        setIsSelect(false);
+      });
     }
     reset();
     navigate("/plan");
-  };
-  const onSaveClick = async () => {
-    if (toDos[index].memo !== memoText) {
-      const ok = window.confirm("memo를 저장 하시겠습니까?");
-      if (ok) {
-        saveMemoSubmit().then(() => {
-          reset();
-          navigate("/plan");
-          setIsLoad(false);
-        });
-      }
-    } else {
-      reset();
-      navigate("/plan");
-    }
-  };
+    setIsSelect(false);
+  });
+
   return (
     <Wrapper>
       <Container>
         <ModalBox>
-          <MemoWrapper>
+          <MemoWrapper ref={memoRef}>
             <MemoCard
               memoText={memoText}
               setMemoText={setMemoText}
-              onSaveClick={onSaveClick}
+              onInputBlur={onInputBlur}
             />
           </MemoWrapper>
         </ModalBox>
       </Container>
-      <Overlay
-        onClick={onOverlayClicked}
-        variants={memoVariants}
-        initial="normal"
-        animate="animate"
-      />
+      <Overlay variants={memoVariants} initial="normal" animate="animate" />
     </Wrapper>
   );
 };
@@ -145,6 +130,7 @@ export const Container = styled.div`
   padding: 0 2.5vh;
   margin: 0 auto;
   z-index: 999;
+  cursor: pointer;
 `;
 export const ModalBox = styled.div`
   display: flex;

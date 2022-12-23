@@ -10,10 +10,6 @@ import {
 } from "../../../../Recoil/atoms";
 import { dbService } from "../../../../firebase";
 import { useParams } from "react-router-dom";
-import { useCounter } from "../../../../hooks/useCounter";
-import TimerInfo from "./TimerInfo";
-import TimerButton from "./TimerButton";
-import { isAndroid } from "react-device-detect";
 
 const TextUpVarients = {
   start: {
@@ -22,7 +18,7 @@ const TextUpVarients = {
   },
   coundStart: {
     opacity: 0,
-    y: 2,
+    y: 6,
   },
   end: {
     opacity: 1,
@@ -34,7 +30,15 @@ const TextUpVarients = {
   },
 };
 
-function BreakTimer() {
+interface IBreakTimer {
+  count: number;
+  start: () => void;
+  stop: () => void;
+  reset: () => void;
+  done: () => void;
+}
+
+function BreakTimer({ count, start, stop, reset, done }: IBreakTimer) {
   const [timerObj, setTimeObj] = useRecoilState(timerState);
   const [isBreakSet, setIsBreakSet] = useRecoilState(isBreakState);
   const [isPause, setIsPause] = useRecoilState(isPauseState);
@@ -42,16 +46,11 @@ function BreakTimer() {
   const [minutes, setMinutes] = useState(timerObj.breakMin);
   const [seconds, setSeconds] = useState(timerObj.breakSec);
   const [inputToggle, setInputToggle] = useRecoilState(inputFocusState);
-  const { count, start, stop, reset, done } = useCounter(
-    timerObj.breakMin,
-    timerObj.breakSec
-  );
   const params = useParams();
   const todoId = params.todoId;
 
   //파이어베이스 timer 업데이트
   async function updateBreakSubmit(type: string) {
-    const isTime = type === "count";
     const isDone = type === "done";
     try {
       await dbService
@@ -125,9 +124,7 @@ function BreakTimer() {
     setMinutes(timerObj.breakMin);
     setSeconds(timerObj.breakSec);
     setIsPause(false);
-    setTimeout(() => {
-      start();
-    }, 600);
+    start();
     return () => {
       setIsPause(false);
       stop();
@@ -141,62 +138,52 @@ function BreakTimer() {
 
   return (
     <>
-      <ContentsWrapper>
-        <InfoWrapper>
-          <TimerInfo seconds={seconds} minutes={minutes} />
-        </InfoWrapper>
-        {!isPause && (
-          <CounterWrapper>
-            <CounterBox
-              variants={TextUpVarients}
-              initial="coundStart"
-              animate="end"
-            >
-              <h4>
-                <span>{timerObj.setFocusSet - timerObj.focusSet}</span>SET
-              </h4>
-              <h4>BREAK</h4>
-            </CounterBox>
-            <BreakBox>
-              <h5>다음 세트까지</h5>
-            </BreakBox>
-            <BreakBox variants={TextUpVarients} initial="start" animate="end">
-              <p>{minutes < 10 ? `0${minutes}` : minutes}</p>
-              <p>:</p>
-              <p>{seconds < 10 ? `0${seconds}` : seconds}</p>
-            </BreakBox>
-          </CounterWrapper>
-        )}
-        {isPause && !inputToggle && (
-          <CounterWrapper>
-            <BreakBox
-              variants={TextUpVarients}
-              initial="coundStart"
-              animate="end"
-            >
-              <h4>PAUSE</h4>
-            </BreakBox>
-            <BreakBox>
-              <h5>다음 세트까지</h5>
-            </BreakBox>
-            <BreakBox variants={TextUpVarients} initial="start" animate="end">
-              <p>{minutes < 10 ? `0${minutes}` : minutes}</p>
-              <p>:</p>
-              <p>{seconds < 10 ? `0${seconds}` : seconds}</p>
-            </BreakBox>
-            <BreakBox>
-              <h5>진행된 SET</h5>
-            </BreakBox>
-            <BreakBox variants={TextUpVarients} initial="start" animate="end">
-              <p>{timerObj.setFocusSet - timerObj.focusSet}</p>
-            </BreakBox>
-          </CounterWrapper>
-        )}
-      </ContentsWrapper>
-      {!(isAndroid && inputToggle) && (
-        <ButtonWrapper>
-          <TimerButton count={count} stop={stop} start={start} />
-        </ButtonWrapper>
+      {!isPause && (
+        <CounterWrapper>
+          <CounterBox
+            variants={TextUpVarients}
+            initial="coundStart"
+            animate="end"
+          >
+            <h4>
+              <span>{timerObj.setFocusSet - timerObj.focusSet}</span>SET
+            </h4>
+            <h4>BREAK</h4>
+          </CounterBox>
+          <BreakBox>
+            <h5>다음 세트까지</h5>
+          </BreakBox>
+          <BreakBox variants={TextUpVarients} initial="start" animate="end">
+            <p>{minutes < 10 ? `0${minutes}` : minutes}</p>
+            <p>:</p>
+            <p>{seconds < 10 ? `0${seconds}` : seconds}</p>
+          </BreakBox>
+        </CounterWrapper>
+      )}
+      {isPause && !inputToggle && (
+        <CounterWrapper>
+          <BreakBox
+            variants={TextUpVarients}
+            initial="coundStart"
+            animate="end"
+          >
+            <h4>PAUSE</h4>
+          </BreakBox>
+          <BreakBox>
+            <h5>다음 세트까지</h5>
+          </BreakBox>
+          <BreakBox variants={TextUpVarients} initial="start" animate="end">
+            <p>{minutes < 10 ? `0${minutes}` : minutes}</p>
+            <p>:</p>
+            <p>{seconds < 10 ? `0${seconds}` : seconds}</p>
+          </BreakBox>
+          <BreakBox>
+            <h5>진행된 SET</h5>
+          </BreakBox>
+          <BreakBox variants={TextUpVarients} initial="start" animate="end">
+            <p>{timerObj.setFocusSet - timerObj.focusSet}</p>
+          </BreakBox>
+        </CounterWrapper>
       )}
     </>
   );
@@ -204,20 +191,6 @@ function BreakTimer() {
 
 export default React.memo(BreakTimer);
 
-const ContentsWrapper = styled.div`
-  position: relative;
-  z-index: 10;
-  height: 70%;
-  width: 100%;
-  color: white;
-`;
-const ButtonWrapper = styled.div`
-  position: relative;
-  display: flex;
-  height: 30%;
-  width: 100%;
-  z-index: 10;
-`;
 const CounterWrapper = styled(motion.div)`
   display: flex;
   flex-direction: column;
@@ -227,15 +200,6 @@ const CounterWrapper = styled(motion.div)`
   }
   @media screen and (max-height: 750px) {
     height: 65%;
-  }
-`;
-const InfoWrapper = styled.div`
-  height: 42%;
-  @media screen and (max-height: 800px) {
-    height: 38%;
-  }
-  @media screen and (max-height: 750px) {
-    height: 35%;
   }
 `;
 const CounterBox = styled(motion.div)`
