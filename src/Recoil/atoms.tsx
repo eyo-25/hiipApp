@@ -128,6 +128,7 @@ interface ItimeState {
   setFocusSec: number;
   setFocusSet: number;
   id: string;
+  status: string;
 }
 export const timerState = atom<ItimeState>({
   key: "timerState",
@@ -148,5 +149,6 @@ export const timerState = atom<ItimeState>({
     setFocusSec: 0,
     setFocusSet: 0,
     id: "",
+    status: "start",
   },
 });

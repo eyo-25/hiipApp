@@ -32,6 +32,7 @@ export function ProgressBar({ count }: ITimerInfo) {
               isBreak={(index + 1) % 2 === 0}
             >
               {index === nowSet.current &&
+                count !== 0 &&
                 (index + 1) % 2 !== 0 &&
                 totalSet.current !== nowSet.current && <ProgressEdge />}
             </ProgressGauge>

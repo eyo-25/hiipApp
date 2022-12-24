@@ -11,13 +11,16 @@ import {
   isWeekState,
   startDateState,
   endDateState,
+  toDoState,
 } from "../../../Recoil/atoms";
 import { Blue, Dark_Gray, Dark_Gray2 } from "../../../Styles/Colors";
 import { useMatch, useNavigate } from "react-router-dom";
 import { ReactComponent as EditBtn } from "../../../Assets/Icons/editbtn.svg";
 import { ReactComponent as DeletBtn } from "../../../Assets/Icons/deletbtn.svg";
-import { dbService } from "../../../firebase";
+import { authService, dbService } from "../../../firebase";
 import useOnClickOutSide from "../../../hooks/useOnClickOutSide";
+import { onSnapshot, query } from "firebase/firestore";
+import { onAuthStateChanged } from "firebase/auth";
 
 export const iconVariants = {
   normal: {
@@ -41,6 +44,7 @@ interface ITodoCard {
 }
 
 function TodoCard({ todoObj, index }: ITodoCard) {
+  const [toDos, setToDos] = useRecoilState(toDoState);
   const [isWeek, setIsWeek] = useRecoilState(isWeekState);
   const [selectTodo, setSelectTodo] = useRecoilState(selectTodoState);
   const [isClicked, setIsClicked] = useState(false);
@@ -51,10 +55,12 @@ function TodoCard({ todoObj, index }: ITodoCard) {
   const [btnPopup, setBtnPopup] = useState(false);
   const [startDate, setStartDate] = useRecoilState(startDateState);
   const [endDate, setEndDate] = useRecoilState(endDateState);
+  const [timerArray, setTimeArray] = useState<any[]>([]);
   const planMatch = useMatch("/plan/createTodo");
   const cardWrapperRef = useRef<any>(null);
   const cardRef = useRef<any>();
   const navigate = useNavigate();
+
   useOnClickOutSide(cardRef, () => {
     setBtnPopup(false);
   });
@@ -70,6 +76,7 @@ function TodoCard({ todoObj, index }: ITodoCard) {
       },
     },
   };
+
   //isWeek 감지
   useEffect(() => {
     if (!isWeek) {
@@ -138,6 +145,34 @@ function TodoCard({ todoObj, index }: ITodoCard) {
       setCounter((prev) => prev + 1);
     }, 100);
   };
+
+  //타이머 변화감지
+  useEffect(() => {
+    const q = query(
+      dbService
+        .collection("plan")
+        .doc(todoObj.id)
+        .collection("timer")
+        .where("todoId", "==", todoObj.id)
+    );
+    const addId = onSnapshot(q, (querySnapshot) => {
+      const newArray = querySnapshot.docs.map((doc: any) => {
+        return {
+          id: doc.id,
+          ...doc.data(),
+        };
+      });
+      if (0 < newArray.length) {
+        setTimeArray(newArray);
+      }
+    });
+    onAuthStateChanged(authService, (user) => {
+      if (user == null) {
+        addId();
+      }
+    });
+  }, []);
+
   const onCardClick = () => {
     setSelectTodo(todoObj.id);
     setStartDate(() => todoObj.startDate);
@@ -188,21 +223,26 @@ function TodoCard({ todoObj, index }: ITodoCard) {
   }
 
   async function deleteToDoSubmit() {
-    try {
-      const planDeleteFbase = () =>
-        dbService.doc(`plan/${todoObj.id}`).delete();
-      const timeDeleteFbase = () =>
+    const planDeleteFbase = () => dbService.doc(`plan/${todoObj.id}`).delete();
+    const timeDeleteFbase = () => {
+      for (let i = 0; i < timerArray.length; i++) {
         dbService
           .doc(`plan/${todoObj.id}`)
           .collection("timer")
-          .doc("time")
+          .doc(timerArray[i].id)
           .delete();
-      await Promise.all([planDeleteFbase(), timeDeleteFbase()]);
+      }
+    };
+    try {
+      if (0 < timerArray.length) {
+        await Promise.all([planDeleteFbase(), timeDeleteFbase()]);
+      } else {
+        await planDeleteFbase();
+      }
     } catch (e) {
       alert(
         "서버 오류가 발생하여 To-Do삭제가 실패 하였습니다. 다시 To-Do를 삭제해 주세요."
       );
-    } finally {
     }
   }
   const onDeleteClick = async () => {
@@ -218,6 +258,7 @@ function TodoCard({ todoObj, index }: ITodoCard) {
     setBtnPopup(false);
     navigate(`/plan/editTodo/${todoObj.id}`);
   };
+
   return (
     <Wrapper ref={cardWrapperRef}>
       <TodoCarWrapper

@@ -8,7 +8,7 @@ import {
   toDoState,
 } from "../../../Recoil/atoms";
 import { useEffect, useRef } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { authService, dbService } from "../../../firebase";
 import { motion } from "framer-motion";
 import styled from "styled-components";
@@ -43,6 +43,7 @@ function Timer() {
   const todoId = params.todoId;
   const index = toDos.findIndex((item) => item.id === todoId);
   const Moment = require("moment");
+  const navigate = useNavigate();
 
   const timeObj = useRef<any>({});
   const now = Moment(new Date()).format("YYYY-MM-DD");
@@ -61,8 +62,9 @@ function Timer() {
     setBreakSec: 5,
     min: 0,
     sec: 10,
-    breakMin: 0,
-    breakSec: 5,
+    breakMin: defaultSet - 1 <= 0 ? 0 : 0,
+    breakSec: defaultSet - 1 <= 0 ? 0 : 5,
+    todoId: todoId,
   };
 
   //오늘날짜 타이머 체크후 없으면 생성

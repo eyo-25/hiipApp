@@ -123,6 +123,24 @@ function TimerButton({ stop, start, count }: ITimerButton) {
     }
   }
 
+  //파이어베이스 timer 업데이트
+  async function updateStatusSubmit(state: string) {
+    try {
+      await dbService
+        .collection("plan")
+        .doc(todoId)
+        // .collection("timer")
+        // .doc(timerObj.id)
+        .update({
+          status: state,
+        });
+    } catch (e) {
+      alert("타이머 ERROR.");
+    } finally {
+      navigate("/feedback");
+    }
+  }
+
   useEffect(() => {
     //시작 애니메이션 기다리고 버튼활성화
     setTimeout(() => {
@@ -178,6 +196,24 @@ function TimerButton({ stop, start, count }: ITimerButton) {
   };
   const onDoneClick = () => {
     navigate("/");
+  };
+  const onFailClick = () => {
+    const ok = window.confirm("계획한 ToDo를 포기 하시겠습니까?");
+    if (ok) {
+      updateStatusSubmit("fail");
+    }
+  };
+  const onSuccessClick = () => {
+    const ok = window.confirm("계획한 ToDo를 완료 하시겠습니까?");
+    if (ok) {
+      updateStatusSubmit("success");
+    }
+  };
+  const onAddClick = () => {
+    const ok = window.confirm("계획한 ToDo를 완료 하시겠습니까?");
+    if (ok) {
+      updateStatusSubmit("success");
+    }
   };
 
   return (
@@ -235,9 +271,9 @@ function TimerButton({ stop, start, count }: ITimerButton) {
               exit="exit"
             >
               <BarContainer>
-                <BarBox>포기</BarBox>
+                <BarBox onClick={onFailClick}>포기</BarBox>
                 <BarLine />
-                <BarBox>성공</BarBox>
+                <BarBox onClick={onSuccessClick}>성공</BarBox>
                 <BarLine />
                 <BarBox>추가</BarBox>
               </BarContainer>

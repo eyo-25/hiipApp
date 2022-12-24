@@ -73,7 +73,7 @@ function Plan() {
     };
   }, []);
 
-  //투두 선택 감지
+  //날짜 셀렉트
   useEffect(() => {
     if (selectTodo === "" && 0 < toDos.length) {
       setSelectTodo(() => toDos[0].id);
@@ -90,6 +90,7 @@ function Plan() {
       setIsEdit(false);
     }
   };
+
   // 브라우저 스와이프
   const onMouseUp = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
     setMouseUpClientY(e.clientY);
@@ -108,6 +109,7 @@ function Plan() {
       closedEdit();
     }
   }, [mouseUpClientY]);
+
   //모바일 스와이프
   const onTouchStart = (e: React.TouchEvent) => {
     setTochedY(e.changedTouches[0].pageY);

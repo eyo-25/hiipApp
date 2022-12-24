@@ -57,9 +57,7 @@ function MemoCard({ memoText, setMemoText, onInputBlur }: iMemoProps) {
       },
     },
   };
-  useEffect(() => {
-    setMemoText(toDos[index].memo);
-  }, []);
+
   const onTextChange = (event: React.FormEvent<HTMLTextAreaElement>) => {
     const {
       currentTarget: { value },

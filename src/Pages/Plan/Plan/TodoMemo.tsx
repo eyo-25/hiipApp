@@ -9,7 +9,7 @@ import {
   toDoState,
   loadState,
 } from "../../../Recoil/atoms";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import MemoCard from "./MemoCard";
 import useOnClickOutSide from "../../../hooks/useOnClickOutSide";
 
@@ -33,12 +33,15 @@ const TodoMemo = () => {
   const [memoText, setMemoText] = useState("");
   const [isEdit, setIsEdit] = useRecoilState(cardEditState);
   const [isSelect, setIsSelect] = useRecoilState(selectState);
-  const [isLoad, setIsLoad] = useRecoilState(loadState);
   const params = useParams();
   const todoId = params.todoId;
   const index = toDos.findIndex((item) => item.id === todoId);
   const navigate = useNavigate();
   const memoRef = useRef<any>();
+
+  useEffect(() => {
+    setMemoText(toDos[index].memo);
+  }, []);
 
   //파이어베이스 plan > memo수정 요청
   async function saveMemoSubmit() {
@@ -54,27 +57,23 @@ const TodoMemo = () => {
     }
   }
   //클릭함수
-  const reset = () => {
-    setIsEdit(false);
-  };
   const onInputBlur = async () => {
     if (toDos[index].memo !== memoText) {
       await saveMemoSubmit();
     }
   };
 
-  useOnClickOutSide(memoRef, () => {
+  const overlayClicked = () => {
     if (toDos[index].memo !== memoText) {
-      saveMemoSubmit().then(() => {
-        reset();
-        navigate("/plan");
-        setIsSelect(false);
-      });
+      saveMemoSubmit();
+      setIsEdit(false);
+      navigate("/plan");
+      setIsSelect(false);
     }
-    reset();
+    setIsEdit(false);
     navigate("/plan");
     setIsSelect(false);
-  });
+  };
 
   return (
     <Wrapper>
@@ -89,7 +88,12 @@ const TodoMemo = () => {
           </MemoWrapper>
         </ModalBox>
       </Container>
-      <Overlay variants={memoVariants} initial="normal" animate="animate" />
+      <Overlay
+        onClick={overlayClicked}
+        variants={memoVariants}
+        initial="normal"
+        animate="animate"
+      />
     </Wrapper>
   );
 };

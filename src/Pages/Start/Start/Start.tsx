@@ -82,7 +82,7 @@ function Start() {
           .update({ status: "start" });
         navigate(`/timer/${toDos[0].id}`);
       } else {
-        navigate(`/timer/${toDos[0].id}`);
+        navigate(`/feedback`);
       }
     } else {
       navigate("/plan");
