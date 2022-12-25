@@ -126,18 +126,11 @@ function TimerButton({ stop, start, count }: ITimerButton) {
   //파이어베이스 timer 업데이트
   async function updateStatusSubmit(state: string) {
     try {
-      await dbService
-        .collection("plan")
-        .doc(todoId)
-        // .collection("timer")
-        // .doc(timerObj.id)
-        .update({
-          status: state,
-        });
+      await dbService.collection("plan").doc(todoId).update({
+        status: state,
+      });
     } catch (e) {
       alert("타이머 ERROR.");
-    } finally {
-      navigate("/feedback");
     }
   }
 

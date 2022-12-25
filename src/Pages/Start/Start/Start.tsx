@@ -81,6 +81,8 @@ function Start() {
           .doc(toDos[0].id)
           .update({ status: "start" });
         navigate(`/timer/${toDos[0].id}`);
+      } else if (toDos[0].status === "start") {
+        navigate(`/timer/${toDos[0].id}`);
       } else {
         navigate(`/feedback`);
       }

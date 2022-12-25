@@ -40,10 +40,9 @@ export const iconVariants = {
 
 interface ITodoCard {
   todoObj: any;
-  index: number;
 }
 
-function TodoCard({ todoObj, index }: ITodoCard) {
+function TodoCard({ todoObj }: ITodoCard) {
   const [toDos, setToDos] = useRecoilState(toDoState);
   const [isWeek, setIsWeek] = useRecoilState(isWeekState);
   const [selectTodo, setSelectTodo] = useRecoilState(selectTodoState);
@@ -277,9 +276,11 @@ function TodoCard({ todoObj, index }: ITodoCard) {
           <TextBox>
             <TitleBox>
               <h4>{todoObj.planTitle}</h4>
-              <StatusBox>
-                <h5>진행중</h5>
-              </StatusBox>
+              {todoObj.status !== "ready" && (
+                <StatusBox>
+                  <h5>진행중</h5>
+                </StatusBox>
+              )}
             </TitleBox>
             <p>{todoObj.planSubTitle}</p>
           </TextBox>

@@ -36,9 +36,6 @@ function TodoBord() {
 
   const onBackClick = () => {
     setIsSelect(false);
-    // if (e.touches.length > 1) {
-    //   e.preventDefault();
-    // }
   };
 
   return (
@@ -70,7 +67,7 @@ function TodoBord() {
             animate="animate"
             key={index}
           >
-            <TodoCard todoObj={toDo} index={index} />
+            <TodoCard todoObj={toDo} />
           </CardWrapper>
         ))}
       </Container>

@@ -111,6 +111,10 @@ export const isPauseState = atom<boolean>({
   key: "isPauseState",
   default: false,
 });
+export const isAddState = atom<boolean>({
+  key: "isAddState",
+  default: false,
+});
 interface ItimeState {
   date: string;
   stopDate: string;

@@ -75,9 +75,11 @@ function MemoCard({ memoText, setMemoText, onInputBlur }: iMemoProps) {
           <TextBox>
             <TitleBox>
               <h4>{toDos[index].planTitle}</h4>
-              <StatusBox>
-                <h5>진행중</h5>
-              </StatusBox>
+              {toDos[index].status !== "ready" && (
+                <StatusBox>
+                  <h5>진행중</h5>
+                </StatusBox>
+              )}
             </TitleBox>
             <p>{toDos[index].planSubTitle}</p>
           </TextBox>
