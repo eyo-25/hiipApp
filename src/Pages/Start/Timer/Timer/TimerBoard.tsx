@@ -1,34 +1,38 @@
 import { useRecoilState } from "recoil";
-import { useEffect, useRef, useState } from "react";
-import { useParams } from "react-router-dom";
-import { motion } from "framer-motion";
-import styled from "styled-components";
-import Background from "../../../Assets/image/bull.png";
-import { onAuthStateChanged } from "firebase/auth";
-import { onSnapshot, query } from "firebase/firestore";
 import {
   inputFocusState,
+  isAddState,
   isBreakState,
   isPauseState,
+  timerSplashState,
   timerState,
+  toDoState,
 } from "../../../../Recoil/atoms";
-import TimerButton from "./TimerButton";
-import { isAndroid } from "react-device-detect";
-import TimerInfo from "./TimerInfo";
-import { dbService } from "../../../../firebase";
-import { useCounter } from "../../../../hooks/useCounter";
+import { useEffect, useRef } from "react";
+import { useParams } from "react-router-dom";
+import { authService, dbService } from "../../../../firebase";
 import IntervalTimer from "./IntervalTimer";
 import BreakTimer from "./BreakTimer";
+import styled from "styled-components";
+import { onAuthStateChanged } from "firebase/auth";
+import { onSnapshot, query } from "firebase/firestore";
+import { useCounter } from "../../../../hooks/useCounter";
+import { isAndroid } from "react-device-detect";
+import TimerInfo from "./TimerInfo";
+import TimerButton from "./TimerButton";
 
 function TimerBoard() {
+  const [isAdd, setIsAdd] = useRecoilState(isAddState);
+  const [isTimerSplash, setIsTimerSplash] = useRecoilState(timerSplashState);
+  const [inputToggle, setInputToggle] = useRecoilState(inputFocusState);
   const [timerObj, setTimerObj] = useRecoilState(timerState);
   const [isBreakSet, setIsBreakSet] = useRecoilState(isBreakState);
-  const [inputToggle, setInputToggle] = useRecoilState(inputFocusState);
   const [isPause, setIsPause] = useRecoilState(isPauseState);
-  const [minutes, setMinutes] = useState(timerObj.min);
-  const [seconds, setSeconds] = useState(timerObj.sec);
+  const [toDos, setToDos] = useRecoilState(toDoState);
   const params = useParams();
   const todoId = params.todoId;
+  const index = toDos.findIndex((item) => item.id === todoId);
+  const Moment = require("moment");
 
   const { count, start, stop, reset, done } = useCounter(
     timerObj.min * 60 + timerObj.sec,
@@ -46,103 +50,124 @@ function TimerBoard() {
     timerObj.setBreakMin * 60 + timerObj.setBreakSec
   );
 
-  //파이어베이스 timer 업데이트
-  async function updateTimeSubmit(type: string) {
-    const isDone = type === "done";
+  const timeObj = useRef<any>({});
+  const now = Moment(new Date()).format("YYYY-MM-DD");
+  const defaultSet = toDos[index].defaultSet;
+  const newObj = {
+    date: Moment(new Date()).format("YYYY-MM-DD"),
+    stopDate: Moment(new Date()).format("YYYY-MM-DD HH:mm:ss"),
+    setFocusSet: defaultSet,
+    setBreakSet: defaultSet - 1 <= 0 ? 0 : defaultSet - 1,
+    focusSet: defaultSet,
+    breakSet: defaultSet - 1 <= 0 ? 0 : defaultSet - 1,
+    //테스트 끝나면 분만 적용
+    setFocusMin: 0,
+    setFocusSec: 10,
+    setBreakMin: 0,
+    setBreakSec: 5,
+    min: 0,
+    sec: 10,
+    breakMin: 0,
+    breakSec: 5,
+  };
+
+  //오늘날짜 타이머 체크후 없으면 생성
+  async function getTimeObj() {
     try {
       await dbService
         .collection("plan")
         .doc(todoId)
         .collection("timer")
-        .doc(timerObj.id)
-        .update({
-          focusSet: isDone ? 0 : timerObj.focusSet - 1,
-          min: isDone ? 0 : timerObj.setFocusMin,
-          sec: isDone ? 0 : timerObj.setFocusSec,
+        .where("date", "==", now)
+        .get()
+        .then((result: any) => {
+          result.forEach((timerData: any) => {
+            timeObj.current = timerData.data();
+          });
         });
-    } catch (e) {
-      alert("타이머 ERROR.");
+    } catch {
+      alert("Timer를 불러오는데 오류가 발생하였습니다. 다시 시도하여 주세요");
+    } finally {
+      if (Object.keys(timeObj.current).length <= 0) {
+        await dbService
+          .collection("plan")
+          .doc(todoId)
+          .collection("timer")
+          .add(newObj);
+      }
     }
   }
 
-  //count를 시간으로 변환하여 표현
-  const timer = async () => {
-    if (timerObj.focusSet <= 0) return;
-    //done
-    if (timerObj.focusSet === 1 && count <= 0) {
-      setSeconds(0);
-      done();
-      setTimerObj((prev) => {
+  //타이머 변경감지
+  useEffect(() => {
+    const q = query(
+      dbService
+        .collection("plan")
+        .doc(todoId)
+        .collection("timer")
+        .where("date", "==", now)
+    );
+    const addId = onSnapshot(q, (querySnapshot) => {
+      const newArray = querySnapshot.docs.map((doc: any) => {
         return {
-          ...prev,
-          focusSet: 0,
-          min: 0,
-          sec: 0,
+          id: doc.id,
+          ...doc.data(),
         };
       });
-      await updateTimeSubmit("done");
-      setIsPause(true);
-      return;
-    }
-    //count
-    if (1 <= timerObj.focusSet && 0 < count) {
-      const mathMin = Math.floor(count / 60);
-      const mathSec = Math.floor(count - mathMin * 60);
-      setMinutes(mathMin);
-      setSeconds(mathSec);
-      setTimerObj((prev) => {
-        return {
-          ...prev,
-          min: mathMin,
-          sec: mathSec,
-        };
-      });
-    }
-    //nextSet
-    if (1 < timerObj.focusSet && count <= 0) {
-      setSeconds(0);
-      await updateTimeSubmit("next");
-      setIsBreakSet(true);
-      setTimerObj((prev) => {
-        return {
-          ...prev,
-          focusSet: timerObj.focusSet - 1,
-          min: timerObj.setFocusMin,
-          sec: timerObj.setFocusSec,
-        };
-      });
-      reset();
-    }
-  };
+      setTimerObj({ ...newArray[0] });
+    });
+    onAuthStateChanged(authService, (user) => {
+      if (user == null) {
+        addId();
+      }
+    });
+  }, []);
 
   useEffect(() => {
-    timer();
-  }, [count]);
+    setIsPause(false);
+    setIsAdd(false);
+    getTimeObj();
+    if (timerObj.focusSet <= timerObj.breakSet) {
+      setIsBreakSet(true);
+    } else {
+      setIsBreakSet(false);
+    }
+    return () => {
+      setIsTimerSplash(true);
+      setIsBreakSet(false);
+      setIsAdd(false);
+      timeObj.current = {};
+    };
+  }, []);
 
   return (
     <>
       <ContentsWrapper>
-        <InfoWrapper>
-          <TimerInfo count={isBreakSet ? breakCount : count} />
-        </InfoWrapper>
-        {!isBreakSet && (
-          <IntervalTimer
-            count={count}
-            start={start}
-            stop={stop}
-            reset={reset}
-            done={done}
-          />
-        )}
-        {isBreakSet && (
-          <BreakTimer
-            count={breakCount}
-            start={breakStart}
-            stop={breakStop}
-            reset={breakReset}
-            done={breakDone}
-          />
-        )}
+        <>
+          {!isAdd && (
+            <InfoWrapper>
+              <TimerInfo count={isBreakSet ? breakCount : count} />
+            </InfoWrapper>
+          )}
+          {!isBreakSet && (
+            <IntervalTimer
+              count={count}
+              start={start}
+              stop={stop}
+              reset={reset}
+              done={done}
+            />
+          )}
+          {isBreakSet && (
+            <BreakTimer
+              count={breakCount}
+              start={breakStart}
+              stop={breakStop}
+              reset={breakReset}
+              done={breakDone}
+            />
+          )}
+        </>
       </ContentsWrapper>
       {!(isAndroid && inputToggle) && (
         <ButtonWrapper>
@@ -150,6 +175,7 @@ function TimerBoard() {
             count={isBreakSet ? breakCount : count}
             stop={isBreakSet ? breakStop : stop}
             start={isBreakSet ? breakStart : start}
+            reset={isBreakSet ? breakReset : reset}
           />
         </ButtonWrapper>
       )}

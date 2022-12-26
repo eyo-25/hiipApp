@@ -1,6 +1,7 @@
 import { useRecoilState } from "recoil";
 import TimerSplash from "../../../Component/TimerSplash";
 import {
+  isAddState,
   isBreakState,
   isPauseState,
   timerSplashState,
@@ -15,7 +16,7 @@ import styled from "styled-components";
 import Background from "../../../Assets/image/bull.png";
 import { onAuthStateChanged } from "firebase/auth";
 import { onSnapshot, query } from "firebase/firestore";
-import TimerBoard from "./TimerBoard";
+import TimerBoard from "./Timer/TimerBoard";
 
 const bottomVariants = {
   normal: {

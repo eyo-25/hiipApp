@@ -2,16 +2,20 @@ import { useRecoilState } from "recoil";
 import { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import {
+  addCountState,
   inputFocusState,
+  isAddState,
   isBreakState,
   isPauseState,
   timerState,
+  toDoState,
 } from "../../../../Recoil/atoms";
 import { AnimatePresence, motion } from "framer-motion";
 import { ReactComponent as PauseIcon } from "../../../../Assets/Icons/pause.svg";
 import { IoPlaySharp, IoStopSharp } from "react-icons/io5";
 import { useNavigate, useParams } from "react-router-dom";
 import { dbService } from "../../../../firebase";
+import { ReactComponent as PlusIcon } from "../../../../Assets/Icons/plus.svg";
 
 const boxVarients = {
   normal: {
@@ -75,13 +79,17 @@ interface ITimerButton {
   start: () => void;
   stop: () => void;
   count: number;
+  reset: () => void;
 }
 
-function TimerButton({ stop, start, count }: ITimerButton) {
+function TimerButton({ stop, start, count, reset }: ITimerButton) {
+  const [isAdd, setIsAdd] = useRecoilState(isAddState);
   const [timerObj, setTimerObj] = useRecoilState(timerState);
   const [isBreakSet, setIsBreakSet] = useRecoilState(isBreakState);
   const [isPause, setIsPause] = useRecoilState(isPauseState);
   const [inputToggle, setInputToggle] = useRecoilState(inputFocusState);
+  const [addSetCount, setAddSetCount] = useRecoilState(addCountState);
+  const [toDos, setToDos] = useRecoilState(toDoState);
   const breakTotal =
     timerObj.setBreakMin * 60 * 100 + timerObj.setBreakSec * 100;
   const focusTotal =
@@ -90,6 +98,7 @@ function TimerButton({ stop, start, count }: ITimerButton) {
   const navigate = useNavigate();
   const params = useParams();
   const todoId = params.todoId;
+  const index = toDos.findIndex((item) => item.id === todoId);
 
   //파이어베이스 timer 업데이트
   async function updateTimeSubmit(type: string) {
@@ -134,6 +143,39 @@ function TimerButton({ stop, start, count }: ITimerButton) {
     }
   }
 
+  //파이어베이스 PlanDefaultSet 업데이트
+  async function updateDefaultSet() {
+    try {
+      const updateAddSetPlan = () =>
+        dbService
+          .collection("plan")
+          .doc(todoId)
+          .update({
+            defaultSet: addSetCount + timerObj.setFocusSet,
+            addSet: toDos[index].addSet + addSetCount,
+          });
+
+      const timeUpdateObj = {
+        setFocusSet: addSetCount + timerObj.setFocusSet,
+        setBreakSet: addSetCount + timerObj.setBreakSet,
+        focusSet: addSetCount + timerObj.focusSet,
+        breakSet: addSetCount + timerObj.breakSet,
+      };
+
+      const updateAddSetTimer = () =>
+        dbService
+          .collection("plan")
+          .doc(todoId)
+          .collection("timer")
+          .doc(timerObj.id)
+          .update(timeUpdateObj);
+      await Promise.all([updateAddSetPlan(), updateAddSetTimer()]);
+    } catch (e) {
+      alert("추가 ERROR.");
+    }
+  }
+
+  //초기화
   useEffect(() => {
     //시작 애니메이션 기다리고 버튼활성화
     setTimeout(() => {
@@ -158,7 +200,6 @@ function TimerButton({ stop, start, count }: ITimerButton) {
       await updateTimeSubmit("focus");
     }
   };
-
   const onStartClick = () => {
     if (1 <= countRef.current && inputToggle) return;
     countRef.current += 1;
@@ -203,10 +244,27 @@ function TimerButton({ stop, start, count }: ITimerButton) {
     }
   };
   const onAddClick = () => {
-    const ok = window.confirm("계획한 ToDo를 완료 하시겠습니까?");
-    if (ok) {
-      updateStatusSubmit("success");
+    setIsAdd(true);
+  };
+  const onAddPlusClick = () => {
+    if (10 <= addSetCount + timerObj.setFocusSet) {
+      return;
+    } else {
+      setAddSetCount((prev) => prev + 1);
     }
+  };
+  const onAddMinusClick = () => {
+    if (addSetCount <= 0) {
+      return;
+    } else {
+      setAddSetCount((prev) => prev - 1);
+    }
+  };
+  const onAddSetClick = () => {
+    if (0 < addSetCount) {
+      updateDefaultSet();
+    }
+    setIsAdd(false);
   };
 
   return (
@@ -233,29 +291,25 @@ function TimerButton({ stop, start, count }: ITimerButton) {
           <>
             <CircleButtonWrapper
               key="stop"
-              onClick={onDoneClick}
+              onClick={!isAdd ? onDoneClick : onAddMinusClick}
               variants={boxVarients}
               whileTap="click"
               initial="normal"
               animate="left"
               exit="exit"
             >
-              <BtnBox bg="white">
-                <StopBtn />
-              </BtnBox>
+              <BtnBox bg="white">{!isAdd ? <StopBtn /> : <MinusBtn />}</BtnBox>
             </CircleButtonWrapper>
             <CircleButtonWrapper
               key="start"
-              onClick={onStartClick}
+              onClick={!isAdd ? onStartClick : onAddPlusClick}
               variants={boxVarients}
               whileTap="click"
               initial="normal"
               animate="right"
               exit="exit"
             >
-              <BtnBox bg="black">
-                <PlayBtn />
-              </BtnBox>
+              <BtnBox bg="black">{!isAdd ? <PlayBtn /> : <PlusBtn />}</BtnBox>
             </CircleButtonWrapper>
             <BarButtonWrapper
               variants={barVariants}
@@ -264,11 +318,21 @@ function TimerButton({ stop, start, count }: ITimerButton) {
               exit="exit"
             >
               <BarContainer>
-                <BarBox onClick={onFailClick}>포기</BarBox>
-                <BarLine />
-                <BarBox onClick={onSuccessClick}>성공</BarBox>
-                <BarLine />
-                <BarBox>추가</BarBox>
+                {!isAdd ? (
+                  <>
+                    <BarBox onClick={onFailClick}>포기</BarBox>
+                    <BarLine />
+                    <BarBox onClick={onSuccessClick}>성공</BarBox>
+                    <BarLine />
+                    <BarBox onClick={onAddClick}>추가</BarBox>
+                  </>
+                ) : (
+                  <>
+                    <BarBox onClick={() => setIsAdd(false)}>취소</BarBox>
+                    <BarLine />
+                    <BarBox onClick={onAddSetClick}>추가</BarBox>
+                  </>
+                )}
               </BarContainer>
             </BarButtonWrapper>
           </>
@@ -326,7 +390,7 @@ const BarBox = styled(motion.div)`
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 33%;
+  width: 100%;
   height: 100%;
   font-size: 14px;
   color: white;
@@ -387,4 +451,22 @@ const StopBtn = styled(IoStopSharp)`
   color: black;
   width: 42%;
   height: 42%;
+`;
+const PlusBtn = styled(PlusIcon)`
+  color: white;
+  width: 30px;
+  height: 30px;
+  @media screen and (max-height: 700px) {
+    width: 25px;
+    height: 25px;
+  }
+`;
+const MinusBtn = styled.div`
+  background-color: black;
+  width: 32px;
+  height: 5px;
+  @media screen and (max-height: 700px) {
+    width: 25px;
+    height: 3.5px;
+  }
 `;

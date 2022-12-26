@@ -1,4 +1,4 @@
-import { atom, selector } from "recoil";
+import { atom } from "recoil";
 
 const Moment = require("moment");
 
@@ -13,6 +13,7 @@ export interface ITodo {
   status: string;
   todoId: any;
   id: string;
+  addSet: string;
 }
 
 export const loadState = atom({
@@ -114,6 +115,10 @@ export const isPauseState = atom<boolean>({
 export const isAddState = atom<boolean>({
   key: "isAddState",
   default: false,
+});
+export const addCountState = atom<number>({
+  key: "addCountState",
+  default: 0,
 });
 interface ItimeState {
   date: string;

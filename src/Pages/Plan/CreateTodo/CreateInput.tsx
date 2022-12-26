@@ -95,6 +95,7 @@ function CreateInput({
         status: "ready",
         uId: uid,
         projectId: project[projectIndex].id,
+        addSet: 0,
       };
       const createTodoFbase = () => dbService.collection("plan").add(planObj);
       const increaseIndexCounteFbase = () =>

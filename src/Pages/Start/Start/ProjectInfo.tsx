@@ -153,7 +153,7 @@ export const DdayBox = styled(motion.div)`
   }
   p {
     font-size: 11vh;
-    letter-spacing: -10px;
+    letter-spacing: -6px;
     margin-right: 8px;
   }
 `;

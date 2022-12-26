@@ -6,10 +6,12 @@ import styled from "styled-components";
 import { dbService } from "../../../../firebase";
 import {
   inputFocusState,
+  isAddState,
   isBreakState,
   isPauseState,
   timerState,
 } from "../../../../Recoil/atoms";
+import AddTimer from "./AddTimer";
 
 const TextUpVarients = {
   start: {
@@ -39,6 +41,7 @@ interface IIntervalTimer {
 }
 
 function IntervalTimer({ count, start, stop, reset, done }: IIntervalTimer) {
+  const [isAdd, setIsAdd] = useRecoilState(isAddState);
   const [timerObj, setTimerObj] = useRecoilState(timerState);
   const [isBreakSet, setIsBreakSet] = useRecoilState(isBreakState);
   const [isPause, setIsPause] = useRecoilState(isPauseState);
@@ -137,8 +140,18 @@ function IntervalTimer({ count, start, stop, reset, done }: IIntervalTimer) {
   }, []);
 
   useEffect(() => {
+    setIntervalSet(timerObj.focusSet);
+    setMinutes(timerObj.min);
+    setSeconds(timerObj.sec);
+  }, [isAdd]);
+
+  useEffect(() => {
     timer();
   }, [count]);
+
+  useEffect(() => {
+    setIntervalSet(timerObj.focusSet);
+  }, [timerObj]);
 
   return (
     <>
@@ -157,29 +170,34 @@ function IntervalTimer({ count, start, stop, reset, done }: IIntervalTimer) {
       )}
       {isPause && !inputToggle && (
         <CounterWrapper>
-          <BreakBox
-            variants={TextUpVarients}
-            initial="coundStart"
-            animate="end"
-          >
-            <h4>{timerObj.focusSet <= 0 ? "FINISH" : "PAUSE"}</h4>
-          </BreakBox>
-          <BreakBox>
-            <h5>다음 휴식까지</h5>
-          </BreakBox>
-          <BreakBox variants={TextUpVarients} initial="start" animate="end">
-            <p>{minutes < 10 ? `0${minutes}` : minutes}</p>
-            <p>:</p>
-            <p>{seconds < 10 ? `0${seconds}` : seconds}</p>
-          </BreakBox>
-          <BreakBox>
-            <h5>진행된 SET</h5>
-          </BreakBox>
-          <BreakBox variants={TextUpVarients} initial="start" animate="end">
-            <p style={{ marginBottom: 0 }}>
-              {timerObj.setFocusSet - timerObj.focusSet}
-            </p>
-          </BreakBox>
+          {!isAdd && (
+            <>
+              <BreakBox
+                variants={TextUpVarients}
+                initial="coundStart"
+                animate="end"
+              >
+                <h4>{timerObj.focusSet <= 0 ? "FINISH" : "PAUSE"}</h4>
+              </BreakBox>
+              <BreakBox>
+                <h5>다음 휴식까지</h5>
+              </BreakBox>
+              <BreakBox variants={TextUpVarients} initial="start" animate="end">
+                <p>{minutes < 10 ? `0${minutes}` : minutes}</p>
+                <p>:</p>
+                <p>{seconds < 10 ? `0${seconds}` : seconds}</p>
+              </BreakBox>
+              <BreakBox>
+                <h5>진행된 SET</h5>
+              </BreakBox>
+              <BreakBox variants={TextUpVarients} initial="start" animate="end">
+                <p style={{ marginBottom: 0 }}>
+                  {timerObj.setFocusSet - timerObj.focusSet}
+                </p>
+              </BreakBox>
+            </>
+          )}
+          {isAdd && <AddTimer />}
         </CounterWrapper>
       )}
     </>
@@ -227,7 +245,7 @@ const BreakBox = styled(motion.div)`
     font-family: "Roboto";
     font-weight: 900;
     font-size: 70px;
-    letter-spacing: -1px;
+    letter-spacing: -0.5px;
     margin-bottom: 4.7vh;
     @media screen and (max-height: 650px) {
       font-size: 65px;

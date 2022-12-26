@@ -4,12 +4,14 @@ import { useRecoilState } from "recoil";
 import styled from "styled-components";
 import {
   inputFocusState,
+  isAddState,
   isBreakState,
   isPauseState,
   timerState,
 } from "../../../../Recoil/atoms";
 import { dbService } from "../../../../firebase";
 import { useParams } from "react-router-dom";
+import AddTimer from "./AddTimer";
 
 const TextUpVarients = {
   start: {
@@ -39,6 +41,7 @@ interface IBreakTimer {
 }
 
 function BreakTimer({ count, start, stop, reset, done }: IBreakTimer) {
+  const [isAdd, setIsAdd] = useRecoilState(isAddState);
   const [timerObj, setTimeObj] = useRecoilState(timerState);
   const [isBreakSet, setIsBreakSet] = useRecoilState(isBreakState);
   const [isPause, setIsPause] = useRecoilState(isPauseState);
@@ -118,11 +121,12 @@ function BreakTimer({ count, start, stop, reset, done }: IBreakTimer) {
     }
   };
 
-  //초기화
   useEffect(() => {
     setBreakSet(timerObj.breakSet);
-    setMinutes(timerObj.breakMin);
-    setSeconds(timerObj.breakSec);
+  }, [timerObj]);
+
+  //초기화
+  useEffect(() => {
     setIsPause(false);
     start();
     return () => {
@@ -162,27 +166,32 @@ function BreakTimer({ count, start, stop, reset, done }: IBreakTimer) {
       )}
       {isPause && !inputToggle && (
         <CounterWrapper>
-          <BreakBox
-            variants={TextUpVarients}
-            initial="coundStart"
-            animate="end"
-          >
-            <h4>PAUSE</h4>
-          </BreakBox>
-          <BreakBox>
-            <h5>다음 세트까지</h5>
-          </BreakBox>
-          <BreakBox variants={TextUpVarients} initial="start" animate="end">
-            <p>{minutes < 10 ? `0${minutes}` : minutes}</p>
-            <p>:</p>
-            <p>{seconds < 10 ? `0${seconds}` : seconds}</p>
-          </BreakBox>
-          <BreakBox>
-            <h5>진행된 SET</h5>
-          </BreakBox>
-          <BreakBox variants={TextUpVarients} initial="start" animate="end">
-            <p>{timerObj.setFocusSet - timerObj.focusSet}</p>
-          </BreakBox>
+          {!isAdd && (
+            <>
+              <BreakBox
+                variants={TextUpVarients}
+                initial="coundStart"
+                animate="end"
+              >
+                <h4>PAUSE</h4>
+              </BreakBox>
+              <BreakBox>
+                <h5>다음 세트까지</h5>
+              </BreakBox>
+              <BreakBox variants={TextUpVarients} initial="start" animate="end">
+                <p>{minutes < 10 ? `0${minutes}` : minutes}</p>
+                <p>:</p>
+                <p>{seconds < 10 ? `0${seconds}` : seconds}</p>
+              </BreakBox>
+              <BreakBox>
+                <h5>진행된 SET</h5>
+              </BreakBox>
+              <BreakBox variants={TextUpVarients} initial="start" animate="end">
+                <p>{timerObj.setFocusSet - timerObj.focusSet}</p>
+              </BreakBox>
+            </>
+          )}
+          {isAdd && <AddTimer />}
         </CounterWrapper>
       )}
     </>
