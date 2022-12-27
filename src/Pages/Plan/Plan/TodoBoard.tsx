@@ -5,7 +5,6 @@ import {
   cardEditState,
   projectState,
   selectState,
-  selectTodoState,
   toDoState,
 } from "../../../Recoil/atoms";
 import { useRecoilState } from "recoil";
@@ -18,8 +17,8 @@ const cardVariants = {
   animate: {
     opacity: 1,
     transition: {
-      delay: 1,
-      duration: 0.8,
+      delay: 0.5,
+      duration: 1,
       type: "linear",
     },
   },
@@ -30,6 +29,7 @@ function TodoBord() {
   const [isEdit, setIsEdit] = useRecoilState(cardEditState);
   const [project, setProject] = useRecoilState(projectState);
   const [isSelect, setIsSelect] = useRecoilState(selectState);
+
   useEffect(() => {
     return setIsEdit(false);
   }, []);

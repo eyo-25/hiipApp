@@ -49,6 +49,10 @@ export const selectState = atom({
   key: "selectState",
   default: false,
 });
+export const isStatusLoad = atom({
+  key: "isStatusLoad",
+  default: false,
+});
 //project
 export const projectState = atom<any>({
   key: "projectState",

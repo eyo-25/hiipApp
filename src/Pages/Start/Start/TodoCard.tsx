@@ -7,9 +7,15 @@ import {
   Normal_Gray2,
   Normal_Gray3,
 } from "../../../Styles/Colors";
+import { dbService } from "../../../firebase";
+import { statusColor, statusName } from "../../../Utils/interface";
 
 function TodoCard({ todoObj }: any) {
   const [intervalArray, setIntervalArray] = useState<number[]>([]);
+  const [timeStatus, setTimeStatus] = useState("");
+  const Moment = require("moment");
+  const now = Moment().format("YYYY-MM-DD");
+
   useEffect(() => {
     setIntervalArray((prev) => {
       const copy = [...prev];
@@ -19,13 +25,32 @@ function TodoCard({ todoObj }: any) {
       return [...copy];
     });
   }, []);
+
+  useEffect(() => {
+    dbService
+      .collection("plan")
+      .doc(todoObj.id)
+      .collection("timer")
+      .where("date", "==", now)
+      .get()
+      .then((result) => {
+        result.forEach((result) => {
+          setTimeStatus(result.data().status);
+        });
+      });
+  }, []);
+
   return (
     <DragBox>
       <TextBox>
         <TitleBox>
           <h4>{todoObj.planTitle}</h4>
           <StatusBox>
-            <h5>진행중</h5>
+            {todoObj.status !== "ready" && (
+              <StatusBox style={{ backgroundColor: statusColor[timeStatus] }}>
+                <h5>{statusName[timeStatus]}</h5>
+              </StatusBox>
+            )}
           </StatusBox>
         </TitleBox>
         <p>{todoObj.planSubTitle}</p>
@@ -83,7 +108,6 @@ const StatusBox = styled.span`
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: ${Blue};
   border-radius: 10px;
   h5 {
     padding: 3px 5px;

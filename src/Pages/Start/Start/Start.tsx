@@ -25,10 +25,11 @@ function Start() {
   const [mouseDownClientY, setMouseDownClientY] = useState(0);
   const [mouseUpClientY, setMouseUpClientY] = useState(0);
   const [clickDate, setClickDate] = useRecoilState(clickDateState);
-  const [isLoad, setIsLoad] = useRecoilState(loadState);
+  const [timeStatus, setTimeStatus] = useState("");
   const [tochedY, setTochedY] = useState(0);
   const navigate = useNavigate();
   const Moment = require("moment");
+  const now = Moment().format("YYYY-MM-DD");
 
   //초기화
   useEffect(() => {
@@ -71,17 +72,30 @@ function Start() {
     },
   };
 
+  //첫째 toDo의 오늘상태
+  useEffect(() => {
+    dbService
+      .collection("plan")
+      .doc(toDos[0].id)
+      .collection("timer")
+      .where("date", "==", now)
+      .get()
+      .then((result) => {
+        result.forEach((result) => {
+          setTimeStatus(result.data().status);
+        });
+      });
+  }, [toDos]);
+
   const onPlayClick = async () => {
     if (project.length <= 0) {
       navigate("/plan/createProject");
     } else if (0 < toDos.length) {
-      if (toDos[0].status === "ready") {
+      if (toDos[0].status === "ready" || timeStatus === "start") {
         await dbService
           .collection("plan")
           .doc(toDos[0].id)
           .update({ status: "start" });
-        navigate(`/timer/${toDos[0].id}`);
-      } else if (toDos[0].status === "start") {
         navigate(`/timer/${toDos[0].id}`);
       } else {
         navigate(`/feedback`);

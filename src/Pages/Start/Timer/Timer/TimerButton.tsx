@@ -135,9 +135,14 @@ function TimerButton({ stop, start, count, reset }: ITimerButton) {
   //파이어베이스 timer 업데이트
   async function updateStatusSubmit(state: string) {
     try {
-      await dbService.collection("plan").doc(todoId).update({
-        status: state,
-      });
+      await dbService
+        .collection("plan")
+        .doc(todoId)
+        .collection("timer")
+        .doc(timerObj.id)
+        .update({
+          status: state,
+        });
     } catch (e) {
       alert("타이머 ERROR.");
     }
@@ -235,12 +240,14 @@ function TimerButton({ stop, start, count, reset }: ITimerButton) {
     const ok = window.confirm("계획한 ToDo를 포기 하시겠습니까?");
     if (ok) {
       updateStatusSubmit("fail");
+      navigate(`/`);
     }
   };
   const onSuccessClick = () => {
     const ok = window.confirm("계획한 ToDo를 완료 하시겠습니까?");
     if (ok) {
       updateStatusSubmit("success");
+      navigate(`/`);
     }
   };
   const onAddClick = () => {

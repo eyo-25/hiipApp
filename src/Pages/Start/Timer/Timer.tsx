@@ -44,7 +44,6 @@ function Timer() {
   const todoId = params.todoId;
   const index = toDos.findIndex((item) => item.id === todoId);
   const Moment = require("moment");
-  const navigate = useNavigate();
 
   const timeObj = useRef<any>({});
   const now = Moment(new Date()).format("YYYY-MM-DD");
@@ -66,6 +65,7 @@ function Timer() {
     breakMin: defaultSet - 1 <= 0 ? 0 : 0,
     breakSec: defaultSet - 1 <= 0 ? 0 : 5,
     todoId: todoId,
+    status: "start",
   };
 
   //오늘날짜 타이머 체크후 없으면 생성

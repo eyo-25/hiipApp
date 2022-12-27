@@ -1,5 +1,5 @@
 import { useMatch } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useRecoilState } from "recoil";
 import Applayout from "../../Component/Applayout";
 import { projectState, toDoState } from "../../Recoil/atoms";
@@ -35,7 +35,7 @@ function Index() {
         addId();
       }
     });
-  }, []);
+  }, [setProject]);
 
   //투두 변경 감지(snapshot)
   useEffect(() => {
@@ -64,7 +64,7 @@ function Index() {
         }
       });
     }
-  }, [project]);
+  }, [project, setToDos]);
 
   return (
     <Applayout>

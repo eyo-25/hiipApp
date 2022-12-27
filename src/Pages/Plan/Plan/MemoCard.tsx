@@ -18,6 +18,8 @@ import { Dark_Gray2 } from "../../../Styles/Colors";
 import { useRecoilState } from "recoil";
 import { toDoState } from "../../../Recoil/atoms";
 import { useParams } from "react-router-dom";
+import { statusColor, statusName } from "../../../Utils/interface";
+import { dbService } from "../../../firebase";
 
 interface iMemoProps {
   memoText: string;
@@ -32,6 +34,9 @@ function MemoCard({ memoText, setMemoText, onInputBlur }: iMemoProps) {
   const todoId = params.todoId;
   const index = toDos.findIndex((item) => item.id === todoId);
   const [intervalArray, setIntervalArray] = useState<number[]>([]);
+  const [timeStatus, setTimeStatus] = useState("");
+  const Moment = require("moment");
+  const now = Moment().format("YYYY-MM-DD");
 
   useEffect(() => {
     setIntervalArray((prev) => {
@@ -42,6 +47,18 @@ function MemoCard({ memoText, setMemoText, onInputBlur }: iMemoProps) {
       }
       return [...copy];
     });
+
+    dbService
+      .collection("plan")
+      .doc(toDos[index].id)
+      .collection("timer")
+      .where("date", "==", now)
+      .get()
+      .then((result) => {
+        result.forEach((result) => {
+          setTimeStatus(result.data().status);
+        });
+      });
   }, []);
 
   const cardVariants = {
@@ -75,11 +92,15 @@ function MemoCard({ memoText, setMemoText, onInputBlur }: iMemoProps) {
           <TextBox>
             <TitleBox>
               <h4>{toDos[index].planTitle}</h4>
-              {toDos[index].status !== "ready" && (
-                <StatusBox>
-                  <h5>진행중</h5>
-                </StatusBox>
-              )}
+              <StatusBox>
+                {toDos[index].status !== "ready" && (
+                  <StatusBox
+                    style={{ backgroundColor: statusColor[timeStatus] }}
+                  >
+                    <h5>{statusName[timeStatus]}</h5>
+                  </StatusBox>
+                )}
+              </StatusBox>
             </TitleBox>
             <p>{toDos[index].planSubTitle}</p>
           </TextBox>
