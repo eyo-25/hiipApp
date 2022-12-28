@@ -222,9 +222,11 @@ function IntervalSetting() {
             <PlusBtn onClick={() => onPlusClick("DefaultSet")} />
           </ItemContentBox>
         </SettingBox>
-        <ButtonBox>
-          <ButtonText onClick={onSubmit}>완료</ButtonText>
-        </ButtonBox>
+        <ButtonWrapper>
+          <ButtonBox onClick={onSubmit}>
+            <ButtonText>완료</ButtonText>
+          </ButtonBox>
+        </ButtonWrapper>
       </AsideWrapper>
     </ContentContainer>
   );
@@ -276,17 +278,27 @@ const SettingBox = styled.div`
     height: 16%;
   }
 `;
-const ButtonBox = styled.div`
+const ButtonWrapper = styled.div`
   height: 14%;
   display: flex;
   align-items: flex-start;
   justify-content: center;
+  cursor: pointer;
+`;
+const ButtonBox = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100px;
+  height: 45px;
+  background-color: black;
 `;
 const ButtonText = styled.h4`
-  margin-top: 5%;
-  font-size: 23px;
+  font-size: 20px;
   font-weight: 500;
+  margin-bottom: 1px;
   cursor: pointer;
+  color: white;
 `;
 const ItemTitle = styled.div`
   display: flex;

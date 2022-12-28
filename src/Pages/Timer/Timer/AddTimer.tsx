@@ -1,8 +1,8 @@
 import { useRecoilState } from "recoil";
-import { addCountState, timerState } from "../../../../Recoil/atoms";
 import styled from "styled-components";
 import { motion } from "framer-motion";
 import { useEffect } from "react";
+import { addCountState, timerState } from "../../../Recoil/atoms";
 
 const TextUpVarients = {
   start: {

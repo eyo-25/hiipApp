@@ -3,14 +3,14 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useRecoilState } from "recoil";
 import styled from "styled-components";
-import { dbService } from "../../../../firebase";
+import { dbService } from "../../../firebase";
 import {
   inputFocusState,
   isAddState,
   isBreakState,
   isPauseState,
   timerState,
-} from "../../../../Recoil/atoms";
+} from "../../../Recoil/atoms";
 import AddTimer from "./AddTimer";
 
 const TextUpVarients = {
@@ -65,6 +65,7 @@ function IntervalTimer({ count, start, stop, reset, done }: IIntervalTimer) {
           focusSet: isDone ? 0 : timerObj.focusSet - 1,
           min: isDone ? 0 : timerObj.setFocusMin,
           sec: isDone ? 0 : timerObj.setFocusSec,
+          status: isDone ? "success" : "start",
         });
     } catch (e) {
       alert("타이머 ERROR.");

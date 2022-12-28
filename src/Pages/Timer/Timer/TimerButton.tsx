@@ -9,13 +9,13 @@ import {
   isPauseState,
   timerState,
   toDoState,
-} from "../../../../Recoil/atoms";
+} from "../../../Recoil/atoms";
 import { AnimatePresence, motion } from "framer-motion";
-import { ReactComponent as PauseIcon } from "../../../../Assets/Icons/pause.svg";
+import { ReactComponent as PauseIcon } from "../../../Assets/Icons/pause.svg";
 import { IoPlaySharp, IoStopSharp } from "react-icons/io5";
 import { useNavigate, useParams } from "react-router-dom";
-import { dbService } from "../../../../firebase";
-import { ReactComponent as PlusIcon } from "../../../../Assets/Icons/plus.svg";
+import { dbService } from "../../../firebase";
+import { ReactComponent as PlusIcon } from "../../../Assets/Icons/plus.svg";
 
 const boxVarients = {
   normal: {
@@ -167,13 +167,36 @@ function TimerButton({ stop, start, count, reset }: ITimerButton) {
         breakSet: addSetCount + timerObj.breakSet,
       };
 
+      const finishTimeUpdateObj = {
+        setFocusSet: addSetCount + timerObj.setFocusSet,
+        setBreakSet: addSetCount + timerObj.setBreakSet,
+        focusSet: addSetCount + timerObj.focusSet,
+        breakSet: addSetCount + timerObj.breakSet,
+        min: timerObj.setFocusMin,
+        sec: timerObj.setFocusSec,
+        breakMin: timerObj.setBreakMin,
+        breakSec: timerObj.setBreakSec,
+        status: "start",
+      };
+
+      const isFinished = timerObj.focusSet <= 0;
+
       const updateAddSetTimer = () =>
         dbService
           .collection("plan")
           .doc(todoId)
           .collection("timer")
           .doc(timerObj.id)
-          .update(timeUpdateObj);
+          .update(isFinished ? finishTimeUpdateObj : timeUpdateObj)
+          .then(() => {
+            if (isFinished) {
+              setIsBreakSet(true);
+              reset();
+              setTimeout(() => {
+                stop();
+              }, 3000);
+            }
+          });
       await Promise.all([updateAddSetPlan(), updateAddSetTimer()]);
     } catch (e) {
       alert("추가 ERROR.");

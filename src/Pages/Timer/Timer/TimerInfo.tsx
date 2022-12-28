@@ -2,15 +2,15 @@ import { motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { useRecoilState } from "recoil";
 import styled from "styled-components";
-import { ReactComponent as PencilIcon } from "../../../../Assets/Icons/pencil.svg";
+import { ReactComponent as PencilIcon } from "../../../Assets/Icons/pencil.svg";
 import {
   inputFocusState,
   isBreakState,
   isPauseState,
   toDoState,
-} from "../../../../Recoil/atoms";
+} from "../../../Recoil/atoms";
 import { IoCloseSharp } from "react-icons/io5";
-import { dbService } from "../../../../firebase";
+import { dbService } from "../../../firebase";
 import { useParams } from "react-router-dom";
 import { ProgressBar } from "./ProgressBar";
 

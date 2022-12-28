@@ -13,7 +13,7 @@ import { useRecoilState } from "recoil";
 import { homeSplashState, loadState } from "../Recoil/atoms";
 import Start from "../Pages/Start/Start/Start";
 import Index from "../Pages/Plan";
-import Timer from "../Pages/Start/Timer/Timer";
+import Timer from "../Pages/Timer/Timer";
 
 interface AppRouterProps {
   isLoggedIn: boolean;

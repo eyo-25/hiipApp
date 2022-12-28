@@ -119,12 +119,7 @@ function MonthDatePicker() {
             isSame={startDate === endDate && endDate === date}
             onClick={() => onDateClick(date)}
           >
-            <DateText
-              nowMonth={
-                Number(Moment(date).format("MM")) !== calendarMonth ||
-                date < Moment().format("YYYY-MM-DD")
-              }
-            >
+            <DateText notNowMonth={date < Moment().format("YYYY-MM-DD")}>
               {Number(Moment(date).format("DD"))}
             </DateText>
             {((startDate <= date && date <= endDate) || startDate === date) && (
@@ -207,8 +202,8 @@ const HoverBox = styled.div<{ isDeadLine: boolean; isSame: boolean }>`
     height: 20px;
   }
 `;
-const DateText = styled.div<{ nowMonth: boolean }>`
-  color: ${(props) => props.nowMonth && "#c4c4c4"};
+const DateText = styled.div<{ notNowMonth: boolean }>`
+  color: ${(props) => props.notNowMonth && "#c4c4c4"};
 `;
 const BarBox = styled.div`
   position: absolute;

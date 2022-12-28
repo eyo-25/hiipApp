@@ -2,16 +2,16 @@ import { motion } from "framer-motion";
 import React, { useEffect, useState } from "react";
 import { useRecoilState } from "recoil";
 import styled from "styled-components";
+import { useParams } from "react-router-dom";
+import AddTimer from "./AddTimer";
 import {
   inputFocusState,
   isAddState,
   isBreakState,
   isPauseState,
   timerState,
-} from "../../../../Recoil/atoms";
-import { dbService } from "../../../../firebase";
-import { useParams } from "react-router-dom";
-import AddTimer from "./AddTimer";
+} from "../../../Recoil/atoms";
+import { dbService } from "../../../firebase";
 
 const TextUpVarients = {
   start: {

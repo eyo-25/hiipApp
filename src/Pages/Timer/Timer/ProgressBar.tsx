@@ -1,7 +1,7 @@
 import styled from "styled-components";
-import { Blue, Red } from "../../../../Styles/Colors";
-import { useProgressBar } from "../../../../hooks/useProgressBar";
-import { timerState } from "../../../../Recoil/atoms";
+import { Blue, Red } from "../../../Styles/Colors";
+import { useProgressBar } from "../../../hooks/useProgressBar";
+import { timerState } from "../../../Recoil/atoms";
 import { useRecoilState } from "recoil";
 
 interface ITimerInfo {

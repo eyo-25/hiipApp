@@ -92,7 +92,7 @@ function CreateProject() {
             <MainTitle>D-DAY가 언제이신가요?</MainTitle>
             <CalendarBoard />
           </CalendarBox>
-          <ButtonBox>
+          <ButtonWrapper>
             {!(inputToggle && isAndroid) && (
               <NextButton
                 onClick={onNextClick}
@@ -100,10 +100,12 @@ function CreateProject() {
                 initial="normal"
                 animate="animate"
               >
-                다음
+                <ButtonBox>
+                  <ButtonText>다음</ButtonText>
+                </ButtonBox>
               </NextButton>
             )}
-          </ButtonBox>
+          </ButtonWrapper>
         </BottomBox>
       </Wrapper>
     </ContentContainer>
@@ -166,12 +168,27 @@ const BottomBox = styled(motion.div)`
   width: 100%;
   height: 100%;
 `;
+const ButtonBox = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100px;
+  height: 45px;
+  background-color: black;
+`;
+const ButtonText = styled.h4`
+  font-size: 20px;
+  font-weight: 500;
+  margin-bottom: 1px;
+  cursor: pointer;
+  color: white;
+`;
 const CalendarBox = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
 `;
-const ButtonBox = styled.div`
+const ButtonWrapper = styled.div`
   display: flex;
   align-items: flex-start;
   justify-content: center;

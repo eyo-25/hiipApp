@@ -1,30 +1,41 @@
 import { useRecoilState } from "recoil";
+
+import { useEffect, useRef } from "react";
+import { useParams } from "react-router-dom";
+import { motion } from "framer-motion";
+import styled from "styled-components";
+import Background from "../../Assets/image/bull.png";
+import { onAuthStateChanged } from "firebase/auth";
+import { onSnapshot, query } from "firebase/firestore";
+import TimerBoard from "./Timer/TimerBoard";
 import {
-  inputFocusState,
-  isAddState,
   isBreakState,
   isPauseState,
   timerSplashState,
   timerState,
   toDoState,
-} from "../../../../Recoil/atoms";
-import { useEffect, useRef } from "react";
-import { useParams } from "react-router-dom";
-import { authService, dbService } from "../../../../firebase";
-import IntervalTimer from "./IntervalTimer";
-import BreakTimer from "./BreakTimer";
-import styled from "styled-components";
-import { onAuthStateChanged } from "firebase/auth";
-import { onSnapshot, query } from "firebase/firestore";
-import { useCounter } from "../../../../hooks/useCounter";
-import { isAndroid } from "react-device-detect";
-import TimerInfo from "./TimerInfo";
-import TimerButton from "./TimerButton";
+} from "../../Recoil/atoms";
+import { authService, dbService } from "../../firebase";
+import TimerSplash from "../../Component/TimerSplash";
 
-function TimerBoard() {
-  const [isAdd, setIsAdd] = useRecoilState(isAddState);
+const bottomVariants = {
+  normal: {
+    opacity: 0,
+    height: "0",
+  },
+  animate: {
+    opacity: 1,
+    height: "80%",
+    transition: {
+      delat: 0.1,
+      duration: 1,
+      type: "linear",
+    },
+  },
+};
+
+function Timer() {
   const [isTimerSplash, setIsTimerSplash] = useRecoilState(timerSplashState);
-  const [inputToggle, setInputToggle] = useRecoilState(inputFocusState);
   const [timerObj, setTimerObj] = useRecoilState(timerState);
   const [isBreakSet, setIsBreakSet] = useRecoilState(isBreakState);
   const [isPause, setIsPause] = useRecoilState(isPauseState);
@@ -33,22 +44,6 @@ function TimerBoard() {
   const todoId = params.todoId;
   const index = toDos.findIndex((item) => item.id === todoId);
   const Moment = require("moment");
-
-  const { count, start, stop, reset, done } = useCounter(
-    timerObj.min * 60 + timerObj.sec,
-    timerObj.setFocusMin * 60 + timerObj.setFocusSec
-  );
-
-  const {
-    count: breakCount,
-    start: breakStart,
-    stop: breakStop,
-    reset: breakReset,
-    done: breakDone,
-  } = useCounter(
-    timerObj.breakMin * 60 + timerObj.breakSec,
-    timerObj.setBreakMin * 60 + timerObj.setBreakSec
-  );
 
   const timeObj = useRef<any>({});
   const now = Moment(new Date()).format("YYYY-MM-DD");
@@ -67,8 +62,10 @@ function TimerBoard() {
     setBreakSec: 5,
     min: 0,
     sec: 10,
-    breakMin: 0,
-    breakSec: 5,
+    breakMin: defaultSet - 1 <= 0 ? 0 : 0,
+    breakSec: defaultSet - 1 <= 0 ? 0 : 5,
+    todoId: todoId,
+    status: "start",
   };
 
   //오늘날짜 타이머 체크후 없으면 생성
@@ -123,9 +120,9 @@ function TimerBoard() {
     });
   }, []);
 
+  //초기화
   useEffect(() => {
     setIsPause(false);
-    setIsAdd(false);
     getTimeObj();
     if (timerObj.focusSet <= timerObj.breakSet) {
       setIsBreakSet(true);
@@ -135,76 +132,61 @@ function TimerBoard() {
     return () => {
       setIsTimerSplash(true);
       setIsBreakSet(false);
-      setIsAdd(false);
       timeObj.current = {};
     };
   }, []);
 
+  if (isTimerSplash) {
+    return <TimerSplash />;
+  }
   return (
-    <>
-      <ContentsWrapper>
-        <>
-          {!isAdd && (
-            <InfoWrapper>
-              <TimerInfo count={isBreakSet ? breakCount : count} />
-            </InfoWrapper>
-          )}
-          {!isBreakSet && (
-            <IntervalTimer
-              count={count}
-              start={start}
-              stop={stop}
-              reset={reset}
-              done={done}
-            />
-          )}
-          {isBreakSet && (
-            <BreakTimer
-              count={breakCount}
-              start={breakStart}
-              stop={breakStop}
-              reset={breakReset}
-              done={breakDone}
-            />
-          )}
-        </>
-      </ContentsWrapper>
-      {!(isAndroid && inputToggle) && (
-        <ButtonWrapper>
-          <TimerButton
-            count={isBreakSet ? breakCount : count}
-            stop={isBreakSet ? breakStop : stop}
-            start={isBreakSet ? breakStart : start}
-            reset={isBreakSet ? breakReset : reset}
-          />
-        </ButtonWrapper>
-      )}
-    </>
+    <Container>
+      <TimerBoard />
+      <BottomGradient
+        variants={bottomVariants}
+        initial="normal"
+        animate="animate"
+        iscolor={isPause ? "Red" : "Blue"}
+      />
+      <BackgroundImg />
+    </Container>
   );
 }
 
-export default TimerBoard;
+export default Timer;
 
-const ContentsWrapper = styled.div`
-  position: relative;
-  z-index: 10;
-  height: 70%;
-  width: 100%;
-  color: white;
-`;
-const ButtonWrapper = styled.div`
+const Container = styled.div`
   position: relative;
   display: flex;
-  height: 30%;
+  flex-direction: column;
   width: 100%;
-  z-index: 10;
+  max-width: 414px;
+  height: calc(var(--vh, 1vh) * 100);
+  overflow: hidden;
+  background-color: black;
+  z-index: 20;
 `;
-const InfoWrapper = styled.div`
-  height: 42%;
-  @media screen and (max-height: 800px) {
-    height: 38%;
-  }
-  @media screen and (max-height: 750px) {
-    height: 35%;
-  }
+const BackgroundImg = styled.div`
+  position: absolute;
+  opacity: 0.5;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: linear-gradient(rgba(0, 0, 0, 0), 40%, rgba(0, 0, 0, 0.4)),
+    url(${Background});
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: 50%;
+`;
+const BottomGradient = styled(motion.div)<{ iscolor: string }>`
+  z-index: 5;
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  background: linear-gradient(
+    rgba(0, 0, 0, 0),
+    70%,
+    ${(props) => props.iscolor}
+  );
 `;
