@@ -174,10 +174,11 @@ const ButtonBox = styled.div`
   align-items: center;
   width: 100px;
   height: 45px;
+  border-radius: 5px;
   background-color: black;
 `;
 const ButtonText = styled.h4`
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 500;
   margin-bottom: 1px;
   cursor: pointer;

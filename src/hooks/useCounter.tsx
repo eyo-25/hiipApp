@@ -4,7 +4,6 @@ export const useCounter = (nowCount: number, resetCount: number) => {
   const [count, setCount] = useState(nowCount);
   const countRef = useRef<number>(nowCount);
   const intervalRef = useRef<any>(null);
-
   const start = useCallback(() => {
     intervalRef.current = setInterval(() => {
       if (intervalRef.current === null) return;

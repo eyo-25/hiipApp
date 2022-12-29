@@ -15,8 +15,8 @@ const bottomVariants = {
     opacity: 1,
     height: "6vh",
     transition: {
-      delay: 0.5,
-      duration: 0.8,
+      delay: 0.6,
+      duration: 1.2,
       type: "linear",
     },
   },

@@ -257,14 +257,15 @@ function TimerButton({ stop, start, count, reset }: ITimerButton) {
     }
   };
   const onDoneClick = () => {
-    navigate("/");
+    navigate(`/`);
   };
   const onFailClick = () => {
-    const ok = window.confirm("계획한 ToDo를 포기 하시겠습니까?");
-    if (ok) {
-      updateStatusSubmit("fail");
-      navigate(`/`);
-    }
+    navigate(`/${todoId}/result`);
+    // const ok = window.confirm("계획한 ToDo를 포기 하시겠습니까?");
+    // if (ok) {
+    //   updateStatusSubmit("fail");
+    //   navigate(`/`);
+    // }
   };
   const onSuccessClick = () => {
     const ok = window.confirm("계획한 ToDo를 완료 하시겠습니까?");

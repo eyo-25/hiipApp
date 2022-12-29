@@ -289,12 +289,13 @@ const ButtonBox = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+  border-radius: 5px;
   width: 100px;
   height: 45px;
   background-color: black;
 `;
 const ButtonText = styled.h4`
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 500;
   margin-bottom: 1px;
   cursor: pointer;
