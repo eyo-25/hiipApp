@@ -126,7 +126,9 @@ export const addCountState = atom<number>({
 });
 interface ItimeState {
   date: string;
-  stopDate: string;
+  addSet: number;
+  endTime: string;
+  startTime: string;
   focusSet: number;
   breakMin: number;
   breakSec: number;
@@ -147,7 +149,9 @@ export const timerState = atom<ItimeState>({
   key: "timerState",
   default: {
     date: Moment().format("YYYY-MM-DD"),
-    stopDate: Moment(new Date()).format("YYYY-MM-DD HH:mm:ss"),
+    addSet: 0,
+    startTime: Moment(new Date()).format("YYYY-MM-DD HH:mm:ss"),
+    endTime: "",
     focusSet: 0,
     breakMin: 0,
     breakSec: 0,

@@ -5,5 +5,6 @@ export const Normal_Gray3 = "#cccccc";
 export const Dark_Gray = "#C4C4C4";
 export const Dark_Gray2 = "#9d9d9d";
 export const Dark_Gray3 = "#4F4F4F";
+export const Dark_Gray4 = "#8E8E8E";
 export const Blue = "#0002FF";
 export const Red = "#FB0045";

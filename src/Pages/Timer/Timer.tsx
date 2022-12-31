@@ -1,5 +1,4 @@
 import { useRecoilState } from "recoil";
-
 import { useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -44,13 +43,14 @@ function Timer() {
   const todoId = params.todoId;
   const index = toDos.findIndex((item) => item.id === todoId);
   const Moment = require("moment");
-
   const timeObj = useRef<any>({});
-  const now = Moment(new Date()).format("YYYY-MM-DD");
+  const now = Moment().format("YYYY-MM-DD");
   const defaultSet = toDos[index].defaultSet;
   const newObj = {
-    date: Moment(new Date()).format("YYYY-MM-DD"),
-    stopDate: Moment(new Date()).format("YYYY-MM-DD HH:mm:ss"),
+    date: now,
+    addSet: 0,
+    startTime: Moment().format("YYYY-MM-DD HH:mm:ss"),
+    endTime: "",
     setFocusSet: defaultSet,
     setBreakSet: defaultSet - 1 <= 0 ? 0 : defaultSet - 1,
     focusSet: defaultSet,

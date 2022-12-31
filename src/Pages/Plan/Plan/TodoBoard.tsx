@@ -17,7 +17,7 @@ const cardVariants = {
   animate: {
     opacity: 1,
     transition: {
-      delay: 0.5,
+      delay: 0.6,
       duration: 1,
       type: "linear",
     },

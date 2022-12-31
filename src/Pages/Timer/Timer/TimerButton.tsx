@@ -7,6 +7,7 @@ import {
   isAddState,
   isBreakState,
   isPauseState,
+  timerSplashState,
   timerState,
   toDoState,
 } from "../../../Recoil/atoms";
@@ -83,6 +84,7 @@ interface ITimerButton {
 }
 
 function TimerButton({ stop, start, count, reset }: ITimerButton) {
+  const [isResultState, setisResultState] = useRecoilState(timerSplashState);
   const [isAdd, setIsAdd] = useRecoilState(isAddState);
   const [timerObj, setTimerObj] = useRecoilState(timerState);
   const [isBreakSet, setIsBreakSet] = useRecoilState(isBreakState);
@@ -165,6 +167,7 @@ function TimerButton({ stop, start, count, reset }: ITimerButton) {
         setBreakSet: addSetCount + timerObj.setBreakSet,
         focusSet: addSetCount + timerObj.focusSet,
         breakSet: addSetCount + timerObj.breakSet,
+        addSet: addSetCount,
       };
 
       const finishTimeUpdateObj = {
@@ -177,6 +180,7 @@ function TimerButton({ stop, start, count, reset }: ITimerButton) {
         breakMin: timerObj.setBreakMin,
         breakSec: timerObj.setBreakSec,
         status: "start",
+        addSet: addSetCount,
       };
 
       const isFinished = timerObj.focusSet <= 0;
@@ -260,7 +264,8 @@ function TimerButton({ stop, start, count, reset }: ITimerButton) {
     navigate(`/`);
   };
   const onFailClick = () => {
-    navigate(`/${todoId}/result`);
+    setisResultState(true);
+    navigate(`/${todoId}/result/fail`);
     // const ok = window.confirm("계획한 ToDo를 포기 하시겠습니까?");
     // if (ok) {
     //   updateStatusSubmit("fail");
@@ -268,11 +273,13 @@ function TimerButton({ stop, start, count, reset }: ITimerButton) {
     // }
   };
   const onSuccessClick = () => {
-    const ok = window.confirm("계획한 ToDo를 완료 하시겠습니까?");
-    if (ok) {
-      updateStatusSubmit("success");
-      navigate(`/`);
-    }
+    setisResultState(true);
+    navigate(`/${todoId}/result/success`);
+    // const ok = window.confirm("계획한 ToDo를 완료 하시겠습니까?");
+    // if (ok) {
+    //   updateStatusSubmit("success");
+    //   navigate(`/`);
+    // }
   };
   const onAddClick = () => {
     setIsAdd(true);

@@ -150,6 +150,7 @@ function TodoCard({ todoObj }: ITodoCard) {
       setCounter((prev) => prev + 1);
     }, 100);
   };
+
   useEffect(() => {
     //타이머 Array 할당
     const q = query(
@@ -280,7 +281,10 @@ function TodoCard({ todoObj }: ITodoCard) {
   };
 
   return (
-    <Wrapper ref={cardWrapperRef}>
+    <Wrapper
+      onContextMenu={(e: any) => e.preventDefault()}
+      ref={cardWrapperRef}
+    >
       <TodoCarWrapper
         variants={cardVariants}
         initial="normal"
