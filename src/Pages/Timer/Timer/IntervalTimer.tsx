@@ -131,8 +131,8 @@ function IntervalTimer({ count, start, stop, reset, done }: IIntervalTimer) {
       setIsPause(true);
     } else {
       setIsPause(false);
+      start();
     }
-    start();
     return () => {
       setIsPause(false);
       stop();

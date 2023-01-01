@@ -29,8 +29,6 @@ function TimerResult() {
   const navigate = useNavigate();
   const now = Moment().format("YYYY-MM-DD");
 
-  console.log(toDo);
-
   const btnVarients = {
     normal: {
       backgroundColor: "rgba(0,0,0,0)",
@@ -60,8 +58,28 @@ function TimerResult() {
               setToDo(result.data());
             }
             setTimerArray((prev) => {
+              //deepCopy
               const copyArray: any[] = [...prev];
-              copyArray.splice(i, 1, result.data());
+              //한세트 총 count
+              const setTotalCount =
+                result.data().setFocusMin * 60 + result.data().setFocusSec;
+              //전체세트 총 count
+              const totalSetCount = setTotalCount * result.data().setFocusSet;
+              //진행한 count
+              const totalPlayCount =
+                setTotalCount *
+                  (result.data().setFocusSet - result.data().focusSet) +
+                (setTotalCount - (result.data().min * 60 + result.data().sec));
+              //배열에 할당
+              copyArray.splice(i, 1, {
+                successPercent: Math.round(
+                  (totalPlayCount /
+                    (0 < result.data().focusSet
+                      ? totalSetCount
+                      : totalPlayCount)) *
+                    100
+                ),
+              });
               return [...copyArray];
             });
           });
@@ -98,16 +116,13 @@ function TimerResult() {
     }
   }, [weekArray]);
 
-  // console.log(timerArray);
-
   // 브라우저 스와이프
   const onMouseUp = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
     setIsPush(false);
     setDistanceX(0);
 
-    if (100 < e.clientX - startX) {
-      console.log("결과 적용");
-      // navigate(`/feedback`)
+    if (120 < e.clientX - startX) {
+      navigate(`/feedback`);
     }
   };
   const onMouseDown = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {

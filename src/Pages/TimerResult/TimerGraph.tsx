@@ -10,15 +10,13 @@ function TimerGraph({ timerArray, weekArray }: ITimerGrap) {
   const Moment = require("moment");
   const todayDay = Moment().day();
   const calendarDays = ["일", "월", "화", "수", "목", "금", "토"];
-  const data = [50, 40, 35.5, 10, 80, 40, 40];
 
-  //   const 퍼센트 = math.round(totalcount / nowcount) * 100
   return (
     <ResultGraphContainer>
       <GraphTextBox>
         <h4>COACH TIP</h4>
         <p>
-          어제보다 평균 집중시간이
+          어제보다 평균 성공률이
           <br />
           <span>12% 하락</span>하였습니다.
         </p>
@@ -32,7 +30,14 @@ function TimerGraph({ timerArray, weekArray }: ITimerGrap) {
         <BarContainer>
           {calendarDays.map((days, index) => (
             <BarBox key={days}>
-              <Bar height={data[index]} today={todayDay === index}></Bar>
+              <Bar
+                height={
+                  timerArray[index].successPercent
+                    ? timerArray[index].successPercent
+                    : 0
+                }
+                today={todayDay === index}
+              ></Bar>
             </BarBox>
           ))}
         </BarContainer>

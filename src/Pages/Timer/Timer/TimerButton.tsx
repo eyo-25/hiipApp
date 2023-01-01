@@ -1,5 +1,5 @@
 import { useRecoilState } from "recoil";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import styled from "styled-components";
 import {
   addCountState,
@@ -81,9 +81,18 @@ interface ITimerButton {
   stop: () => void;
   count: number;
   reset: () => void;
+  breakReset: () => void;
+  breakStop: () => void;
 }
 
-function TimerButton({ stop, start, count, reset }: ITimerButton) {
+function TimerButton({
+  stop,
+  start,
+  count,
+  reset,
+  breakReset,
+  breakStop,
+}: ITimerButton) {
   const [isResultState, setisResultState] = useRecoilState(timerSplashState);
   const [isAdd, setIsAdd] = useRecoilState(isAddState);
   const [timerObj, setTimerObj] = useRecoilState(timerState);
@@ -162,25 +171,33 @@ function TimerButton({ stop, start, count, reset }: ITimerButton) {
             addSet: toDos[index].addSet + addSetCount,
           });
 
-      const timeUpdateObj = {
+      const focusTimeUpdateObj = {
         setFocusSet: addSetCount + timerObj.setFocusSet,
         setBreakSet: addSetCount + timerObj.setBreakSet,
         focusSet: addSetCount + timerObj.focusSet,
         breakSet: addSetCount + timerObj.breakSet,
-        addSet: addSetCount,
+        breakMin: timerObj.setBreakMin,
+        breakSec: timerObj.setBreakSec,
+        addSet: addSetCount + timerObj.addSet,
+      };
+
+      const breakTimeUpdateObj = {
+        setFocusSet: addSetCount + timerObj.setFocusSet,
+        setBreakSet: addSetCount + timerObj.setBreakSet,
+        focusSet: addSetCount + timerObj.focusSet,
+        breakSet: addSetCount + timerObj.breakSet,
+        addSet: addSetCount + timerObj.addSet,
       };
 
       const finishTimeUpdateObj = {
         setFocusSet: addSetCount + timerObj.setFocusSet,
         setBreakSet: addSetCount + timerObj.setBreakSet,
-        focusSet: addSetCount + timerObj.focusSet,
-        breakSet: addSetCount + timerObj.breakSet,
+        focusSet: addSetCount,
+        breakSet: addSetCount - 1,
         min: timerObj.setFocusMin,
         sec: timerObj.setFocusSec,
-        breakMin: timerObj.setBreakMin,
-        breakSec: timerObj.setBreakSec,
         status: "start",
-        addSet: addSetCount,
+        addSet: addSetCount + timerObj.addSet,
       };
 
       const isFinished = timerObj.focusSet <= 0;
@@ -191,14 +208,19 @@ function TimerButton({ stop, start, count, reset }: ITimerButton) {
           .doc(todoId)
           .collection("timer")
           .doc(timerObj.id)
-          .update(isFinished ? finishTimeUpdateObj : timeUpdateObj)
+          .update(
+            isFinished
+              ? finishTimeUpdateObj
+              : isBreakSet
+              ? breakTimeUpdateObj
+              : focusTimeUpdateObj
+          )
           .then(() => {
             if (isFinished) {
-              setIsBreakSet(true);
               reset();
-              setTimeout(() => {
-                stop();
-              }, 3000);
+              breakReset();
+            } else if (!isBreakSet) {
+              breakReset();
             }
           });
       await Promise.all([updateAddSetPlan(), updateAddSetTimer()]);

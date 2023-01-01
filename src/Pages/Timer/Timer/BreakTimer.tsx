@@ -137,7 +137,9 @@ function BreakTimer({ count, start, stop, reset, done }: IBreakTimer) {
   }, []);
 
   useEffect(() => {
-    timer();
+    if (0 < timerObj.breakSet) {
+      timer();
+    }
   }, [count]);
 
   return (

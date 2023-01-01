@@ -122,12 +122,16 @@ function Timer() {
 
   //초기화
   useEffect(() => {
-    setIsPause(false);
     getTimeObj();
-    if (timerObj.focusSet <= timerObj.breakSet) {
+    if (timerObj.focusSet === 0) {
+      setIsBreakSet(false);
+      setIsPause(true);
+    } else if (timerObj.focusSet <= timerObj.breakSet) {
       setIsBreakSet(true);
+      setIsPause(false);
     } else {
       setIsBreakSet(false);
+      setIsPause(false);
     }
     return () => {
       setIsTimerSplash(true);

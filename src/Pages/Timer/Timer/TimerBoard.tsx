@@ -124,17 +124,10 @@ function TimerBoard() {
   }, []);
 
   useEffect(() => {
-    setIsPause(false);
     setIsAdd(false);
     getTimeObj();
-    if (timerObj.focusSet <= timerObj.breakSet) {
-      setIsBreakSet(true);
-    } else {
-      setIsBreakSet(false);
-    }
     return () => {
       setIsTimerSplash(true);
-      setIsBreakSet(false);
       setIsAdd(false);
       timeObj.current = {};
     };
@@ -176,6 +169,8 @@ function TimerBoard() {
             stop={isBreakSet ? breakStop : stop}
             start={isBreakSet ? breakStart : start}
             reset={isBreakSet ? breakReset : reset}
+            breakReset={breakReset}
+            breakStop={breakStop}
           />
         </ButtonWrapper>
       )}
