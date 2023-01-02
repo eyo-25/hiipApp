@@ -1,12 +1,14 @@
 {
   "files": {
     "main.css": "/hiipApp/static/css/main.34ee9472.css",
-    "main.js": "/hiipApp/static/js/main.16a165c4.js",
+    "main.js": "/hiipApp/static/js/main.2f739651.js",
     "static/js/156.2dd18260.chunk.js": "/hiipApp/static/js/156.2dd18260.chunk.js",
     "static/js/134.bf775aa6.chunk.js": "/hiipApp/static/js/134.bf775aa6.chunk.js",
     "static/media/result_success.png": "/hiipApp/static/media/result_success.89daf434c5727f973705.png",
     "static/media/start_background2.png": "/hiipApp/static/media/start_background2.7f39d0b5d394d7cd25db.png",
     "static/media/bull.png": "/hiipApp/static/media/bull.e4b79b2bfd2cd3e33df3.png",
+    "static/media/result_fail.png": "/hiipApp/static/media/result_fail.29ecb6e0af02a5997b56.png",
+    "static/media/result_extend.png": "/hiipApp/static/media/result_extend.23c844aaffbd82568f40.png",
     "static/media/Roboto-BlackItalic.woff": "/hiipApp/static/media/Roboto-BlackItalic.a2aa69c5f10fdeb3a862.woff",
     "static/media/Roboto-Bold.woff": "/hiipApp/static/media/Roboto-Bold.2ddbea4806c184d186fa.woff",
     "static/media/NotoSansKR-Medium.woff": "/hiipApp/static/media/NotoSansKR-Medium.b9ef050bc1e73ab34f9e.woff",
@@ -29,12 +31,12 @@
     "static/media/plus.svg": "/hiipApp/static/media/plus.29ef5c87b8ab896d68730bf8b2420968.svg",
     "static/media/minusbtn.svg": "/hiipApp/static/media/minusbtn.9a4b268e15c74bb1d7bd0dd076a3f264.svg",
     "main.34ee9472.css.map": "/hiipApp/static/css/main.34ee9472.css.map",
-    "main.16a165c4.js.map": "/hiipApp/static/js/main.16a165c4.js.map",
+    "main.2f739651.js.map": "/hiipApp/static/js/main.2f739651.js.map",
     "156.2dd18260.chunk.js.map": "/hiipApp/static/js/156.2dd18260.chunk.js.map",
     "134.bf775aa6.chunk.js.map": "/hiipApp/static/js/134.bf775aa6.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.34ee9472.css",
-    "static/js/main.16a165c4.js"
+    "static/js/main.2f739651.js"
   ]
 }
