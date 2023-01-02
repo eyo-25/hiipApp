@@ -5,6 +5,7 @@ const Moment = require("moment");
 export interface ITodo {
   endDate: string;
   index: number;
+  timerIndex: number;
   defaultSet: number;
   memo: string;
   planSubTitle: string;
@@ -127,8 +128,6 @@ export const addCountState = atom<number>({
 interface ItimeState {
   date: string;
   addSet: number;
-  endTime: string;
-  startTime: string;
   focusSet: number;
   breakMin: number;
   breakSec: number;
@@ -150,8 +149,6 @@ export const timerState = atom<ItimeState>({
   default: {
     date: Moment().format("YYYY-MM-DD"),
     addSet: 0,
-    startTime: Moment(new Date()).format("YYYY-MM-DD HH:mm:ss"),
-    endTime: "",
     focusSet: 0,
     breakMin: 0,
     breakSec: 0,

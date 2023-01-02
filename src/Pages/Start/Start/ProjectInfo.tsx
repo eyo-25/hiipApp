@@ -32,18 +32,18 @@ function ProjectInfo({
   const [project, setProject] = useRecoilState(projectState);
   const [projectDday, setProjectDday] = useState("");
   const [clickDate, setClickDate] = useRecoilState(clickDateState);
-  const [wiseSayingArry, setWiseSayingArry] = useState<string[]>([]);
+  const [wiseSayingArray, setWiseSayingArray] = useState<string[]>([]);
   const Moment = require("moment");
 
   //초기화
   useEffect(() => {
     const randomIndex = Math.floor(Math.random() * (wiseSaying.length + 1));
     const randomWiseSaying = wiseSaying[randomIndex];
-    const randomWiseSayingArry = (
+    const randomWiseSayingArray = (
       randomWiseSaying || "이대론-가망이 없다"
     ).split("-");
-    setWiseSayingArry(randomWiseSayingArry);
-    return () => setWiseSayingArry([]);
+    setWiseSayingArray(randomWiseSayingArray);
+    return () => setWiseSayingArray([]);
   }, [isReady]);
 
   // 디데이 세팅
@@ -74,7 +74,7 @@ function ProjectInfo({
               >
                 {wiseSaying && (
                   <>
-                    {wiseSayingArry.map((word, i) => (
+                    {wiseSayingArray.map((word, i) => (
                       <WiseSayingText key={i}>
                         {word}
                         <br />

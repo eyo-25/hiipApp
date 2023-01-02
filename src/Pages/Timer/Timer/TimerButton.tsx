@@ -7,6 +7,7 @@ import {
   isAddState,
   isBreakState,
   isPauseState,
+  loadState,
   timerSplashState,
   timerState,
   toDoState,
@@ -93,6 +94,7 @@ function TimerButton({
   breakReset,
   breakStop,
 }: ITimerButton) {
+  const [isLoad, setIsLoad] = useRecoilState(loadState);
   const [isResultState, setisResultState] = useRecoilState(timerSplashState);
   const [isAdd, setIsAdd] = useRecoilState(isAddState);
   const [timerObj, setTimerObj] = useRecoilState(timerState);
@@ -161,6 +163,7 @@ function TimerButton({
 
   //파이어베이스 PlanDefaultSet 업데이트
   async function updateDefaultSet() {
+    setIsLoad(true);
     try {
       const updateAddSetPlan = () =>
         dbService
@@ -226,6 +229,8 @@ function TimerButton({
       await Promise.all([updateAddSetPlan(), updateAddSetTimer()]);
     } catch (e) {
       alert("추가 ERROR.");
+    } finally {
+      setIsLoad(false);
     }
   }
 

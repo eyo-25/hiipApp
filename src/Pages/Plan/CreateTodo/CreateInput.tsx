@@ -86,6 +86,7 @@ function CreateInput({
     try {
       const planObj = {
         index: project[projectIndex].indexcount + 1,
+        timerIndex: 0,
         defaultSet: count,
         memo: "",
         planSubTitle: planSubTitle,

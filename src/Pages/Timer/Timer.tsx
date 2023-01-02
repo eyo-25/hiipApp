@@ -49,8 +49,6 @@ function Timer() {
   const newObj = {
     date: now,
     addSet: 0,
-    startTime: Moment().format("YYYY-MM-DD HH:mm:ss"),
-    endTime: "",
     setFocusSet: defaultSet,
     setBreakSet: defaultSet - 1 <= 0 ? 0 : defaultSet - 1,
     focusSet: defaultSet,
@@ -68,7 +66,7 @@ function Timer() {
     status: "start",
   };
 
-  //오늘날짜 타이머 체크후 없으면 생성
+  //오늘날짜 타이머 체크후 없으면 생성 + timerIndex늘리기
   async function getTimeObj() {
     try {
       await dbService
@@ -86,11 +84,25 @@ function Timer() {
       alert("Timer를 불러오는데 오류가 발생하였습니다. 다시 시도하여 주세요");
     } finally {
       if (Object.keys(timeObj.current).length <= 0) {
-        await dbService
-          .collection("plan")
-          .doc(todoId)
-          .collection("timer")
-          .add(newObj);
+        const createTimer = () =>
+          dbService
+            .collection("plan")
+            .doc(todoId)
+            .collection("timer")
+            .add(newObj);
+        const timerIndexIncrease = () =>
+          dbService
+            .collection("plan")
+            .doc(todoId)
+            .get()
+            .then(async (result: any) => {
+              await dbService
+                .collection("plan")
+                .doc(todoId)
+                .update({ timerIndex: result.data().timerIndex + 1 });
+            });
+
+        await Promise.all([createTimer(), timerIndexIncrease()]);
       }
     }
   }

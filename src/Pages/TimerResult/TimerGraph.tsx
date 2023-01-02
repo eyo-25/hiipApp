@@ -1,12 +1,14 @@
 import styled from "styled-components";
 import { Blue, Dark_Gray, Dark_Gray4 } from "../../Styles/Colors";
+import { resultColor } from "../../Utils/interface";
 
 interface ITimerGrap {
   timerArray: any[];
   weekArray: string[];
+  resultStatus?: string;
 }
 
-function TimerGraph({ timerArray, weekArray }: ITimerGrap) {
+function TimerGraph({ timerArray, weekArray, resultStatus }: ITimerGrap) {
   const Moment = require("moment");
   const todayDay = Moment().day();
   const calendarDays = ["일", "월", "화", "수", "목", "금", "토"];
@@ -18,7 +20,14 @@ function TimerGraph({ timerArray, weekArray }: ITimerGrap) {
         <p>
           어제보다 평균 성공률이
           <br />
-          <span>12% 하락</span>하였습니다.
+          <span
+            style={{
+              color: resultStatus ? resultColor[resultStatus] : "Black",
+            }}
+          >
+            12% 하락
+          </span>
+          하였습니다.
         </p>
       </GraphTextBox>
       <GraphBox>
@@ -36,6 +45,7 @@ function TimerGraph({ timerArray, weekArray }: ITimerGrap) {
                     ? timerArray[index].successPercent
                     : 0
                 }
+                color={resultStatus ? resultColor[resultStatus] : "Black"}
                 today={todayDay === index}
               ></Bar>
             </BarBox>
@@ -76,9 +86,6 @@ const GraphTextBox = styled.div`
     line-height: 1.3;
     text-align: center;
     font-size: 1.8vh;
-    span {
-      color: Blue;
-    }
   }
 `;
 const GraphBox = styled.div`
@@ -115,10 +122,10 @@ const BarBox = styled.div`
   height: 100%;
   width: 100%;
 `;
-const Bar = styled.div<{ height: number; today: boolean }>`
+const Bar = styled.div<{ height: number; today: boolean; color: string }>`
   height: ${(props) => props.height}%;
   width: 50%;
-  background-color: ${(props) => (props.today ? Blue : Dark_Gray)};
+  background-color: ${(props) => (props.today ? props.color : Dark_Gray)};
 `;
 const DayContainer = styled.div`
   display: grid;

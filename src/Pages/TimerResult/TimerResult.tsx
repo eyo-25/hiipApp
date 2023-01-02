@@ -1,16 +1,22 @@
 import styled from "styled-components";
 import { Dark_Gray3, Dark_Gray4, Normal_Gray2 } from "../../Styles/Colors";
-import Background from "../../Assets/image/result_success.png";
+import SussessBackground from "../../Assets/image/result_success.png";
+import ExtendBackground from "../../Assets/image/result_extend.png";
+import FailBackground from "../../Assets/image/result_fail.png";
 import { IoChevronBackSharp } from "react-icons/io5";
 import { useNavigate, useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { dbService } from "../../firebase";
 import TimerGraph from "./TimerGraph";
+import { resultColor, resultMent } from "../../Utils/interface";
+import { isMobile } from "react-device-detect";
 
 function TimerResult() {
-  const [startX, setStartX] = useState(0);
+  const [mouseStartX, setMouseStartX] = useState(0);
   const [distanceX, setDistanceX] = useState(0);
+  const [tochedStartX, setTochedStartX] = useState(0);
+  const [tochedX, setTochedX] = useState(0);
   const [isPush, setIsPush] = useState(false);
   const [timerArray, setTimerArray] = useState<any[]>([
     {},
@@ -23,8 +29,12 @@ function TimerResult() {
   ]);
   const [weekArray, setWeekArray] = useState<string[]>([]);
   const [toDo, setToDo] = useState<any>();
+  const [planPercent, setPlanPercent] = useState<any>();
+  const [background, setBackground] = useState<any>();
+  const [mentArray, setMentArray] = useState<string[]>([]);
   const params = useParams();
   const todoId = params.todoId;
+  const resultStatus = params.status;
   const Moment = require("moment");
   const navigate = useNavigate();
   const now = Moment().format("YYYY-MM-DD");
@@ -42,6 +52,26 @@ function TimerResult() {
       },
     },
   };
+
+  async function getPlanArray() {
+    try {
+      await dbService
+        .collection("plan")
+        .doc(todoId)
+        .get()
+        .then((result: any) => {
+          setPlanPercent(() => {
+            const startDate = Moment(result.data().startDate);
+            const endDate = Moment(result.data().endDate);
+            const totalDate = endDate.diff(startDate, "days");
+            const timerIndex = result.data().timerIndex;
+            return Math.round((timerIndex / totalDate) * 100);
+          });
+        });
+    } catch {
+      alert("plan에러");
+    }
+  }
 
   //날짜에 해당하는 timerObj 배정
   async function getTimerArray(i: number) {
@@ -89,23 +119,45 @@ function TimerResult() {
     }
   }
 
+  // 초기화
   useEffect(() => {
+    //week 초기화
     setWeekArray((prev) => {
       const copy = [...prev];
-      // 앞 배열 채우기
       let removeDay = 0;
       for (let index = Moment().day(); index >= 0; index--) {
         copy[index] = Moment().subtract(removeDay, "days").format("YYYY-MM-DD");
         removeDay++;
       }
       let addDay = 0;
-      // 뒷 배열 채우기
       for (let index = Moment().day(); index < 7; index++) {
         copy[index] = Moment().add(addDay, "days").format("YYYY-MM-DD");
         addDay++;
       }
       return [...copy];
     });
+
+    //ment배열 초기화
+    if (resultStatus) {
+      const resultMentArray = (
+        resultMent[resultStatus] || "이대론-가망이 없다"
+      ).split("-");
+      setMentArray(resultMentArray);
+    }
+
+    //상태별 배경 초기화
+    setBackground(() => {
+      if (resultStatus === "extend") {
+        return ExtendBackground;
+      } else if (resultStatus === "fail") {
+        return FailBackground;
+      } else {
+        return SussessBackground;
+      }
+    });
+
+    //plan 초기화
+    getPlanArray();
   }, []);
 
   useEffect(() => {
@@ -118,21 +170,21 @@ function TimerResult() {
 
   // 브라우저 스와이프
   const onMouseUp = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
-    setIsPush(false);
-    setDistanceX(0);
-
-    if (120 < e.clientX - startX) {
+    if (120 < e.clientX - mouseStartX) {
       navigate(`/feedback`);
     }
+    setIsPush(false);
+    setDistanceX(0);
+    setMouseStartX(0);
   };
   const onMouseDown = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
     setIsPush(true);
     setDistanceX(0);
-    setStartX(e.clientX);
+    setMouseStartX(e.clientX);
   };
   const onMouseMove = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
     if (isPush) {
-      setDistanceX(e.clientX - startX);
+      setDistanceX(e.clientX - mouseStartX);
     }
   };
   const onMouseLeave = () => {
@@ -140,24 +192,46 @@ function TimerResult() {
     setIsPush(false);
   };
 
+  //모바일 스와이프
+  const onTouchStart = (e: React.TouchEvent) => {
+    setIsPush(true);
+    setTochedStartX(e.changedTouches[0].pageX);
+  };
+  const onTouchEnd = () => {
+    if (180 < tochedX) {
+      navigate(`/feedback`);
+    }
+    setIsPush(false);
+    setTochedStartX(0);
+    setTochedX(0);
+  };
+  const onTouchMove = (e: React.TouchEvent) => {
+    if (isPush) {
+      setTochedX(e.changedTouches[0].pageX - tochedStartX);
+    }
+  };
+
   return (
     <Container>
       <TopWrapper>
         <TopContainer>
           <PrevIcon onClick={() => navigate(`/timer/${todoId}`)} />
-          <ResultText>
-            성공을 맛 봤으니
-            <br />
-            꾸준함을 맛볼 차례다.
-          </ResultText>
+          <ResultTextBox>
+            {mentArray.map((word, i) => (
+              <ResultText key={i}>
+                {word}
+                <br />
+              </ResultText>
+            ))}
+          </ResultTextBox>
         </TopContainer>
-        <BackgroundImg />
+        <BackgroundImg background={background} />
       </TopWrapper>
       <BottomWrapper>
         <ResultInfoContainer>
           <ResultInfoBox>
             <NewBox>+18</NewBox>
-            <h4>30%</h4>
+            <h4>{planPercent}%</h4>
             <p>계획진행</p>
           </ResultInfoBox>
           <ResultInfoBox>
@@ -172,7 +246,11 @@ function TimerResult() {
           </ResultInfoBox>
         </ResultInfoContainer>
         <ResultGraphWrapper>
-          <TimerGraph timerArray={timerArray} weekArray={weekArray} />
+          <TimerGraph
+            resultStatus={resultStatus}
+            timerArray={timerArray}
+            weekArray={weekArray}
+          />
         </ResultGraphWrapper>
         <PushBarWrapper>
           <PushBarContainer
@@ -180,13 +258,17 @@ function TimerResult() {
             onMouseUp={onMouseUp}
             onMouseMove={onMouseMove}
             onMouseLeave={onMouseLeave}
+            onTouchEnd={onTouchEnd}
+            onTouchStart={onTouchStart}
+            onTouchMove={onTouchMove}
+            color={resultStatus ? resultColor[resultStatus] : "Black"}
           >
             <PushTextBox>{!isPush && "밀어서 인터벌 결과 적용"}</PushTextBox>
             <PushButton
               variants={btnVarients}
               initial="normal"
               animate="animate"
-              style={{ left: distanceX + "px" }}
+              style={{ left: isMobile ? tochedX : distanceX + "px" }}
             >
               홈
             </PushButton>
@@ -221,17 +303,20 @@ const TopContainer = styled.div`
   justify-content: space-between;
   height: 100%;
   width: 100%;
-  padding: 0 24px;
+  padding: 0 3.3vh;
   z-index: 10;
+  @media screen and (max-height: 800px) {
+    padding: 0 4vh;
+  }
 `;
-const BackgroundImg = styled.div`
+const BackgroundImg = styled.div<{ background: any }>`
   width: 100%;
   height: 100%;
-  background-image: url(${Background});
+  background-image: url(${(props) => props.background});
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
-  opacity: 0.5;
+  opacity: 0.4;
 `;
 const PrevIcon = styled(IoChevronBackSharp)`
   height: 24px;
@@ -240,13 +325,18 @@ const PrevIcon = styled(IoChevronBackSharp)`
   margin-top: 2.5vh;
   cursor: pointer;
 `;
+const ResultTextBox = styled.div`
+  margin-bottom: 7vh;
+`;
 const ResultText = styled.div`
   color: white;
-  font-size: 3.2vh;
+  font-size: 3vh;
   letter-spacing: -0.5px;
-  line-height: 1.5;
-  font-weight: 900;
-  margin-bottom: 7vh;
+  line-height: 1.3;
+  font-weight: 700;
+  @media screen and (min-height: 900px) {
+    font-size: 26px;
+  }
 `;
 const BottomWrapper = styled.div`
   position: absolute;
@@ -256,7 +346,10 @@ const BottomWrapper = styled.div`
   border-top-left-radius: 2vh;
   background-color: ${Normal_Gray2};
   width: 100%;
-  padding: 6vh 24px 7vh 24px;
+  padding: 6vh 3.3vh 7vh 3.3vh;
+  @media screen and (max-height: 800px) {
+    padding: 6vh 4vh 7vh 4vh;
+  }
 `;
 const ResultInfoContainer = styled.div`
   height: 25%;
@@ -279,7 +372,7 @@ const ResultInfoBox = styled.div`
     margin-right: 0;
   }
   h4 {
-    margin-top: 1.2vh;
+    margin-top: 1vh;
     font-weight: 900;
     font-size: 2.8vh;
   }
@@ -297,6 +390,7 @@ const NewBox = styled.div`
   background-color: black;
   width: 30px;
   height: 3vh;
+  max-height: 18px;
   border-radius: 10px;
   color: white;
   font-size: 1vh;
@@ -311,7 +405,7 @@ const PushBarWrapper = styled.div`
   height: 10%;
   width: 100%;
 `;
-const PushBarContainer = styled.div`
+const PushBarContainer = styled.div<{ color: string }>`
   overflow: hidden;
   position: relative;
   display: flex;
@@ -324,7 +418,7 @@ const PushBarContainer = styled.div`
     to right,
     rgba(0, 0, 0, 1),
     70%,
-    rgba(0, 2, 255, 1)
+    ${(props) => props.color}
   );
   cursor: pointer;
 `;
