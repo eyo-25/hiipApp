@@ -32,8 +32,10 @@ function TimerResult() {
   const [planPercent, setPlanPercent] = useState<any>();
   const [background, setBackground] = useState<any>();
   const [mentArray, setMentArray] = useState<string[]>([]);
+  const [timerIndex, setTimerIndex] = useState<number>(0);
   const params = useParams();
   const todoId = params.todoId;
+  const timerId = params.timerId;
   const resultStatus = params.status;
   const Moment = require("moment");
   const navigate = useNavigate();
@@ -60,6 +62,7 @@ function TimerResult() {
         .doc(todoId)
         .get()
         .then((result: any) => {
+          setTimerIndex(result.data().timerIndex);
           setPlanPercent(() => {
             const startDate = Moment(result.data().startDate);
             const endDate = Moment(result.data().endDate);
@@ -70,6 +73,22 @@ function TimerResult() {
         });
     } catch {
       alert("plan에러");
+    }
+  }
+
+  //파이어베이스 timer상태 업데이트
+  async function updateStatusSubmit(status: string) {
+    try {
+      await dbService
+        .collection("plan")
+        .doc(todoId)
+        .collection("timer")
+        .doc(timerId)
+        .update({
+          status: status,
+        });
+    } catch (e) {
+      alert("타이머 ERROR.");
     }
   }
 
@@ -170,7 +189,12 @@ function TimerResult() {
 
   // 브라우저 스와이프
   const onMouseUp = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
-    if (120 < e.clientX - mouseStartX) {
+    if (120 < e.clientX - mouseStartX && resultStatus) {
+      if (resultStatus === "extend") {
+        updateStatusSubmit("success");
+      } else {
+        updateStatusSubmit(resultStatus);
+      }
       navigate(`/feedback`);
     }
     setIsPush(false);
@@ -198,7 +222,8 @@ function TimerResult() {
     setTochedStartX(e.changedTouches[0].pageX);
   };
   const onTouchEnd = () => {
-    if (180 < tochedX) {
+    if (180 < tochedX && resultStatus) {
+      updateStatusSubmit(resultStatus);
       navigate(`/feedback`);
     }
     setIsPush(false);
@@ -247,9 +272,9 @@ function TimerResult() {
         </ResultInfoContainer>
         <ResultGraphWrapper>
           <TimerGraph
+            timerIndex={timerIndex}
             resultStatus={resultStatus}
             timerArray={timerArray}
-            weekArray={weekArray}
           />
         </ResultGraphWrapper>
         <PushBarWrapper>
@@ -404,6 +429,7 @@ const ResultGraphWrapper = styled.div`
 const PushBarWrapper = styled.div`
   height: 10%;
   width: 100%;
+  min-height: 45px;
 `;
 const PushBarContainer = styled.div<{ color: string }>`
   overflow: hidden;
@@ -441,8 +467,9 @@ const PushButton = styled(motion.div)`
   justify-content: center;
   align-items: center;
   width: 6.5vh;
-  min-width: 45px;
+  min-width: 50px;
   height: 4.5vh;
+  min-height: 35px;
   font-size: 1.6vh;
   border-radius: 0.8vh;
   border: 0.5px solid white;

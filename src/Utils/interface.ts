@@ -1,4 +1,4 @@
-import { Blue, Red } from "../Styles/Colors";
+import { Blue, Red, Yellow } from "../Styles/Colors";
 
 export interface IUserObjProps {
   userObj: any;
@@ -26,8 +26,8 @@ type resultMentType = {
   [key: string]: string;
 };
 export const resultMent: resultMentType = {
-  extend: "성공을 맛 봤으니-꾸준함을 맛볼 차례다.",
-  success: "한번 끝까지 해봤으니-내일은 오늘보다 쉬울거다.",
+  success: "성공을 맛 봤으니-꾸준함을 맛볼 차례다.",
+  extend: "한번 끝까지 해봤으니-내일은 오늘보다 쉬울거다.",
   fail: "시작은 반-근데 넌,-오늘 거기서 뒷걸음 쳤네?",
 };
 
@@ -35,7 +35,8 @@ type resultColorType = {
   [key: string]: string;
 };
 export const resultColor: resultColorType = {
-  start: "black",
+  default: "#000",
+  extend: Yellow,
   success: Blue,
   fail: Red,
 };

@@ -1,35 +1,53 @@
+import { useEffect, useState } from "react";
 import styled from "styled-components";
-import { Blue, Dark_Gray, Dark_Gray4 } from "../../Styles/Colors";
+import { Dark_Gray, Dark_Gray4 } from "../../Styles/Colors";
 import { resultColor } from "../../Utils/interface";
 
 interface ITimerGrap {
   timerArray: any[];
-  weekArray: string[];
+  timerIndex: number;
   resultStatus?: string;
 }
 
-function TimerGraph({ timerArray, weekArray, resultStatus }: ITimerGrap) {
+function TimerGraph({ timerArray, resultStatus, timerIndex }: ITimerGrap) {
   const Moment = require("moment");
   const todayDay = Moment().day();
   const calendarDays = ["일", "월", "화", "수", "목", "금", "토"];
+  const [percentDiff, setPercentDiff] = useState(0);
+
+  //초기화
+  useEffect(() => {
+    if (todayDay !== 0 && 1 < timerIndex) {
+      const diff =
+        timerArray[todayDay].successPercent -
+        timerArray[todayDay - 1].successPercent;
+      setPercentDiff(diff);
+    } else {
+      setPercentDiff(timerArray[todayDay].successPercent);
+    }
+  }, [timerArray]);
 
   return (
     <ResultGraphContainer>
-      <GraphTextBox>
-        <h4>COACH TIP</h4>
-        <p>
-          어제보다 평균 성공률이
-          <br />
-          <span
-            style={{
-              color: resultStatus ? resultColor[resultStatus] : "Black",
-            }}
-          >
-            12% 하락
-          </span>
-          하였습니다.
-        </p>
-      </GraphTextBox>
+      {resultStatus && (
+        <GraphTextBox>
+          <h4>COACH TIP</h4>
+          <p>
+            어제보다 평균 진행률이
+            <br />
+            {0 <= percentDiff ? (
+              <span style={{ color: resultColor[resultStatus] }}>
+                {percentDiff}% 상승
+              </span>
+            ) : (
+              <span style={{ color: resultColor[resultStatus] }}>
+                {Math.abs(percentDiff)}% 하락
+              </span>
+            )}
+            하였습니다.
+          </p>
+        </GraphTextBox>
+      )}
       <GraphBox>
         <LineBox>
           <Line />

@@ -1,12 +1,7 @@
 import { IoPlaySharp } from "react-icons/io5";
 import { useEffect, useState } from "react";
 import styled from "styled-components";
-import {
-  Blue,
-  Dark_Gray2,
-  Normal_Gray2,
-  Normal_Gray3,
-} from "../../../Styles/Colors";
+import { Dark_Gray2, Normal_Gray2, Normal_Gray3 } from "../../../Styles/Colors";
 import { dbService } from "../../../firebase";
 import { statusColor, statusName } from "../../../Utils/interface";
 

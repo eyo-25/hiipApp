@@ -145,22 +145,6 @@ function TimerButton({
     }
   }
 
-  //파이어베이스 timer 업데이트
-  async function updateStatusSubmit(state: string) {
-    try {
-      await dbService
-        .collection("plan")
-        .doc(todoId)
-        .collection("timer")
-        .doc(timerObj.id)
-        .update({
-          status: state,
-        });
-    } catch (e) {
-      alert("타이머 ERROR.");
-    }
-  }
-
   //파이어베이스 PlanDefaultSet 업데이트
   async function updateDefaultSet() {
     setIsLoad(true);
@@ -292,21 +276,15 @@ function TimerButton({
   };
   const onFailClick = () => {
     setisResultState(true);
-    navigate(`/${todoId}/result/fail`);
-    // const ok = window.confirm("계획한 ToDo를 포기 하시겠습니까?");
-    // if (ok) {
-    //   updateStatusSubmit("fail");
-    //   navigate(`/`);
-    // }
+    navigate(`/${todoId}/result/${timerObj.id}/fail`);
   };
   const onSuccessClick = () => {
     setisResultState(true);
-    navigate(`/${todoId}/result/success`);
-    // const ok = window.confirm("계획한 ToDo를 완료 하시겠습니까?");
-    // if (ok) {
-    //   updateStatusSubmit("success");
-    //   navigate(`/`);
-    // }
+    if (0 < timerObj.addSet) {
+      navigate(`/${todoId}/result/${timerObj.id}/extend`);
+    } else {
+      navigate(`/${todoId}/result/${timerObj.id}/success`);
+    }
   };
   const onAddClick = () => {
     setIsAdd(true);

@@ -22,7 +22,7 @@ import { authService, dbService } from "../../../firebase";
 import useOnClickOutSide from "../../../hooks/useOnClickOutSide";
 import { onSnapshot, query } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
-import { statusColor, statusName } from "../../../Utils/interface";
+import { resultColor, statusColor, statusName } from "../../../Utils/interface";
 
 export const iconVariants = {
   normal: {
@@ -65,6 +65,41 @@ function TodoCard({ todoObj }: ITodoCard) {
   const cardWrapperRef = useRef<any>(null);
   const cardRef = useRef<any>();
   const navigate = useNavigate();
+  const [timerIndex, setTimerIndex] = useState(0);
+  // const timerIndex = timerArray.findIndex((item) => item.date === now);
+
+  useEffect(() => {
+    setTimerIndex(timerArray.findIndex((item) => item.date === now));
+  }, [timerArray]);
+
+  let intervalArray = [] as any;
+  for (let index = 0; index < todoObj.defaultSet; index++) {
+    if (0 <= timerIndex && timerArray[timerIndex]) {
+      if (timeStatus === "fail") {
+        const defaultSet = todoObj.defaultSet - timerArray[timerIndex].focusSet;
+        if (index < defaultSet) {
+          intervalArray[index] = "default";
+        } else {
+          intervalArray[index] = "fail";
+        }
+      } else {
+        const defaultSet = todoObj.defaultSet - timerArray[timerIndex].addSet;
+        if (index < defaultSet) {
+          intervalArray[index] = "default";
+        } else {
+          intervalArray[index] = "extend";
+        }
+      }
+    } else {
+      intervalArray[index] = "default";
+    }
+  }
+
+  // useEffect(() => {
+  //   if (0 <= timerIndex && timerArray[timerIndex]) {
+  //     setTimeStatus(timerArray[timerIndex].status);
+  //   }
+  // }, [timerArray]);
 
   useOnClickOutSide(cardRef, () => {
     setBtnPopup(false);
@@ -235,11 +270,6 @@ function TodoCard({ todoObj }: ITodoCard) {
     }
   };
 
-  let intervalArray = [] as any;
-  for (let index = 0; index < todoObj.defaultSet; index++) {
-    intervalArray[index] = index;
-  }
-
   async function deleteToDoSubmit() {
     const planDeleteFbase = () => dbService.doc(`plan/${todoObj.id}`).delete();
     const timeDeleteFbase = () => {
@@ -252,6 +282,7 @@ function TodoCard({ todoObj }: ITodoCard) {
       }
     };
     try {
+      setToDos([]);
       setStatusLoad(true);
       if (0 < timerArray.length) {
         await Promise.all([planDeleteFbase(), timeDeleteFbase()]);
@@ -278,6 +309,21 @@ function TodoCard({ todoObj }: ITodoCard) {
     setIsTodoEdit(true);
     setBtnPopup(false);
     navigate(`/plan/editTodo/${todoObj.id}`);
+  };
+  const onStartClick = async () => {
+    if (todoObj.status === "ready") {
+      await dbService
+        .collection("plan")
+        .doc(todoObj.id)
+        .update({ status: "start" });
+      navigate(`/timer/${todoObj.id}`);
+    } else if (
+      todoObj.status === "start" &&
+      timeStatus !== "fail" &&
+      timeStatus !== "success"
+    ) {
+      navigate(`/timer/${todoObj.id}`);
+    }
   };
 
   return (
@@ -310,9 +356,17 @@ function TodoCard({ todoObj }: ITodoCard) {
             <p>{todoObj.planSubTitle}</p>
           </TextBox>
           <IntervalBox>
-            <h4>{todoObj.defaultSet}</h4>
+            <h4
+            // style={{
+            //   color: statusColor[timeStatus]
+            //     ? statusColor[timeStatus]
+            //     : "black",
+            // }}
+            >
+              {todoObj.defaultSet}
+            </h4>
             <p>SET</p>
-            <StartBtn />
+            <StartBtn onClick={onStartClick} />
           </IntervalBox>
         </TodoTopBox>
         <MemoContainer
@@ -342,8 +396,11 @@ function TodoCard({ todoObj }: ITodoCard) {
           )}
         </MemoContainer>
         <IntervalBarBox>
-          {intervalArray.map((index: number) => (
-            <IntervalBar key={index} />
+          {intervalArray.map((item: any, index: number) => (
+            <IntervalBar
+              style={{ backgroundColor: resultColor[item] }}
+              key={index}
+            />
           ))}
         </IntervalBarBox>
         <Background
@@ -442,6 +499,7 @@ export const IntervalBox = styled.div`
 export const StartBtn = styled(IoPlaySharp)`
   color: ${Dark_Gray2};
   margin-left: 1.3vh;
+  z-index: 20;
 `;
 export const IntervalBarBox = styled.ul`
   position: absolute;

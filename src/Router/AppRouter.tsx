@@ -34,7 +34,10 @@ export default function AppRouter({ isLoggedIn, userObj }: AppRouterProps) {
       <Routes>
         <Route path={"/"} element={<Home />}></Route>
         <Route path={"/timer/:todoId"} element={<Timer />} />
-        <Route path={"/:todoId/result/:status"} element={<TimerResult />} />
+        <Route
+          path={"/:todoId/result/:timerId/:status"}
+          element={<TimerResult />}
+        />
         <Route path={"/plan"} element={<Index />}>
           <Route path={"/plan/memo/:todoId"} element={<Plan />} />
           <Route path={"/plan/createTodo"} element={<Plan />} />

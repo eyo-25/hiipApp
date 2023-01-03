@@ -87,7 +87,7 @@ const Tabs = styled.li`
   justify-content: flex-start;
   width: 25%;
   @media screen and (max-height: 800px) {
-    width: 20%;
+    width: 22%;
   }
 `;
 const TabsTitle = styled.h4<{ isActive: boolean }>`

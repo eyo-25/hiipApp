@@ -8,3 +8,4 @@ export const Dark_Gray3 = "#4F4F4F";
 export const Dark_Gray4 = "#8E8E8E";
 export const Blue = "#0002FF";
 export const Red = "#FB0045";
+export const Yellow = "#FFC500";

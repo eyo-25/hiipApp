@@ -82,6 +82,7 @@ function CreateInput({
   };
   //파이어베이스 ToDo생성 요청
   async function createToDoSubmit() {
+    setToDos([]);
     setIsLoad(true);
     try {
       const planObj = {
@@ -135,8 +136,8 @@ function CreateInput({
     }
   }
 
-  //전송 함수
-  const onSubmit = async () => {
+  //todo카드 생성 클릭
+  const onCreateCardClick = async () => {
     const isRequired: boolean =
       startDate === "" ||
       endDate === "" ||
@@ -207,7 +208,7 @@ function CreateInput({
     setEndDate(value);
   };
   return (
-    <ModalForm onSubmit={onSubmit}>
+    <ModalForm onSubmit={onCreateCardClick}>
       <ItemBox>
         <ItemTitle>TO-DO 제목</ItemTitle>
         <TitleInput
@@ -268,7 +269,7 @@ function CreateInput({
         <CancelBtn type="button" onClick={onCancleClicked}>
           취소
         </CancelBtn>
-        <ConfirmBtn type="button" onClick={onSubmit}>
+        <ConfirmBtn type="button" onClick={onCreateCardClick}>
           {mode === "CREATE" ? "생성" : "수정"}
         </ConfirmBtn>
       </BtnBox>
