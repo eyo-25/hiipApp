@@ -33,7 +33,7 @@ function TimerGraph({ timerArray, resultStatus, timerIndex }: ITimerGrap) {
         <GraphTextBox>
           <h4>COACH TIP</h4>
           <p>
-            어제보다 평균 진행률이
+            어제보다 계획 성공률이
             <br />
             {0 <= percentDiff ? (
               <span style={{ color: resultColor[resultStatus] }}>

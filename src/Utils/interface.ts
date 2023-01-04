@@ -8,6 +8,7 @@ type statusNameType = {
   [key: string]: string;
 };
 export const statusName: statusNameType = {
+  extend: "진행중",
   start: "진행중",
   success: "완료",
   fail: "실패",
@@ -17,6 +18,7 @@ type statusColorType = {
   [key: string]: string;
 };
 export const statusColor: statusColorType = {
+  extend: "black",
   start: "black",
   success: Blue,
   fail: Red,

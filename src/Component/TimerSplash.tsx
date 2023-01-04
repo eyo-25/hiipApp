@@ -72,7 +72,7 @@ function TimerSplash() {
           )}
         </AnimatePresence>
       </CountBox>
-      <BackgroundImg />
+      {/* <BackgroundImg /> */}
     </Container>
   );
 }

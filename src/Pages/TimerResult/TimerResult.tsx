@@ -33,6 +33,8 @@ function TimerResult() {
   const [background, setBackground] = useState<any>();
   const [mentArray, setMentArray] = useState<string[]>([]);
   const [timerIndex, setTimerIndex] = useState<number>(0);
+  const [endTime, setEndTime] = useState<string>("");
+  const [usedCount, setUsedCount] = useState<number>(0);
   const params = useParams();
   const todoId = params.todoId;
   const timerId = params.timerId;
@@ -40,6 +42,8 @@ function TimerResult() {
   const Moment = require("moment");
   const navigate = useNavigate();
   const now = Moment().format("YYYY-MM-DD");
+
+  console.log(timerArray);
 
   const btnVarients = {
     normal: {
@@ -79,21 +83,42 @@ function TimerResult() {
   //파이어베이스 timer상태 업데이트
   async function updateStatusSubmit(status: string) {
     try {
-      await dbService
-        .collection("plan")
-        .doc(todoId)
-        .collection("timer")
-        .doc(timerId)
-        .update({
-          status: status,
-        });
+      if (status === "success" || status === "extend") {
+        dbService
+          .collection("plan")
+          .doc(todoId)
+          .collection("timer")
+          .doc(timerId)
+          .update({
+            focusSet: 0,
+            breakMin: 0,
+            breakSec: 0,
+            breakSet: 0,
+            min: 0,
+            sec: 0,
+            status: "success",
+            endTime: endTime,
+            usedCount: usedCount,
+          });
+      } else {
+        dbService
+          .collection("plan")
+          .doc(todoId)
+          .collection("timer")
+          .doc(timerId)
+          .update({
+            status: status,
+            endTime: endTime,
+            // usedCount: usedCount,
+          });
+      }
     } catch (e) {
       alert("타이머 ERROR.");
     }
   }
 
   //날짜에 해당하는 timerObj 배정
-  async function getTimerArray(i: number) {
+  async function getSuccessPercentArray(i: number) {
     try {
       await dbService
         .collection("plan")
@@ -138,8 +163,100 @@ function TimerResult() {
     }
   }
 
+  //날짜에 해당하는 timerObj 배정
+  async function getConcentrateArray(i: number) {
+    try {
+      await dbService
+        .collection("plan")
+        .doc(todoId)
+        .collection("timer")
+        .where("date", "==", weekArray[i])
+        .get()
+        .then((result) => {
+          result.forEach((result) => {
+            if (result.data().date === now) {
+              setToDo(result.data());
+
+              setTimerArray((prev) => {
+                //deepCopy
+                const copyArray: any[] = [...prev];
+
+                const resultData = result.data();
+                const endTimeMoment = Moment(endTime);
+                const startTimeMoment = Moment(result.data().startTime);
+                const totalCount = Moment.duration(
+                  endTimeMoment.diff(startTimeMoment)
+                ).asSeconds();
+
+                const totalFocusSetCount =
+                  resultData.setFocusMin * 60 + resultData.setFocusSec;
+                const totalFocusNowCount = resultData.min * 60 + resultData.sec;
+                const totalBreakSetCount =
+                  resultData.setBreakMin * 60 + resultData.setBreakSec;
+                const totalBreakNowCount =
+                  resultData.breakMin * 60 + resultData.breakSec;
+
+                const endFullCount =
+                  totalFocusSetCount *
+                    (resultData.setFocusSet - resultData.focusSet) +
+                  totalBreakSetCount *
+                    (resultData.setBreakSet - resultData.breakSet);
+
+                let usedCount = 0;
+                if (
+                  resultData.focusSet !== 0 &&
+                  resultData.breakSet < resultData.focusSet
+                ) {
+                  usedCount =
+                    totalFocusSetCount - totalFocusNowCount + endFullCount;
+                } else if (
+                  resultData.focusSet !== 0 &&
+                  resultData.focusSet < resultData.breakSet
+                ) {
+                  usedCount =
+                    totalBreakSetCount - totalBreakNowCount + endFullCount;
+                } else {
+                  usedCount =
+                    totalFocusSetCount * resultData.setFocusSet +
+                    totalBreakSetCount * resultData.setBreakSet;
+                }
+
+                console.log(Math.round((usedCount / totalCount) * 100));
+                //배열에 할당
+                copyArray.splice(i, 1, {
+                  successPercent: Math.round((usedCount / totalCount) * 100),
+                });
+                setUsedCount(usedCount);
+                return [...copyArray];
+              });
+            } else {
+              setTimerArray((prev) => {
+                const endTimeMoment = Moment(result.data().endTime);
+                const startTimeMoment = Moment(result.data().startTime);
+                const usedCount = result.data().usedCount;
+
+                const totalCount = Moment.duration(
+                  endTimeMoment.diff(startTimeMoment)
+                ).asSeconds();
+
+                const copyArray: any[] = [...prev];
+                copyArray.splice(i, 1, {
+                  successPercent: Math.round((usedCount / totalCount) * 100),
+                });
+                return [...copyArray];
+              });
+            }
+          });
+        });
+    } catch {
+      alert("Timer 오류");
+    }
+  }
+
   // 초기화
   useEffect(() => {
+    //임시 endDate배정
+    setEndTime(Moment().format("YYYY-MM-DD hh:mm:ss"));
     //week 초기화
     setWeekArray((prev) => {
       const copy = [...prev];
@@ -182,7 +299,11 @@ function TimerResult() {
   useEffect(() => {
     if (7 === weekArray.length) {
       for (let i = 0; i < weekArray.length; i++) {
-        getTimerArray(i);
+        if (resultStatus === "fail") {
+          getSuccessPercentArray(i);
+        } else {
+          getConcentrateArray(i);
+        }
       }
     }
   }, [weekArray]);
@@ -190,11 +311,7 @@ function TimerResult() {
   // 브라우저 스와이프
   const onMouseUp = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
     if (120 < e.clientX - mouseStartX && resultStatus) {
-      if (resultStatus === "extend") {
-        updateStatusSubmit("success");
-      } else {
-        updateStatusSubmit(resultStatus);
-      }
+      updateStatusSubmit(resultStatus);
       navigate(`/feedback`);
     }
     setIsPush(false);
@@ -415,6 +532,7 @@ const NewBox = styled.div`
   background-color: black;
   width: 30px;
   height: 3vh;
+  min-height: 14px;
   max-height: 18px;
   border-radius: 10px;
   color: white;
@@ -469,7 +587,7 @@ const PushButton = styled(motion.div)`
   width: 6.5vh;
   min-width: 50px;
   height: 4.5vh;
-  min-height: 35px;
+  min-height: 32px;
   font-size: 1.6vh;
   border-radius: 0.8vh;
   border: 0.5px solid white;

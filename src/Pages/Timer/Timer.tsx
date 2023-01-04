@@ -62,8 +62,11 @@ function Timer() {
     sec: 10,
     breakMin: defaultSet - 1 <= 0 ? 0 : 0,
     breakSec: defaultSet - 1 <= 0 ? 0 : 5,
+    startTime: Moment().format("YYYY-MM-DD hh:mm:ss"),
+    endTime: "",
     todoId: todoId,
     status: "start",
+    usedCount: 0,
   };
 
   //오늘날짜 타이머 체크후 없으면 생성 + timerIndex늘리기

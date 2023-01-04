@@ -3,23 +3,37 @@ import { useEffect, useState } from "react";
 import styled from "styled-components";
 import { Dark_Gray2, Normal_Gray2, Normal_Gray3 } from "../../../Styles/Colors";
 import { dbService } from "../../../firebase";
-import { statusColor, statusName } from "../../../Utils/interface";
+import { resultColor, statusColor, statusName } from "../../../Utils/interface";
+import { ItimeState } from "../../../Recoil/atoms";
 
 function TodoCard({ todoObj }: any) {
-  const [intervalArray, setIntervalArray] = useState<number[]>([]);
-  const [timeStatus, setTimeStatus] = useState("");
+  // const [intervalArray, setIntervalArray] = useState<any[]>();
+  const [timerObj, setTimerObj] = useState<ItimeState>();
   const Moment = require("moment");
   const now = Moment().format("YYYY-MM-DD");
 
-  useEffect(() => {
-    setIntervalArray((prev) => {
-      const copy = [...prev];
-      for (let index = 0; index < todoObj.defaultSet; index++) {
-        copy[index] = index;
+  let intervalArray = [] as any;
+  for (let index = 0; index < todoObj.defaultSet; index++) {
+    if (timerObj) {
+      if (timerObj.status === "fail") {
+        const defaultSet = todoObj.defaultSet - timerObj.focusSet;
+        if (index < defaultSet) {
+          intervalArray[index] = "default";
+        } else {
+          intervalArray[index] = "fail";
+        }
+      } else {
+        const defaultSet = todoObj.defaultSet - timerObj.addSet;
+        if (index < defaultSet) {
+          intervalArray[index] = "default";
+        } else {
+          intervalArray[index] = "extend";
+        }
       }
-      return [...copy];
-    });
-  }, []);
+    } else {
+      intervalArray[index] = "default";
+    }
+  }
 
   useEffect(() => {
     dbService
@@ -29,8 +43,8 @@ function TodoCard({ todoObj }: any) {
       .where("date", "==", now)
       .get()
       .then((result) => {
-        result.forEach((result) => {
-          setTimeStatus(result.data().status);
+        result.forEach((result: any) => {
+          setTimerObj(result.data());
         });
       });
   }, []);
@@ -41,9 +55,11 @@ function TodoCard({ todoObj }: any) {
         <TitleBox>
           <h4>{todoObj.planTitle}</h4>
           <StatusBox>
-            {todoObj.status !== "ready" && (
-              <StatusBox style={{ backgroundColor: statusColor[timeStatus] }}>
-                <h5>{statusName[timeStatus]}</h5>
+            {todoObj.status !== "ready" && timerObj && (
+              <StatusBox
+                style={{ backgroundColor: statusColor[timerObj.status] }}
+              >
+                <h5>{statusName[timerObj.status]}</h5>
               </StatusBox>
             )}
           </StatusBox>
@@ -56,8 +72,11 @@ function TodoCard({ todoObj }: any) {
         <StartBtn />
       </IntervalBox>
       <IntervalBarBox>
-        {intervalArray.map((index) => (
-          <IntervalBar key={index} />
+        {intervalArray.map((item: any, index: number) => (
+          <IntervalBar
+            style={{ backgroundColor: resultColor[item] }}
+            key={index}
+          />
         ))}
       </IntervalBarBox>
     </DragBox>

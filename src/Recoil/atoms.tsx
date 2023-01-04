@@ -125,7 +125,7 @@ export const addCountState = atom<number>({
   key: "addCountState",
   default: 0,
 });
-interface ItimeState {
+export interface ItimeState {
   date: string;
   addSet: number;
   focusSet: number;
@@ -134,15 +134,17 @@ interface ItimeState {
   breakSet: number;
   min: number;
   sec: number;
-  mSec: number;
   setBreakMin: number;
   setBreakSec: number;
   setBreakSet: number;
   setFocusMin: number;
   setFocusSec: number;
   setFocusSet: number;
+  startTime: string;
+  endTime: string;
   id: string;
   status: string;
+  usedCount: number;
 }
 export const timerState = atom<ItimeState>({
   key: "timerState",
@@ -155,14 +157,16 @@ export const timerState = atom<ItimeState>({
     breakSet: 0,
     min: 0,
     sec: 0,
-    mSec: 0,
     setBreakMin: 0,
     setBreakSec: 0,
     setBreakSet: 0,
     setFocusMin: 0,
     setFocusSec: 0,
     setFocusSet: 0,
+    startTime: "",
+    endTime: "",
     id: "",
     status: "start",
+    usedCount: 0,
   },
 });
