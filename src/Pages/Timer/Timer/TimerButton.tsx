@@ -18,6 +18,7 @@ import { IoPlaySharp, IoStopSharp } from "react-icons/io5";
 import { useNavigate, useParams } from "react-router-dom";
 import { dbService } from "../../../firebase";
 import { ReactComponent as PlusIcon } from "../../../Assets/Icons/plus.svg";
+import { useUsedCount } from "../../../hooks/useUsedCount";
 
 const boxVarients = {
   normal: {
@@ -107,11 +108,13 @@ function TimerButton({
     timerObj.setBreakMin * 60 * 100 + timerObj.setBreakSec * 100;
   const focusTotal =
     timerObj.setFocusMin * 60 * 100 + timerObj.setFocusSec * 100;
+  const Moment = require("moment");
   const countRef = useRef(1);
   const navigate = useNavigate();
   const params = useParams();
   const todoId = params.todoId;
   const index = toDos.findIndex((item) => item.id === todoId);
+  const { usedCount } = useUsedCount(isBreakSet, timerObj);
 
   //파이어베이스 timer 업데이트
   async function updateTimeSubmit(type: string) {
@@ -127,6 +130,8 @@ function TimerButton({
             focusSet: timerObj.focusSet,
             min: timerObj.min,
             sec: timerObj.sec,
+            usedCount: usedCount,
+            endTime: Moment().format("YYYY-MM-DD hh:mm:ss"),
           });
       } else {
         await dbService
@@ -138,6 +143,8 @@ function TimerButton({
             breakSet: timerObj.breakSet,
             breakMin: timerObj.breakMin,
             breakSec: timerObj.breakSec,
+            usedCount: usedCount,
+            endTime: Moment().format("YYYY-MM-DD"),
           });
       }
     } catch (e) {

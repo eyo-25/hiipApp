@@ -33,8 +33,6 @@ function TimerResult() {
   const [background, setBackground] = useState<any>();
   const [mentArray, setMentArray] = useState<string[]>([]);
   const [timerIndex, setTimerIndex] = useState<number>(0);
-  const [endTime, setEndTime] = useState<string>("");
-  const [usedCount, setUsedCount] = useState<number>(0);
   const params = useParams();
   const todoId = params.todoId;
   const timerId = params.timerId;
@@ -42,8 +40,6 @@ function TimerResult() {
   const Moment = require("moment");
   const navigate = useNavigate();
   const now = Moment().format("YYYY-MM-DD");
-
-  console.log(timerArray);
 
   const btnVarients = {
     normal: {
@@ -83,35 +79,14 @@ function TimerResult() {
   //파이어베이스 timer상태 업데이트
   async function updateStatusSubmit(status: string) {
     try {
-      if (status === "success" || status === "extend") {
-        dbService
-          .collection("plan")
-          .doc(todoId)
-          .collection("timer")
-          .doc(timerId)
-          .update({
-            focusSet: 0,
-            breakMin: 0,
-            breakSec: 0,
-            breakSet: 0,
-            min: 0,
-            sec: 0,
-            status: "success",
-            endTime: endTime,
-            usedCount: usedCount,
-          });
-      } else {
-        dbService
-          .collection("plan")
-          .doc(todoId)
-          .collection("timer")
-          .doc(timerId)
-          .update({
-            status: status,
-            endTime: endTime,
-            // usedCount: usedCount,
-          });
-      }
+      dbService
+        .collection("plan")
+        .doc(todoId)
+        .collection("timer")
+        .doc(timerId)
+        .update({
+          status: status === "fail" ? status : "success",
+        });
     } catch (e) {
       alert("타이머 ERROR.");
     }
@@ -174,78 +149,21 @@ function TimerResult() {
         .get()
         .then((result) => {
           result.forEach((result) => {
-            if (result.data().date === now) {
-              setToDo(result.data());
+            setTimerArray((prev) => {
+              const endTimeMoment = Moment(result.data().endTime);
+              const startTimeMoment = Moment(result.data().startTime);
+              const usedCount = result.data().usedCount;
 
-              setTimerArray((prev) => {
-                //deepCopy
-                const copyArray: any[] = [...prev];
+              const totalCount = Moment.duration(
+                endTimeMoment.diff(startTimeMoment)
+              ).asSeconds();
 
-                const resultData = result.data();
-                const endTimeMoment = Moment(endTime);
-                const startTimeMoment = Moment(result.data().startTime);
-                const totalCount = Moment.duration(
-                  endTimeMoment.diff(startTimeMoment)
-                ).asSeconds();
-
-                const totalFocusSetCount =
-                  resultData.setFocusMin * 60 + resultData.setFocusSec;
-                const totalFocusNowCount = resultData.min * 60 + resultData.sec;
-                const totalBreakSetCount =
-                  resultData.setBreakMin * 60 + resultData.setBreakSec;
-                const totalBreakNowCount =
-                  resultData.breakMin * 60 + resultData.breakSec;
-
-                const endFullCount =
-                  totalFocusSetCount *
-                    (resultData.setFocusSet - resultData.focusSet) +
-                  totalBreakSetCount *
-                    (resultData.setBreakSet - resultData.breakSet);
-
-                let usedCount = 0;
-                if (
-                  resultData.focusSet !== 0 &&
-                  resultData.breakSet < resultData.focusSet
-                ) {
-                  usedCount =
-                    totalFocusSetCount - totalFocusNowCount + endFullCount;
-                } else if (
-                  resultData.focusSet !== 0 &&
-                  resultData.focusSet < resultData.breakSet
-                ) {
-                  usedCount =
-                    totalBreakSetCount - totalBreakNowCount + endFullCount;
-                } else {
-                  usedCount =
-                    totalFocusSetCount * resultData.setFocusSet +
-                    totalBreakSetCount * resultData.setBreakSet;
-                }
-
-                console.log(Math.round((usedCount / totalCount) * 100));
-                //배열에 할당
-                copyArray.splice(i, 1, {
-                  successPercent: Math.round((usedCount / totalCount) * 100),
-                });
-                setUsedCount(usedCount);
-                return [...copyArray];
+              const copyArray: any[] = [...prev];
+              copyArray.splice(i, 1, {
+                successPercent: Math.round((usedCount / totalCount) * 100),
               });
-            } else {
-              setTimerArray((prev) => {
-                const endTimeMoment = Moment(result.data().endTime);
-                const startTimeMoment = Moment(result.data().startTime);
-                const usedCount = result.data().usedCount;
-
-                const totalCount = Moment.duration(
-                  endTimeMoment.diff(startTimeMoment)
-                ).asSeconds();
-
-                const copyArray: any[] = [...prev];
-                copyArray.splice(i, 1, {
-                  successPercent: Math.round((usedCount / totalCount) * 100),
-                });
-                return [...copyArray];
-              });
-            }
+              return [...copyArray];
+            });
           });
         });
     } catch {
@@ -255,8 +173,6 @@ function TimerResult() {
 
   // 초기화
   useEffect(() => {
-    //임시 endDate배정
-    setEndTime(Moment().format("YYYY-MM-DD hh:mm:ss"));
     //week 초기화
     setWeekArray((prev) => {
       const copy = [...prev];

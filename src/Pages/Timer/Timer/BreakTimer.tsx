@@ -12,6 +12,7 @@ import {
   timerState,
 } from "../../../Recoil/atoms";
 import { dbService } from "../../../firebase";
+import { useUsedCount } from "../../../hooks/useUsedCount";
 
 const TextUpVarients = {
   start: {
@@ -51,10 +52,12 @@ function BreakTimer({ count, start, stop, reset, done }: IBreakTimer) {
   const [inputToggle, setInputToggle] = useRecoilState(inputFocusState);
   const params = useParams();
   const todoId = params.todoId;
+  const { nextUsedCount, usedCount } = useUsedCount(isBreakSet, timerObj);
 
   //파이어베이스 timer 업데이트
   async function updateBreakSubmit(type: string) {
     const isDone = type === "done";
+    const isNext = type === "next";
     try {
       await dbService
         .collection("plan")
@@ -65,6 +68,7 @@ function BreakTimer({ count, start, stop, reset, done }: IBreakTimer) {
           breakSet: isDone ? 0 : timerObj.breakSet - 1,
           breakMin: isDone ? 0 : timerObj.setBreakMin,
           breakSec: isDone ? 0 : timerObj.setBreakSec,
+          usedCount: isNext || isDone ? nextUsedCount : usedCount,
         });
     } catch (e) {
       alert("타이머 ERROR.");

@@ -4,6 +4,7 @@ import { useParams } from "react-router-dom";
 import { useRecoilState } from "recoil";
 import styled from "styled-components";
 import { dbService } from "../../../firebase";
+import { useUsedCount } from "../../../hooks/useUsedCount";
 import {
   inputFocusState,
   isAddState,
@@ -49,12 +50,18 @@ function IntervalTimer({ count, start, stop, reset, done }: IIntervalTimer) {
   const [intervalSet, setIntervalSet] = useState(timerObj.focusSet);
   const [minutes, setMinutes] = useState(timerObj.min);
   const [seconds, setSeconds] = useState(timerObj.sec);
+  const Moment = require("moment");
   const params = useParams();
   const todoId = params.todoId;
+  const { doneUsedCount, nextUsedCount, usedCount } = useUsedCount(
+    isBreakSet,
+    timerObj
+  );
 
   //파이어베이스 timer 업데이트
   async function updateTimeSubmit(type: string) {
     const isDone = type === "done";
+    const isNext = type === "next";
     try {
       await dbService
         .collection("plan")
@@ -65,6 +72,12 @@ function IntervalTimer({ count, start, stop, reset, done }: IIntervalTimer) {
           focusSet: isDone ? 0 : timerObj.focusSet - 1,
           min: isDone ? 0 : timerObj.setFocusMin,
           sec: isDone ? 0 : timerObj.setFocusSec,
+          usedCount: isDone
+            ? doneUsedCount
+            : isNext
+            ? nextUsedCount
+            : usedCount,
+          endTime: Moment().format("YYYY-MM-DD hh:mm:ss"),
         });
     } catch (e) {
       alert("타이머 ERROR.");
