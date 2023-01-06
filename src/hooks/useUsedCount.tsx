@@ -1,4 +1,4 @@
-import { ItimeState } from "../Recoil/atoms";
+import { ItimeState } from "../Utils/interface";
 
 export const useUsedCount = (isBreak: boolean, timerObj: ItimeState) => {
   const totalFocusSetCount = timerObj.setFocusMin * 60 + timerObj.setFocusSec;

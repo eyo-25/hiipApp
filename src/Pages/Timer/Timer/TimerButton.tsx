@@ -131,7 +131,6 @@ function TimerButton({
             min: timerObj.min,
             sec: timerObj.sec,
             usedCount: usedCount,
-            endTime: Moment().format("YYYY-MM-DD hh:mm:ss"),
           });
       } else {
         await dbService
@@ -144,7 +143,6 @@ function TimerButton({
             breakMin: timerObj.breakMin,
             breakSec: timerObj.breakSec,
             usedCount: usedCount,
-            endTime: Moment().format("YYYY-MM-DD"),
           });
       }
     } catch (e) {
@@ -173,6 +171,7 @@ function TimerButton({
         breakMin: timerObj.setBreakMin,
         breakSec: timerObj.setBreakSec,
         addSet: addSetCount + timerObj.addSet,
+        endTime: "",
       };
 
       const breakTimeUpdateObj = {
@@ -181,6 +180,7 @@ function TimerButton({
         focusSet: addSetCount + timerObj.focusSet,
         breakSet: addSetCount + timerObj.breakSet,
         addSet: addSetCount + timerObj.addSet,
+        endTime: "",
       };
 
       const finishTimeUpdateObj = {
@@ -192,6 +192,7 @@ function TimerButton({
         sec: timerObj.setFocusSec,
         status: "start",
         addSet: addSetCount + timerObj.addSet,
+        endTime: "",
       };
 
       const isFinished = timerObj.focusSet <= 0;

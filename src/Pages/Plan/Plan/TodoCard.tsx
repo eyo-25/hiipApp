@@ -13,6 +13,7 @@ import {
   endDateState,
   toDoState,
   isStatusLoad,
+  timerState,
 } from "../../../Recoil/atoms";
 import { Dark_Gray, Dark_Gray2 } from "../../../Styles/Colors";
 import { useMatch, useNavigate } from "react-router-dom";
@@ -56,6 +57,7 @@ function TodoCard({ todoObj }: ITodoCard) {
   const [btnPopup, setBtnPopup] = useState(false);
   const [startDate, setStartDate] = useRecoilState(startDateState);
   const [endDate, setEndDate] = useRecoilState(endDateState);
+  const [timerObj, setTimerObj] = useRecoilState(timerState);
   const [timerArray, setTimeArray] = useState<any[]>([]);
   const [timeStatus, setTimeStatus] = useState("");
   const [statusLoad, setStatusLoad] = useRecoilState(isStatusLoad);
@@ -356,15 +358,7 @@ function TodoCard({ todoObj }: ITodoCard) {
             <p>{todoObj.planSubTitle}</p>
           </TextBox>
           <IntervalBox>
-            <h4
-            // style={{
-            //   color: statusColor[timeStatus]
-            //     ? statusColor[timeStatus]
-            //     : "black",
-            // }}
-            >
-              {todoObj.defaultSet}
-            </h4>
+            <h4>{todoObj.defaultSet}</h4>
             <p>SET</p>
             <StartBtn onClick={onStartClick} />
           </IntervalBox>

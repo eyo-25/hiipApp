@@ -77,7 +77,7 @@ function IntervalTimer({ count, start, stop, reset, done }: IIntervalTimer) {
             : isNext
             ? nextUsedCount
             : usedCount,
-          endTime: Moment().format("YYYY-MM-DD hh:mm:ss"),
+          endTime: isDone ? Moment().format("YYYY-MM-DD HH:mm:ss") : "",
         });
     } catch (e) {
       alert("타이머 ERROR.");

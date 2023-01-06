@@ -16,6 +16,7 @@ import {
 } from "../../Recoil/atoms";
 import { authService, dbService } from "../../firebase";
 import TimerSplash from "../../Component/TimerSplash";
+import { defaultTimer } from "../../Utils/interface";
 
 const bottomVariants = {
   normal: {
@@ -62,7 +63,7 @@ function Timer() {
     sec: 10,
     breakMin: defaultSet - 1 <= 0 ? 0 : 0,
     breakSec: defaultSet - 1 <= 0 ? 0 : 5,
-    startTime: Moment().format("YYYY-MM-DD hh:mm:ss"),
+    startTime: Moment().format("YYYY-MM-DD HH:mm:ss"),
     endTime: "",
     todoId: todoId,
     status: "start",
@@ -106,6 +107,17 @@ function Timer() {
             });
 
         await Promise.all([createTimer(), timerIndexIncrease()]);
+      } else {
+        if (timeObj.current.focusSet === 0) {
+          setIsBreakSet(false);
+          setIsPause(true);
+        } else if (timeObj.current.focusSet <= timeObj.current.breakSet) {
+          setIsBreakSet(true);
+          setIsPause(false);
+        } else {
+          setIsBreakSet(false);
+          setIsPause(false);
+        }
       }
     }
   }
@@ -138,20 +150,21 @@ function Timer() {
   //초기화
   useEffect(() => {
     getTimeObj();
-    if (timerObj.focusSet === 0) {
-      setIsBreakSet(false);
-      setIsPause(true);
-    } else if (timerObj.focusSet <= timerObj.breakSet) {
-      setIsBreakSet(true);
-      setIsPause(false);
-    } else {
-      setIsBreakSet(false);
-      setIsPause(false);
-    }
+    // if (timerObj.focusSet === 0) {
+    //   setIsBreakSet(false);
+    //   setIsPause(true);
+    // } else if (timerObj.focusSet <= timerObj.breakSet) {
+    //   setIsBreakSet(true);
+    //   setIsPause(false);
+    // } else {
+    //   setIsBreakSet(false);
+    //   setIsPause(false);
+    // }
     return () => {
       setIsTimerSplash(true);
       setIsBreakSet(false);
       timeObj.current = {};
+      setTimerObj(defaultTimer);
     };
   }, []);
 

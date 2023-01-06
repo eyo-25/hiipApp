@@ -1,4 +1,5 @@
 import { atom } from "recoil";
+import { defaultTimer, ItimeState } from "../Utils/interface";
 
 const Moment = require("moment");
 
@@ -125,48 +126,7 @@ export const addCountState = atom<number>({
   key: "addCountState",
   default: 0,
 });
-export interface ItimeState {
-  date: string;
-  addSet: number;
-  focusSet: number;
-  breakMin: number;
-  breakSec: number;
-  breakSet: number;
-  min: number;
-  sec: number;
-  setBreakMin: number;
-  setBreakSec: number;
-  setBreakSet: number;
-  setFocusMin: number;
-  setFocusSec: number;
-  setFocusSet: number;
-  startTime: string;
-  endTime: string;
-  id: string;
-  status: string;
-  usedCount: number;
-}
 export const timerState = atom<ItimeState>({
   key: "timerState",
-  default: {
-    date: Moment().format("YYYY-MM-DD"),
-    addSet: 0,
-    focusSet: 0,
-    breakMin: 0,
-    breakSec: 0,
-    breakSet: 0,
-    min: 0,
-    sec: 0,
-    setBreakMin: 0,
-    setBreakSec: 0,
-    setBreakSet: 0,
-    setFocusMin: 0,
-    setFocusSec: 0,
-    setFocusSet: 0,
-    startTime: "",
-    endTime: "",
-    id: "",
-    status: "start",
-    usedCount: 0,
-  },
+  default: defaultTimer,
 });

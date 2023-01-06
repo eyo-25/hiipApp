@@ -3,14 +3,19 @@ import { useEffect, useState } from "react";
 import styled from "styled-components";
 import { Dark_Gray2, Normal_Gray2, Normal_Gray3 } from "../../../Styles/Colors";
 import { dbService } from "../../../firebase";
-import { resultColor, statusColor, statusName } from "../../../Utils/interface";
-import { ItimeState } from "../../../Recoil/atoms";
+import {
+  ItimeState,
+  resultColor,
+  statusColor,
+  statusName,
+} from "../../../Utils/interface";
+import { useNavigate } from "react-router-dom";
 
 function TodoCard({ todoObj }: any) {
-  // const [intervalArray, setIntervalArray] = useState<any[]>();
   const [timerObj, setTimerObj] = useState<ItimeState>();
   const Moment = require("moment");
   const now = Moment().format("YYYY-MM-DD");
+  const navigate = useNavigate();
 
   let intervalArray = [] as any;
   for (let index = 0; index < todoObj.defaultSet; index++) {
@@ -34,6 +39,23 @@ function TodoCard({ todoObj }: any) {
       intervalArray[index] = "default";
     }
   }
+
+  const onStartClick = async () => {
+    if (todoObj.status === "ready") {
+      await dbService
+        .collection("plan")
+        .doc(todoObj.id)
+        .update({ status: "start" });
+      navigate(`/timer/${todoObj.id}`);
+    } else if (
+      todoObj.status === "start" &&
+      timerObj &&
+      timerObj.status !== "fail" &&
+      timerObj.status !== "success"
+    ) {
+      navigate(`/timer/${todoObj.id}`);
+    }
+  };
 
   useEffect(() => {
     dbService
@@ -69,7 +91,7 @@ function TodoCard({ todoObj }: any) {
       <IntervalBox>
         <h4>{todoObj.defaultSet}</h4>
         <p>SET</p>
-        <StartBtn />
+        <StartBtn onClick={onStartClick} />
       </IntervalBox>
       <IntervalBarBox>
         {intervalArray.map((item: any, index: number) => (

@@ -5,7 +5,7 @@ import ExtendBackground from "../../Assets/image/result_extend.png";
 import FailBackground from "../../Assets/image/result_fail.png";
 import { IoChevronBackSharp } from "react-icons/io5";
 import { useNavigate, useParams } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { dbService } from "../../firebase";
 import TimerGraph from "./TimerGraph";
@@ -33,13 +33,14 @@ function TimerResult() {
   const [background, setBackground] = useState<any>();
   const [mentArray, setMentArray] = useState<string[]>([]);
   const [timerIndex, setTimerIndex] = useState<number>(0);
+  const [endTime, setEndTime] = useState<string>("");
   const params = useParams();
   const todoId = params.todoId;
   const timerId = params.timerId;
   const resultStatus = params.status;
   const Moment = require("moment");
   const navigate = useNavigate();
-  const now = Moment().format("YYYY-MM-DD");
+  const now = useRef<string>();
 
   const btnVarients = {
     normal: {
@@ -79,14 +80,27 @@ function TimerResult() {
   //파이어베이스 timer상태 업데이트
   async function updateStatusSubmit(status: string) {
     try {
-      dbService
-        .collection("plan")
-        .doc(todoId)
-        .collection("timer")
-        .doc(timerId)
-        .update({
-          status: status === "fail" ? status : "success",
-        });
+      if (status === "success" || status === "extend") {
+        dbService
+          .collection("plan")
+          .doc(todoId)
+          .collection("timer")
+          .doc(timerId)
+          .update({
+            status: "success",
+            endTime: Moment(now.current).format("YYYY-MM-DD HH:mm:ss"),
+          });
+      } else {
+        dbService
+          .collection("plan")
+          .doc(todoId)
+          .collection("timer")
+          .doc(timerId)
+          .update({
+            status: status,
+            endTime: Moment(now.current).format("YYYY-MM-DD HH:mm:ss"),
+          });
+      }
     } catch (e) {
       alert("타이머 ERROR.");
     }
@@ -103,7 +117,9 @@ function TimerResult() {
         .get()
         .then((result) => {
           result.forEach((result) => {
-            if (result.data().date === now) {
+            if (
+              result.data().date === Moment(now.current).format("YYYY-MM-DD")
+            ) {
               setToDo(result.data());
             }
             setTimerArray((prev) => {
@@ -149,19 +165,37 @@ function TimerResult() {
         .get()
         .then((result) => {
           result.forEach((result) => {
+            setToDo(result.data());
             setTimerArray((prev) => {
-              const endTimeMoment = Moment(result.data().endTime);
+              const endTimeMoment = Moment(
+                result.data().endTime === ""
+                  ? Moment(now.current).format("YYYY-MM-DD HH:mm:ss")
+                  : result.data().endTime
+              );
               const startTimeMoment = Moment(result.data().startTime);
               const usedCount = result.data().usedCount;
-
               const totalCount = Moment.duration(
                 endTimeMoment.diff(startTimeMoment)
               ).asSeconds();
 
+              const overTime = totalCount - usedCount;
+              const focusPercentValue =
+                100 - Math.round((overTime / 9000) * 100);
+              const focusPercent = () => {
+                if (100 <= focusPercentValue) {
+                  return 100;
+                } else if (focusPercentValue <= 0) {
+                  return 0;
+                } else {
+                  return focusPercentValue;
+                }
+              };
+
               const copyArray: any[] = [...prev];
               copyArray.splice(i, 1, {
-                successPercent: Math.round((usedCount / totalCount) * 100),
+                successPercent: focusPercent(),
               });
+
               return [...copyArray];
             });
           });
@@ -173,6 +207,8 @@ function TimerResult() {
 
   // 초기화
   useEffect(() => {
+    //now 초기화
+    now.current = Moment();
     //week 초기화
     setWeekArray((prev) => {
       const copy = [...prev];
