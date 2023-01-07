@@ -123,6 +123,7 @@ const DragBox = styled.div`
     height: 90px;
   }
 `;
+
 const TextBox = styled.div`
   display: flex;
   flex-direction: column;

@@ -54,6 +54,7 @@ function Timer() {
     setBreakSet: defaultSet - 1 <= 0 ? 0 : defaultSet - 1,
     focusSet: defaultSet,
     breakSet: defaultSet - 1 <= 0 ? 0 : defaultSet - 1,
+    successCount: toDos[index].successCount,
     //테스트 끝나면 분만 적용
     setFocusMin: 0,
     setFocusSec: 10,

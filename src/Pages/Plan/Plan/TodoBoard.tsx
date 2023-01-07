@@ -3,6 +3,7 @@ import styled from "styled-components";
 import TodoCard from "./TodoCard";
 import {
   cardEditState,
+  createClickDateState,
   projectState,
   selectState,
   toDoState,
@@ -29,6 +30,7 @@ function TodoBord() {
   const [isEdit, setIsEdit] = useRecoilState(cardEditState);
   const [project, setProject] = useRecoilState(projectState);
   const [isSelect, setIsSelect] = useRecoilState(selectState);
+  const [clickDate, setClickDate] = useRecoilState(createClickDateState);
 
   useEffect(() => {
     return setIsEdit(false);
@@ -60,6 +62,7 @@ function TodoBord() {
             )}
           </GuidBox>
         )}
+        {/* {toDo.startDate <= clickDate && clickDate <= toDo.endDate ? ( */}
         {toDos?.map((toDo, index) => (
           <CardWrapper
             variants={cardVariants}

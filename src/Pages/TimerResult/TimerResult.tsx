@@ -33,7 +33,6 @@ function TimerResult() {
   const [background, setBackground] = useState<any>();
   const [mentArray, setMentArray] = useState<string[]>([]);
   const [timerIndex, setTimerIndex] = useState<number>(0);
-  const [endTime, setEndTime] = useState<string>("");
   const params = useParams();
   const todoId = params.todoId;
   const timerId = params.timerId;
@@ -41,6 +40,7 @@ function TimerResult() {
   const Moment = require("moment");
   const navigate = useNavigate();
   const now = useRef<string>();
+  const startDate = useRef<string>("");
 
   const btnVarients = {
     normal: {
@@ -63,6 +63,7 @@ function TimerResult() {
         .doc(todoId)
         .get()
         .then((result: any) => {
+          startDate.current = result.data().startDate;
           setTimerIndex(result.data().timerIndex);
           setPlanPercent(() => {
             const startDate = Moment(result.data().startDate);
@@ -90,6 +91,12 @@ function TimerResult() {
             status: "success",
             endTime: Moment(now.current).format("YYYY-MM-DD HH:mm:ss"),
           });
+        dbService
+          .collection("plan")
+          .doc(todoId)
+          .update({
+            successCount: toDo.successCount + 1,
+          });
       } else {
         dbService
           .collection("plan")
@@ -106,8 +113,8 @@ function TimerResult() {
     }
   }
 
-  //날짜에 해당하는 timerObj 배정
-  async function getSuccessPercentArray(i: number) {
+  //Extend에 해당하는 timerObj 배정
+  async function getExtendPercentArray(i: number) {
     try {
       await dbService
         .collection("plan")
@@ -154,8 +161,54 @@ function TimerResult() {
     }
   }
 
-  //날짜에 해당하는 timerObj 배정
-  async function getConcentrateArray(i: number) {
+  //fail에 해당하는 timerObj 배정
+  async function getFailPercentArray() {
+    try {
+      await dbService
+        .collection("plan")
+        .doc(todoId)
+        .collection("timer")
+        .get()
+        .then((result) => {
+          result.forEach((result) => {
+            if (
+              result.data().date === Moment(now.current).format("YYYY-MM-DD")
+            ) {
+              setToDo(result.data());
+            }
+            setTimerArray((prev) => {
+              //deepCopy
+              const copyArray: any[] = [...prev];
+              const dayIndex = Moment(result.data().date).day();
+              const isSuccess = result.data().status === "success";
+              const successCount = isSuccess
+                ? result.data().successCount + 1
+                : result.data().successCount;
+
+              const startTimeMoment = Moment(startDate.current);
+              const endTimeMoment = Moment(result.data().date);
+
+              const progressDuration = Moment.duration(
+                endTimeMoment.diff(startTimeMoment)
+              ).asDays();
+
+              //배열에 할당
+              copyArray.splice(dayIndex, 1, {
+                successPercent: Math.round(
+                  (successCount / (progressDuration + 1)) * 100
+                ),
+              });
+              return [...copyArray];
+            });
+          });
+        });
+    } catch {
+      alert("Timer 오류");
+    }
+  }
+
+  //fail에 해당하는 timerObj 배정
+  async function getSuccessPercentArray(i: number) {
     try {
       await dbService
         .collection("plan")
@@ -167,6 +220,10 @@ function TimerResult() {
           result.forEach((result) => {
             setToDo(result.data());
             setTimerArray((prev) => {
+              const isDayOver =
+                result.data().date !==
+                  Moment(now.current).format("YYYY-MM-DD") &&
+                result.data().endTime === "";
               const endTimeMoment = Moment(
                 result.data().endTime === ""
                   ? Moment(now.current).format("YYYY-MM-DD HH:mm:ss")
@@ -193,7 +250,7 @@ function TimerResult() {
 
               const copyArray: any[] = [...prev];
               copyArray.splice(i, 1, {
-                successPercent: focusPercent(),
+                successPercent: isDayOver ? 0 : focusPercent(),
               });
 
               return [...copyArray];
@@ -209,6 +266,8 @@ function TimerResult() {
   useEffect(() => {
     //now 초기화
     now.current = Moment();
+    //plan 초기화
+    getPlanArray();
     //week 초기화
     setWeekArray((prev) => {
       const copy = [...prev];
@@ -243,20 +302,19 @@ function TimerResult() {
         return SussessBackground;
       }
     });
-
-    //plan 초기화
-    getPlanArray();
   }, []);
 
   useEffect(() => {
-    if (7 === weekArray.length) {
+    if (resultStatus !== "fail" && 7 === weekArray.length) {
       for (let i = 0; i < weekArray.length; i++) {
-        if (resultStatus === "fail") {
+        if (resultStatus === "extend") {
+          getExtendPercentArray(i);
+        } else if (resultStatus === "success") {
           getSuccessPercentArray(i);
-        } else {
-          getConcentrateArray(i);
         }
       }
+    } else if (resultStatus === "fail" && 7 === weekArray.length) {
+      getFailPercentArray();
     }
   }, [weekArray]);
 

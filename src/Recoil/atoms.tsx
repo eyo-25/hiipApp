@@ -7,6 +7,7 @@ export interface ITodo {
   endDate: string;
   index: number;
   timerIndex: number;
+  successCount: number;
   defaultSet: number;
   memo: string;
   planSubTitle: string;

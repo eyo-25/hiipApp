@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import styled from "styled-components";
 import { Dark_Gray, Dark_Gray4 } from "../../Styles/Colors";
-import { resultColor } from "../../Utils/interface";
+import { resultColor, resultGraphMent } from "../../Utils/interface";
 
 interface ITimerGrap {
   timerArray: any[];
@@ -33,7 +33,7 @@ function TimerGraph({ timerArray, resultStatus, timerIndex }: ITimerGrap) {
         <GraphTextBox>
           <h4>COACH TIP</h4>
           <p>
-            어제보다 계획 달성률이
+            {resultGraphMent[resultStatus]}
             <br />
             {0 <= percentDiff ? (
               <span style={{ color: resultColor[resultStatus] }}>

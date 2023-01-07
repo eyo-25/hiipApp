@@ -4,43 +4,36 @@ export interface IUserObjProps {
   userObj: any;
 }
 
-type statusNameType = {
+type statusStringType = {
   [key: string]: string;
 };
-export const statusName: statusNameType = {
+export const statusName: statusStringType = {
   extend: "진행중",
   start: "진행중",
   success: "완료",
   fail: "실패",
 };
-
-type statusColorType = {
-  [key: string]: string;
-};
-export const statusColor: statusColorType = {
+export const statusColor: statusStringType = {
   extend: "black",
   start: "black",
   success: Blue,
   fail: Red,
 };
-
-type resultMentType = {
-  [key: string]: string;
-};
-export const resultMent: resultMentType = {
+export const resultMent: statusStringType = {
   success: "성공을 맛 봤으니-꾸준함을 맛볼 차례다.",
   extend: "한번 끝까지 해봤으니-내일은 오늘보다 쉬울거다.",
   fail: "시작은 반-근데 넌,-오늘 거기서 뒷걸음 쳤네?",
 };
-
-type resultColorType = {
-  [key: string]: string;
-};
-export const resultColor: resultColorType = {
+export const resultColor: statusStringType = {
   default: "#000",
   extend: Yellow,
   success: Blue,
   fail: Red,
+};
+export const resultGraphMent: statusStringType = {
+  extend: "어제보다 평균 계획 완수율이",
+  success: "어제보다 평균 집중시간이",
+  fail: "어제보다 예상 계획 성공률이",
 };
 
 const Moment = require("moment");
@@ -65,6 +58,7 @@ export interface ItimeState {
   id: string;
   status: string;
   usedCount: number;
+  successCount: number;
 }
 
 export const defaultTimer = {
@@ -87,4 +81,5 @@ export const defaultTimer = {
   id: "",
   status: "start",
   usedCount: 0,
+  successCount: 0,
 };

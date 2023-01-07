@@ -109,6 +109,6 @@ const CountBox = styled.div`
 `;
 const CountText = styled(motion.div)`
   font-family: "RobotoBold";
-  font-size: 12vh;
+  font-size: 10vh;
   color: white;
 `;
