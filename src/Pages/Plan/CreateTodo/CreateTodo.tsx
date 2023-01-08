@@ -57,6 +57,7 @@ const CreateTodo = ({ mode }: { mode: string }) => {
   const [endDate, setEndDate] = useRecoilState(createEndDateState);
   const [planTitle, setPlanTitle] = useRecoilState(createTitleState);
   const [planSubTitle, setPlanSubTitle] = useRecoilState(createSubTitleState);
+  const [planStatus, setPlanStatus] = useState("");
   const [count, setCount] = useState(1);
   const params = useParams();
   const todoId = params.todoId;
@@ -70,6 +71,7 @@ const CreateTodo = ({ mode }: { mode: string }) => {
       );
       setCount(project[projectIndex].defaultSet);
     } else {
+      setPlanStatus(`${toDos[index].status}`);
       setStartDate(`${toDos[index].startDate}`);
       setEndDate(`${toDos[index].endDate}`);
       setPlanTitle(`${toDos[index].planTitle}`);
@@ -98,6 +100,7 @@ const CreateTodo = ({ mode }: { mode: string }) => {
       <ModalWrapper variants={popupVariants} initial="normal" animate="animate">
         {!startToggle && !endToggle && (
           <CreateInput
+            planStatus={planStatus}
             setStartToggle={setStartToggle}
             setEndToggle={setEndToggle}
             count={count}

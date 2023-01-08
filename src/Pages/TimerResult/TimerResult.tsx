@@ -28,11 +28,11 @@ function TimerResult() {
     {},
   ]);
   const [weekArray, setWeekArray] = useState<string[]>([]);
-  const [toDo, setToDo] = useState<any>();
   const [planPercent, setPlanPercent] = useState<any>();
   const [background, setBackground] = useState<any>();
   const [mentArray, setMentArray] = useState<string[]>([]);
   const [timerIndex, setTimerIndex] = useState<number>(0);
+  const [nowTimer, setNowTimer] = useState<any>();
   const params = useParams();
   const todoId = params.todoId;
   const timerId = params.timerId;
@@ -95,7 +95,7 @@ function TimerResult() {
           .collection("plan")
           .doc(todoId)
           .update({
-            successCount: toDo.successCount + 1,
+            successCount: nowTimer.successCount + 1,
           });
       } else {
         dbService
@@ -127,7 +127,7 @@ function TimerResult() {
             if (
               result.data().date === Moment(now.current).format("YYYY-MM-DD")
             ) {
-              setToDo(result.data());
+              setNowTimer(result.data());
             }
             setTimerArray((prev) => {
               //deepCopy
@@ -174,32 +174,66 @@ function TimerResult() {
             if (
               result.data().date === Moment(now.current).format("YYYY-MM-DD")
             ) {
-              setToDo(result.data());
+              setNowTimer(result.data());
             }
-            setTimerArray((prev) => {
-              //deepCopy
-              const copyArray: any[] = [...prev];
-              const dayIndex = Moment(result.data().date).day();
-              const isSuccess = result.data().status === "success";
-              const successCount = isSuccess
-                ? result.data().successCount + 1
-                : result.data().successCount;
+            if (
+              weekArray[0] <= result.data().date.result &&
+              result.data().date <= weekArray[6]
+            ) {
+              setTimerArray((prev) => {
+                //deepCopy
+                const copyArray: any[] = [...prev];
+                const dayIndex = Moment(result.data().date).day();
+                const isSuccess = result.data().status === "success";
+                const successCount = isSuccess
+                  ? result.data().successCount + 1
+                  : result.data().successCount;
 
-              const startTimeMoment = Moment(startDate.current);
-              const endTimeMoment = Moment(result.data().date);
+                const startTimeMoment = Moment(startDate.current);
+                const endTimeMoment = Moment(result.data().date);
 
-              const progressDuration = Moment.duration(
-                endTimeMoment.diff(startTimeMoment)
-              ).asDays();
+                const progressDuration = () => {
+                  const duration = Moment.duration(
+                    endTimeMoment.diff(startTimeMoment)
+                  ).asDays();
+                  if (0 <= duration) {
+                    return duration;
+                  } else {
+                    return 0;
+                  }
+                };
 
-              //배열에 할당
-              copyArray.splice(dayIndex, 1, {
-                successPercent: Math.round(
-                  (successCount / (progressDuration + 1)) * 100
-                ),
+                const failPercentValue = Math.round(
+                  (successCount / (progressDuration() + 1)) * 100
+                );
+
+                const failPercent = () => {
+                  if (100 <= failPercentValue) {
+                    return 100;
+                  } else if (failPercentValue <= 0) {
+                    return 0;
+                  } else {
+                    return failPercentValue;
+                  }
+                };
+
+                //배열에 할당
+                copyArray.splice(dayIndex, 1, {
+                  successPercent: failPercent(),
+                });
+                return [...copyArray];
               });
-              return [...copyArray];
-            });
+            } else {
+              setTimerArray((prev) => {
+                const dayIndex = Moment(result.data().date).day();
+                const copyArray: any[] = [...prev];
+                //배열에 할당
+                copyArray.splice(dayIndex, 1, {
+                  successPercent: 0,
+                });
+                return [...copyArray];
+              });
+            }
           });
         });
     } catch {
@@ -218,42 +252,51 @@ function TimerResult() {
         .get()
         .then((result) => {
           result.forEach((result) => {
-            setToDo(result.data());
+            setNowTimer(result.data());
             setTimerArray((prev) => {
-              const isDayOver =
-                result.data().date !==
-                  Moment(now.current).format("YYYY-MM-DD") &&
-                result.data().endTime === "";
-              const endTimeMoment = Moment(
-                result.data().endTime === ""
-                  ? Moment(now.current).format("YYYY-MM-DD HH:mm:ss")
-                  : result.data().endTime
-              );
-              const startTimeMoment = Moment(result.data().startTime);
-              const usedCount = result.data().usedCount;
-              const totalCount = Moment.duration(
-                endTimeMoment.diff(startTimeMoment)
-              ).asSeconds();
+              if (result.data().status === "fail") {
+                const copyArray: any[] = [...prev];
+                copyArray.splice(i, 1, {
+                  successPercent: 0,
+                });
 
-              const overTime = totalCount - usedCount;
-              const focusPercentValue =
-                100 - Math.round((overTime / 9000) * 100);
-              const focusPercent = () => {
-                if (100 <= focusPercentValue) {
-                  return 100;
-                } else if (focusPercentValue <= 0) {
-                  return 0;
-                } else {
-                  return focusPercentValue;
-                }
-              };
+                return [...copyArray];
+              } else {
+                const isDayOver =
+                  result.data().date !==
+                    Moment(now.current).format("YYYY-MM-DD") &&
+                  result.data().endTime === "";
+                const endTimeMoment = Moment(
+                  result.data().endTime === ""
+                    ? Moment(now.current).format("YYYY-MM-DD HH:mm:ss")
+                    : result.data().endTime
+                );
+                const startTimeMoment = Moment(result.data().startTime);
+                const usedCount = result.data().usedCount;
+                const totalCount = Moment.duration(
+                  endTimeMoment.diff(startTimeMoment)
+                ).asSeconds();
 
-              const copyArray: any[] = [...prev];
-              copyArray.splice(i, 1, {
-                successPercent: isDayOver ? 0 : focusPercent(),
-              });
+                const overTime = totalCount - usedCount;
+                const focusPercentValue =
+                  100 - Math.round((overTime / 9000) * 100);
+                const focusPercent = () => {
+                  if (100 <= focusPercentValue) {
+                    return 100;
+                  } else if (focusPercentValue <= 0) {
+                    return 0;
+                  } else {
+                    return focusPercentValue;
+                  }
+                };
 
-              return [...copyArray];
+                const copyArray: any[] = [...prev];
+                copyArray.splice(i, 1, {
+                  successPercent: isDayOver ? 0 : focusPercent(),
+                });
+
+                return [...copyArray];
+              }
             });
           });
         });
@@ -388,12 +431,12 @@ function TimerResult() {
           </ResultInfoBox>
           <ResultInfoBox>
             <NewBox>+18</NewBox>
-            <h4>{toDo && toDo.setFocusSet}SET</h4>
+            <h4>{nowTimer && nowTimer.setFocusSet}SET</h4>
             <p>진행세트</p>
           </ResultInfoBox>
           <ResultInfoBox>
             <NewBox>+18</NewBox>
-            <h4>{toDo && toDo.addSet}SET</h4>
+            <h4>{nowTimer && nowTimer.addSet}SET</h4>
             <p>추가세트</p>
           </ResultInfoBox>
         </ResultInfoContainer>

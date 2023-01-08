@@ -26,6 +26,7 @@ function MonthDatePicker({
   const [monthArray, setMonthArray] = useState<string[]>([]);
   const [startDate, setStartDate] = useRecoilState(createStartDateState);
   const [endDate, setEndDate] = useRecoilState(createEndDateState);
+  const nowDate = Moment().format("YYYY-MM-DD");
 
   useEffect(() => {
     setClickDate(() => {
@@ -95,7 +96,9 @@ function MonthDatePicker({
   const onDateClick = (clickedDate: string) => {
     if (
       !(
-        project[0].startDate <= clickedDate && clickedDate <= project[0].endDate
+        nowDate <= clickedDate &&
+        project[0].startDate <= clickedDate &&
+        clickedDate <= project[0].endDate
       )
     ) {
       return;
@@ -124,7 +127,9 @@ function MonthDatePicker({
           <HoverBox onClick={() => onDateClick(date)}>
             <DateText
               nowMonth={
-                project[0].startDate <= date && date <= project[0].endDate
+                nowDate <= date &&
+                project[0].startDate <= date &&
+                date <= project[0].endDate
               }
             >
               {Number(Moment(date).format("DD"))}

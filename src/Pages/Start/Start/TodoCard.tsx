@@ -47,13 +47,15 @@ function TodoCard({ todoObj }: any) {
         .doc(todoObj.id)
         .update({ status: "start" });
       navigate(`/timer/${todoObj.id}`);
-    } else if (
-      todoObj.status === "start" &&
-      timerObj &&
-      timerObj.status !== "fail" &&
-      timerObj.status !== "success"
-    ) {
-      navigate(`/timer/${todoObj.id}`);
+    } else if (todoObj.status === "start") {
+      if (
+        timerObj &&
+        (timerObj.status === "fail" || timerObj.status === "success")
+      ) {
+        return;
+      } else {
+        navigate(`/timer/${todoObj.id}`);
+      }
     }
   };
 

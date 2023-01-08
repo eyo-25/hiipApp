@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { IoAddCircle, IoRemoveCircle } from "react-icons/io5";
 import { useNavigate, useParams } from "react-router-dom";
 import { useRecoilState } from "recoil";
@@ -25,6 +25,7 @@ interface ICreateInput {
   count: number;
   setCount: React.Dispatch<React.SetStateAction<number>>;
   mode: string;
+  planStatus: string;
 }
 
 function CreateInput({
@@ -33,6 +34,7 @@ function CreateInput({
   count,
   setCount,
   mode,
+  planStatus,
 }: ICreateInput) {
   const navigate = useNavigate();
   const [project, setProject] = useRecoilState(projectState);
@@ -183,6 +185,8 @@ function CreateInput({
     }
   };
 
+  const startDateInput = useRef<any>();
+
   //인풋 관리
   const titleChange = (event: React.FormEvent<HTMLInputElement>) => {
     const {
@@ -208,6 +212,16 @@ function CreateInput({
     } = event;
     setEndDate(value);
   };
+  const onStartDateFocus = () => {
+    if (mode === "CREATE" || (mode === "EDIT" && planStatus === "ready")) {
+      setStartToggle(true);
+      setEndToggle(false);
+    } else {
+      startDateInput.current.blur();
+      alert("측정이 시작된 후 시작날짜는 변경할수 없습니다.");
+    }
+  };
+
   return (
     <ModalForm onSubmit={onCreateCardClick}>
       <ItemBox>
@@ -244,13 +258,11 @@ function CreateInput({
         <ItemBox>
           <ItemTitle>시작 날짜</ItemTitle>
           <DateInput
+            ref={startDateInput}
             value={startDate}
             onChange={startDateChange}
             inputMode="none"
-            onFocus={() => {
-              setStartToggle(true);
-              setEndToggle(false);
-            }}
+            onFocus={onStartDateFocus}
           />
         </ItemBox>
         <ItemBox>

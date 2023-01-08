@@ -68,7 +68,6 @@ function TodoCard({ todoObj }: ITodoCard) {
   const cardRef = useRef<any>();
   const navigate = useNavigate();
   const [timerIndex, setTimerIndex] = useState(0);
-  // const timerIndex = timerArray.findIndex((item) => item.date === now);
 
   useEffect(() => {
     setTimerIndex(timerArray.findIndex((item) => item.date === now));
