@@ -1,11 +1,12 @@
 import { motion } from "framer-motion";
-import { useEffect, useState, useRef } from "react";
+import { useRef } from "react";
 import { IoAddCircle, IoRemoveCircle } from "react-icons/io5";
 import { useNavigate, useParams } from "react-router-dom";
 import { useRecoilState } from "recoil";
 import styled from "styled-components";
 import { dbService } from "../../../firebase";
 import {
+  clickDateState,
   createEndDateState,
   createStartDateState,
   createSubTitleState,
@@ -40,14 +41,16 @@ function CreateInput({
   const [project, setProject] = useRecoilState(projectState);
   const [toDos, setToDos] = useRecoilState(toDoState);
   const [isCreate, setIsCreate] = useRecoilState(isCreateState);
-  const [startDate, setStartDate] = useRecoilState(createStartDateState);
-  const [endDate, setEndDate] = useRecoilState(createEndDateState);
-  const [startDate2, setStartDate2] = useRecoilState(startDateState);
-  const [endDate2, setEndDate2] = useRecoilState(endDateState);
+  const [inputStartDate, setInputStartDate] =
+    useRecoilState(createStartDateState);
+  const [inputEndDate, setInputEndDate] = useRecoilState(createEndDateState);
+  const [startDate, setStartDate] = useRecoilState(startDateState);
+  const [endDate, setEndDate] = useRecoilState(endDateState);
   const [planTitle, setPlanTitle] = useRecoilState(createTitleState);
   const [planSubTitle, setPlanSubTitle] = useRecoilState(createSubTitleState);
   const [isTodoEdit, setIsTodoEdit] = useRecoilState(isTodoEditState);
   const [isLoad, setIsLoad] = useRecoilState(loadState);
+  const [clickDate, setClickDate] = useRecoilState(clickDateState);
   const uid = JSON.parse(localStorage.getItem("user") as any).uid;
   const projectIndex = project.findIndex((item: any) => item.select === "true");
   const params = useParams();
@@ -95,8 +98,8 @@ function CreateInput({
         memo: "",
         planSubTitle: planSubTitle,
         planTitle: planTitle,
-        startDate: startDate,
-        endDate: endDate,
+        startDate: inputStartDate,
+        endDate: inputEndDate,
         status: "ready",
         uId: uid,
         projectId: project[projectIndex].id,
@@ -126,8 +129,8 @@ function CreateInput({
         defaultSet: count,
         planSubTitle: planSubTitle,
         planTitle: planTitle,
-        startDate: startDate,
-        endDate: endDate,
+        startDate: inputStartDate,
+        endDate: inputEndDate,
       };
       await dbService.collection("plan").doc(todoId).update(editObj);
     } catch (e) {
@@ -142,15 +145,15 @@ function CreateInput({
   //todo카드 생성 클릭
   const onCreateCardClick = async () => {
     const isRequired: boolean =
-      startDate === "" ||
-      endDate === "" ||
+      inputStartDate === "" ||
+      inputEndDate === "" ||
       planTitle === "" ||
       planSubTitle === "";
     const requiredMessage = () => {
       if (planTitle === "" || planSubTitle === "") {
         alert("To-Do 제목을 설정해 주세요");
         return;
-      } else if (startDate === "" || endDate === "") {
+      } else if (inputStartDate === "" || inputEndDate === "") {
         alert("To-Do 날짜를 설정해 주세요");
         return;
       }
@@ -162,9 +165,11 @@ function CreateInput({
         const ok = window.confirm("To-Do를 생성하시겠습니까?");
         if (ok) {
           createToDoSubmit().then(() => {
+            if (inputStartDate <= clickDate && clickDate <= inputEndDate) {
+              setStartDate(inputStartDate);
+              setEndDate(inputEndDate);
+            }
             navigate("/plan");
-            setStartDate2(startDate);
-            setEndDate2(endDate);
             setIsCreate(false);
           });
         }
@@ -175,10 +180,24 @@ function CreateInput({
       } else {
         const ok = window.confirm("To-Do를 수정하시겠습니까?");
         if (ok) {
-          setStartDate2(startDate);
-          setEndDate2(endDate);
           setIsTodoEdit(false);
           editToDoSubmit();
+          for (let i = 0; i < toDos.length; i++) {
+            if (toDos[index].id === toDos[i].id) {
+              continue;
+            }
+            if (
+              toDos[i].startDate <= clickDate &&
+              clickDate <= toDos[i].endDate
+            ) {
+              setStartDate(toDos[i].startDate);
+              setEndDate(toDos[i].endDate);
+              break;
+            } else if (i + 1 === toDos.length) {
+              setStartDate("");
+              setEndDate("");
+            }
+          }
           navigate("/plan");
         }
       }
@@ -204,13 +223,13 @@ function CreateInput({
     const {
       currentTarget: { value },
     } = event;
-    setStartDate(value);
+    setInputStartDate(value);
   };
   const endDateChange = (event: React.FormEvent<HTMLInputElement>) => {
     const {
       currentTarget: { value },
     } = event;
-    setEndDate(value);
+    setInputEndDate(value);
   };
   const onStartDateFocus = () => {
     if (mode === "CREATE" || (mode === "EDIT" && planStatus === "ready")) {
@@ -259,7 +278,7 @@ function CreateInput({
           <ItemTitle>시작 날짜</ItemTitle>
           <DateInput
             ref={startDateInput}
-            value={startDate}
+            value={inputStartDate}
             onChange={startDateChange}
             inputMode="none"
             onFocus={onStartDateFocus}
@@ -268,7 +287,7 @@ function CreateInput({
         <ItemBox>
           <ItemTitle>종료 날짜</ItemTitle>
           <DateInput
-            value={endDate}
+            value={inputEndDate}
             onChange={endDateChange}
             onFocus={() => {
               setStartToggle(false);

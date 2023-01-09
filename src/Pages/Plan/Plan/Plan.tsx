@@ -14,7 +14,6 @@ import {
   cardEditState,
   toDoState,
   isTodoEditState,
-  selectTodoState,
   startDateState,
   endDateState,
   isWeekState,
@@ -35,9 +34,6 @@ function Plan() {
   const [mouseDownClientY, setMouseDownClientY] = useState(0);
   const [mouseUpClientY, setMouseUpClientY] = useState(0);
   const [tochedY, setTochedY] = useState(0);
-  const [startDate, setStartDate] = useRecoilState(startDateState);
-  const [endDate, setEndDate] = useRecoilState(endDateState);
-  const [selectTodo, setSelectTodo] = useRecoilState(selectTodoState);
 
   const calendarVariants = {
     normal: {
@@ -56,34 +52,15 @@ function Plan() {
   useEffect(() => {
     setIsTodoEdit(false);
     setIsCreate(false);
-    if (0 < toDos.length) {
-      setSelectTodo(() => toDos[0].id);
-      setStartDate(() => toDos[0].startDate);
-      setEndDate(() => toDos[0].endDate);
-    } else {
+    if (toDos.length <= 0) {
       setIsWeek(true);
     }
     return () => {
       setIsEdit(false);
       setIsSelect(false);
-      setSelectTodo("");
-      setStartDate("");
-      setEndDate("");
       setIsWeek(false);
     };
   }, []);
-
-  //날짜 셀렉트
-  useEffect(() => {
-    if (selectTodo === "" && 0 < toDos.length) {
-      setSelectTodo(() => toDos[0].id);
-      setStartDate(() => toDos[0].startDate);
-      setEndDate(() => toDos[0].endDate);
-    } else if (selectTodo === "" && 0 >= toDos.length) {
-      setStartDate("");
-      setEndDate("");
-    }
-  }, [toDos, selectTodo]);
 
   const closedEdit = () => {
     if (isEdit) {

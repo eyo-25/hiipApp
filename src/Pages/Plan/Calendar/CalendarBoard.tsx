@@ -2,7 +2,13 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { IoChevronForward, IoChevronBack } from "react-icons/io5";
 import { useRecoilState } from "recoil";
-import { clickDateState, isWeekState } from "../../../Recoil/atoms";
+import {
+  clickDateState,
+  endDateState,
+  isWeekState,
+  startDateState,
+  toDoState,
+} from "../../../Recoil/atoms";
 import WeeklyDatePicker from "./WeeklyDatePicker";
 import MonthDatePicker from "./MonthDatePicker";
 import { motion } from "framer-motion";
@@ -23,6 +29,9 @@ const calendarVariants = {
 
 const CalendarBoard = () => {
   const Moment = require("moment");
+  const [toDos, setToDos] = useRecoilState(toDoState);
+  const [startDate, setStartDate] = useRecoilState(startDateState);
+  const [endDate, setEndDate] = useRecoilState(endDateState);
   const calendarDays = ["일", "월", "화", "수", "목", "금", "토"];
   const [clickDate, setClickDate] = useRecoilState(clickDateState);
   const [isWeek, setIsWeek] = useRecoilState(isWeekState);
@@ -63,6 +72,22 @@ const CalendarBoard = () => {
   useEffect(() => {
     onTodayClick();
   }, []);
+
+  //클릭한 날짜 변경시 첫번째 todo의 일정이 나타나도록 설정
+  useEffect(() => {
+    if (0 < toDos.length) {
+      for (let i = 0; i < toDos.length; i++) {
+        if (toDos[i].startDate <= clickDate && clickDate <= toDos[i].endDate) {
+          setStartDate(toDos[i].startDate);
+          setEndDate(toDos[i].endDate);
+          break;
+        } else if (i + 1 === toDos.length) {
+          setStartDate("");
+          setEndDate("");
+        }
+      }
+    }
+  }, [clickDate]);
 
   return (
     <Wrapper>

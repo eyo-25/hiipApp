@@ -6,6 +6,7 @@ import {
   createClickDateState,
   createEndDateState,
   createStartDateState,
+  toDoState,
 } from "../../../Recoil/atoms";
 import { useEffect } from "react";
 import MonthDatePicker from "./MonthDatePicker";
@@ -38,7 +39,6 @@ function CalendarBoard({
   const Moment = require("moment");
   const calendarDays = ["일", "월", "화", "수", "목", "금", "토"];
   const [clickDate, setClickDate] = useRecoilState(createClickDateState);
-  const [startDate, setStartDate] = useRecoilState(createStartDateState);
   const [endDate, setEndDate] = useRecoilState(createEndDateState);
 
   const onPrevClick = () => {

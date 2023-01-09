@@ -40,10 +40,6 @@ export const isWeekState = atom({
   key: "isWeekState",
   default: false,
 });
-export const selectTodoState = atom({
-  key: "selectTodoState",
-  default: "",
-});
 export const cardEditState = atom({
   key: "cardEditState",
   default: false,

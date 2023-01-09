@@ -53,8 +53,9 @@ const CreateTodo = ({ mode }: { mode: string }) => {
   const [isTodoEdit, setIsTodoEdit] = useRecoilState(isTodoEditState);
   const [startToggle, setStartToggle] = useState(false);
   const [endToggle, setEndToggle] = useState(false);
-  const [startDate, setStartDate] = useRecoilState(createStartDateState);
-  const [endDate, setEndDate] = useRecoilState(createEndDateState);
+  const [inputStartDate, setInputStartDate] =
+    useRecoilState(createStartDateState);
+  const [inputEndDate, setInputEndDate] = useRecoilState(createEndDateState);
   const [planTitle, setPlanTitle] = useRecoilState(createTitleState);
   const [planSubTitle, setPlanSubTitle] = useRecoilState(createSubTitleState);
   const [planStatus, setPlanStatus] = useState("");
@@ -72,16 +73,16 @@ const CreateTodo = ({ mode }: { mode: string }) => {
       setCount(project[projectIndex].defaultSet);
     } else {
       setPlanStatus(`${toDos[index].status}`);
-      setStartDate(`${toDos[index].startDate}`);
-      setEndDate(`${toDos[index].endDate}`);
+      setInputStartDate(`${toDos[index].startDate}`);
+      setInputEndDate(`${toDos[index].endDate}`);
       setPlanTitle(`${toDos[index].planTitle}`);
       setPlanSubTitle(`${toDos[index].planSubTitle}`);
       setCount(toDos[index].defaultSet);
     }
     //클린업
     return () => {
-      setStartDate("");
-      setEndDate("");
+      setInputStartDate("");
+      setInputEndDate("");
       setPlanTitle("");
       setPlanSubTitle("");
     };

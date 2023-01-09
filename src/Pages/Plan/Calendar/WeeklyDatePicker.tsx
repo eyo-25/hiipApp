@@ -4,7 +4,6 @@ import {
   clickDateState,
   endDateState,
   projectState,
-  selectTodoState,
   startDateState,
   toDoState,
 } from "../../../Recoil/atoms";
@@ -34,7 +33,6 @@ const WeeklyDatePicker = () => {
   const [weekArray, setWeekArray] = useState<Date[]>([]);
   const [startDate, setStartDate] = useRecoilState(startDateState);
   const [endDate, setEndDate] = useRecoilState(endDateState);
-  const [selectTodo, setSelectTodo] = useRecoilState(selectTodoState);
 
   useEffect(() => {
     setWeekArray((prev) => {

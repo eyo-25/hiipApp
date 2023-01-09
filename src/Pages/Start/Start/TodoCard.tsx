@@ -11,51 +11,59 @@ import {
 } from "../../../Utils/interface";
 import { useNavigate } from "react-router-dom";
 
-function TodoCard({ todoObj }: any) {
+interface ITodoCard {
+  todoObj: any;
+  index: number;
+}
+function TodoCard({ todoObj, index }: ITodoCard) {
   const [timerObj, setTimerObj] = useState<ItimeState>();
   const Moment = require("moment");
   const now = Moment().format("YYYY-MM-DD");
   const navigate = useNavigate();
 
   let intervalArray = [] as any;
-  for (let index = 0; index < todoObj.defaultSet; index++) {
+  for (let i = 0; i < todoObj.defaultSet; i++) {
     if (timerObj) {
       if (timerObj.status === "fail") {
         const defaultSet = todoObj.defaultSet - timerObj.focusSet;
-        if (index < defaultSet) {
-          intervalArray[index] = "default";
+        if (i < defaultSet) {
+          intervalArray[i] = "default";
         } else {
-          intervalArray[index] = "fail";
+          intervalArray[i] = "fail";
         }
       } else {
         const defaultSet = todoObj.defaultSet - timerObj.addSet;
-        if (index < defaultSet) {
-          intervalArray[index] = "default";
+        if (i < defaultSet) {
+          intervalArray[i] = "default";
         } else {
-          intervalArray[index] = "extend";
+          intervalArray[i] = "extend";
         }
       }
     } else {
-      intervalArray[index] = "default";
+      intervalArray[i] = "default";
     }
   }
 
   const onStartClick = async () => {
-    if (todoObj.status === "ready") {
-      await dbService
-        .collection("plan")
-        .doc(todoObj.id)
-        .update({ status: "start" });
-      navigate(`/timer/${todoObj.id}`);
-    } else if (todoObj.status === "start") {
-      if (
-        timerObj &&
-        (timerObj.status === "fail" || timerObj.status === "success")
-      ) {
-        return;
-      } else {
+    if (todoObj.startDate <= now && now <= todoObj.endDate) {
+      if (todoObj.status === "ready") {
+        await dbService
+          .collection("plan")
+          .doc(todoObj.id)
+          .update({ status: "start" });
         navigate(`/timer/${todoObj.id}`);
+      } else if (todoObj.status === "start") {
+        if (
+          timerObj &&
+          (timerObj.status === "fail" || timerObj.status === "success")
+        ) {
+          return;
+        } else {
+          navigate(`/timer/${todoObj.id}`);
+        }
       }
+    } else {
+      alert("오늘 진행할 계획이 아닙니다.");
     }
   };
 
@@ -81,7 +89,9 @@ function TodoCard({ todoObj }: any) {
           <StatusBox>
             {todoObj.status !== "ready" && timerObj && (
               <StatusBox
-                style={{ backgroundColor: statusColor[timerObj.status] }}
+                style={{
+                  backgroundColor: statusColor[timerObj.status],
+                }}
               >
                 <h5>{statusName[timerObj.status]}</h5>
               </StatusBox>
@@ -96,10 +106,12 @@ function TodoCard({ todoObj }: any) {
         <StartBtn onClick={onStartClick} />
       </IntervalBox>
       <IntervalBarBox>
-        {intervalArray.map((item: any, index: number) => (
+        {intervalArray.map((item: any, keyIndex: number) => (
           <IntervalBar
-            style={{ backgroundColor: resultColor[item] }}
-            key={index}
+            style={{
+              backgroundColor: index !== 0 ? Normal_Gray3 : resultColor[item],
+            }}
+            key={keyIndex}
           />
         ))}
       </IntervalBarBox>

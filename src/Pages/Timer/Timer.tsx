@@ -150,17 +150,8 @@ function Timer() {
 
   //초기화
   useEffect(() => {
+    //오늘날짜에 todo 기간이 없으면 home으로 navigate
     getTimeObj();
-    // if (timerObj.focusSet === 0) {
-    //   setIsBreakSet(false);
-    //   setIsPause(true);
-    // } else if (timerObj.focusSet <= timerObj.breakSet) {
-    //   setIsBreakSet(true);
-    //   setIsPause(false);
-    // } else {
-    //   setIsBreakSet(false);
-    //   setIsPause(false);
-    // }
     return () => {
       setIsTimerSplash(true);
       setIsBreakSet(false);

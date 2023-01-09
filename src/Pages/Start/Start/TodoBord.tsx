@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import styled from "styled-components";
 import TodoCard from "./TodoCard";
-import { toDoState } from "../../../Recoil/atoms";
+import { clickDateState, toDoState } from "../../../Recoil/atoms";
 import { useRecoilState } from "recoil";
 import { motion } from "framer-motion";
 import { scrollIntoView } from "seamless-scroll-polyfill";
@@ -24,6 +24,7 @@ const bottomVariants = {
 
 function TodoBord({ isReady }: { isReady: boolean }) {
   const [toDos, setToDos] = useRecoilState(toDoState);
+  const [clickDate, setClickDate] = useRecoilState(clickDateState);
   const topRef = useRef<any>(null);
 
   //레디 상태해제시 스크롤
@@ -42,7 +43,9 @@ function TodoBord({ isReady }: { isReady: boolean }) {
       <Container ref={topRef}>
         {toDos?.map((toDo, index) => (
           <CardWrapper key={index}>
-            <TodoCard todoObj={toDo} />
+            {toDo.startDate <= clickDate && clickDate <= toDo.endDate && (
+              <TodoCard todoObj={toDo} index={index} />
+            )}
           </CardWrapper>
         ))}
       </Container>

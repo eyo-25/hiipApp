@@ -4,8 +4,10 @@ import TodoCard from "./TodoCard";
 import {
   cardEditState,
   clickDateState,
+  endDateState,
   projectState,
   selectState,
+  startDateState,
   toDoState,
 } from "../../../Recoil/atoms";
 import { useRecoilState } from "recoil";
@@ -31,9 +33,8 @@ function TodoBord() {
   const [project, setProject] = useRecoilState(projectState);
   const [isSelect, setIsSelect] = useRecoilState(selectState);
   const [clickDate, setClickDate] = useRecoilState(clickDateState);
-
   useEffect(() => {
-    return setIsEdit(false);
+    return () => setIsEdit(false);
   }, []);
 
   const onBackClick = () => {

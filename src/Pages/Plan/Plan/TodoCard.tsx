@@ -7,13 +7,12 @@ import {
   selectState,
   cardEditState,
   isTodoEditState,
-  selectTodoState,
   isWeekState,
   startDateState,
   endDateState,
   toDoState,
   isStatusLoad,
-  timerState,
+  clickDateState,
 } from "../../../Recoil/atoms";
 import { Dark_Gray, Dark_Gray2 } from "../../../Styles/Colors";
 import { useMatch, useNavigate } from "react-router-dom";
@@ -48,7 +47,6 @@ interface ITodoCard {
 function TodoCard({ todoObj }: ITodoCard) {
   const [toDos, setToDos] = useRecoilState(toDoState);
   const [isWeek, setIsWeek] = useRecoilState(isWeekState);
-  const [selectTodo, setSelectTodo] = useRecoilState(selectTodoState);
   const [isClicked, setIsClicked] = useState(false);
   const [isTodoEdit, setIsTodoEdit] = useRecoilState(isTodoEditState);
   const [isSelect, setIsSelect] = useRecoilState(selectState);
@@ -57,10 +55,10 @@ function TodoCard({ todoObj }: ITodoCard) {
   const [btnPopup, setBtnPopup] = useState(false);
   const [startDate, setStartDate] = useRecoilState(startDateState);
   const [endDate, setEndDate] = useRecoilState(endDateState);
-  const [timerObj, setTimerObj] = useRecoilState(timerState);
   const [timerArray, setTimeArray] = useState<any[]>([]);
   const [timeStatus, setTimeStatus] = useState("");
   const [statusLoad, setStatusLoad] = useRecoilState(isStatusLoad);
+  const [clickDate, setClickDate] = useRecoilState(clickDateState);
   const Moment = require("moment");
   const now = Moment().format("YYYY-MM-DD");
   const planMatch = useMatch("/plan/createTodo");
@@ -95,12 +93,6 @@ function TodoCard({ todoObj }: ITodoCard) {
       intervalArray[index] = "default";
     }
   }
-
-  // useEffect(() => {
-  //   if (0 <= timerIndex && timerArray[timerIndex]) {
-  //     setTimeStatus(timerArray[timerIndex].status);
-  //   }
-  // }, [timerArray]);
 
   useOnClickOutSide(cardRef, () => {
     setBtnPopup(false);
@@ -179,9 +171,8 @@ function TodoCard({ todoObj }: ITodoCard) {
 
   const intervalRef = React.useRef(null) as any;
   const startCounter = () => {
-    setSelectTodo(todoObj.id);
-    setStartDate(() => todoObj.startDate);
-    setEndDate(() => todoObj.endDate);
+    setStartDate(todoObj.startDate);
+    setEndDate(todoObj.endDate);
     intervalRef.current = setInterval(() => {
       setCounter((prev) => prev + 1);
     }, 100);
@@ -228,9 +219,6 @@ function TodoCard({ todoObj }: ITodoCard) {
   }, [todoObj, now]);
 
   const onCardClick = () => {
-    setSelectTodo(todoObj.id);
-    setStartDate(() => todoObj.startDate);
-    setEndDate(() => todoObj.endDate);
     if (counter < 6 && !isClicked && isWeek) {
       clickToggle();
     } else if (counter < 6 && isClicked && isWeek) {
@@ -302,8 +290,25 @@ function TodoCard({ todoObj }: ITodoCard) {
     setBtnPopup(false);
     const ok = window.confirm("To-do를 삭제 하시겠습니까?");
     if (ok) {
+      if (todoObj.startDate <= clickDate && clickDate <= todoObj.endDate) {
+        for (let i = 0; i < toDos.length; i++) {
+          if (todoObj.id === toDos[i].id) {
+            continue;
+          }
+          if (
+            toDos[i].startDate <= clickDate &&
+            clickDate <= toDos[i].endDate
+          ) {
+            setStartDate(toDos[i].startDate);
+            setEndDate(toDos[i].endDate);
+            break;
+          } else if (i + 1 === toDos.length) {
+            setStartDate("");
+            setEndDate("");
+          }
+        }
+      }
       await deleteToDoSubmit();
-      setSelectTodo("");
     }
   };
   const onEditClick = async () => {
@@ -312,18 +317,22 @@ function TodoCard({ todoObj }: ITodoCard) {
     navigate(`/plan/editTodo/${todoObj.id}`);
   };
   const onStartClick = async () => {
-    if (todoObj.status === "ready") {
-      await dbService
-        .collection("plan")
-        .doc(todoObj.id)
-        .update({ status: "start" });
-      navigate(`/timer/${todoObj.id}`);
-    } else if (
-      todoObj.status === "start" &&
-      timeStatus !== "fail" &&
-      timeStatus !== "success"
-    ) {
-      navigate(`/timer/${todoObj.id}`);
+    if (todoObj.startDate <= now && now <= todoObj.endDate) {
+      if (todoObj.status === "ready") {
+        await dbService
+          .collection("plan")
+          .doc(todoObj.id)
+          .update({ status: "start" });
+        navigate(`/timer/${todoObj.id}`);
+      } else if (
+        todoObj.status === "start" &&
+        timeStatus !== "fail" &&
+        timeStatus !== "success"
+      ) {
+        navigate(`/timer/${todoObj.id}`);
+      }
+    } else {
+      alert("오늘 진행할 계획이 아닙니다.");
     }
   };
 

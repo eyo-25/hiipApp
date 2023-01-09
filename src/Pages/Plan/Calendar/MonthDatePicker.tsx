@@ -4,9 +4,7 @@ import {
   clickDateState,
   endDateState,
   projectState,
-  selectTodoState,
   startDateState,
-  toDoState,
 } from "../../../Recoil/atoms";
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
@@ -31,10 +29,8 @@ function MonthDatePicker() {
   const [project, setProject] = useRecoilState(projectState);
   const [clickDate, setClickDate] = useRecoilState(clickDateState);
   const [monthArray, setMonthArray] = useState<string[]>([]);
-  const [toDos, setToDos] = useRecoilState(toDoState);
   const [startDate, setStartDate] = useRecoilState(startDateState);
   const [endDate, setEndDate] = useRecoilState(endDateState);
-  const [selectTodo, setSelectTodo] = useRecoilState(selectTodoState);
 
   // 현재월
   let calendarMonth = Number(Moment(clickDate).format("MM"));

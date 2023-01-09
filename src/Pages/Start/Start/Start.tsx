@@ -93,20 +93,24 @@ function Start() {
     if (project.length <= 0) {
       navigate("/plan/createProject");
     } else if (0 < toDos.length) {
-      if (toDos[0].status === "ready") {
-        await dbService
-          .collection("plan")
-          .doc(toDos[0].id)
-          .update({ status: "start" });
-        navigate(`/timer/${toDos[0].id}`);
-      } else if (
-        toDos[0].status === "start" &&
-        timeStatus !== "fail" &&
-        timeStatus !== "success"
-      ) {
-        navigate(`/timer/${toDos[0].id}`);
+      if (toDos[0].startDate <= now && now <= toDos[0].endDate) {
+        if (toDos[0].status === "ready") {
+          await dbService
+            .collection("plan")
+            .doc(toDos[0].id)
+            .update({ status: "start" });
+          navigate(`/timer/${toDos[0].id}`);
+        } else if (
+          toDos[0].status === "start" &&
+          timeStatus !== "fail" &&
+          timeStatus !== "success"
+        ) {
+          navigate(`/timer/${toDos[0].id}`);
+        } else {
+          navigate(`/feedback`);
+        }
       } else {
-        navigate(`/feedback`);
+        alert("오늘 진행할 계획이 아닙니다.");
       }
     } else {
       navigate("/plan");
