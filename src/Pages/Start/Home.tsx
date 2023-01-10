@@ -63,6 +63,50 @@ function Home() {
     }
   }, [project, isHomeSplash]);
 
+  const [startTodos, setStartTodos] = useState([]);
+  const [endTodos, setEndTodos] = useState([]);
+  const [timerArray, setTimerArray] = useState<any[]>([{}, {}, {}, {}, {}]);
+  const Moment = require("moment");
+  const now = Moment().format("YYYY-MM-DD");
+
+  useEffect(() => {
+    if (0 < toDos.length) {
+      for (let i = 0; i < toDos.length; i++) {
+        dbService
+          .collection("plan")
+          .doc(toDos[i].id)
+          .collection("timer")
+          .where("date", "==", now)
+          .get()
+          .then((result) => {
+            result.forEach((resultData) => {
+              setTimerArray((prev) => {
+                const copy = [...prev];
+                let timerObj = {};
+                if (resultData.data()) {
+                  timerObj = {
+                    focusSet: resultData.data().focusSet,
+                    addSet: resultData.data().addSet,
+                    status: resultData.data().status,
+                  };
+                } else {
+                  timerObj = {
+                    focusSet: 0,
+                    addSet: 0,
+                    status: "ready",
+                  };
+                }
+                copy.splice(i, 1, timerObj);
+                return [...copy];
+              });
+            });
+          });
+      }
+    }
+  }, [toDos]);
+
+  console.log(timerArray);
+
   if (isHomeSplash) {
     return <HomeSplash />;
   }

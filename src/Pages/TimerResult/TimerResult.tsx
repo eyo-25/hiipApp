@@ -11,6 +11,7 @@ import { dbService } from "../../firebase";
 import TimerGraph from "./TimerGraph";
 import { resultColor, resultMent } from "../../Utils/interface";
 import { isMobile } from "react-device-detect";
+import { async } from "@firebase/util";
 
 function TimerResult() {
   const [mouseStartX, setMouseStartX] = useState(0);
@@ -41,6 +42,7 @@ function TimerResult() {
   const navigate = useNavigate();
   const now = useRef<string>();
   const startDate = useRef<string>("");
+  const resultPercent = useRef<number>();
 
   const btnVarients = {
     normal: {
@@ -161,83 +163,125 @@ function TimerResult() {
     }
   }
 
-  //fail에 해당하는 timerObj 배정
+  const noneCount = useRef<any>(0);
+
   async function getFailPercentArray() {
     try {
-      await dbService
-        .collection("plan")
-        .doc(todoId)
-        .collection("timer")
-        .get()
-        .then((result) => {
-          result.forEach((result) => {
-            if (
-              result.data().date === Moment(now.current).format("YYYY-MM-DD")
-            ) {
-              setNowTimer(result.data());
-            }
-            if (
-              weekArray[0] <= result.data().date.result &&
-              result.data().date <= weekArray[6]
-            ) {
-              setTimerArray((prev) => {
-                //deepCopy
-                const copyArray: any[] = [...prev];
-                const dayIndex = Moment(result.data().date).day();
-                const isSuccess = result.data().status === "success";
-                const successCount = isSuccess
-                  ? result.data().successCount + 1
-                  : result.data().successCount;
+      weekArray.forEach((weekDate, index) => {
+        dbService
+          .collection("plan")
+          .doc(todoId)
+          .collection("timer")
+          .where("date", "==", weekDate)
+          .orderBy("timerIndex")
+          .get()
+          .then((result) => {
+            setTimerArray((prev) => {
+              //deep copy
+              const copyArray: any[] = [...prev];
+              //결과 분류
+              if (weekDate <= Moment().format("YYYY-MM-DD")) {
+                if (!result.empty) {
+                  result.forEach((resultData) => {
+                    if (
+                      resultData.data().date ===
+                      Moment(now.current).format("YYYY-MM-DD")
+                    ) {
+                      setNowTimer(resultData.data());
+                    }
 
-                const startTimeMoment = Moment(startDate.current);
-                const endTimeMoment = Moment(result.data().date);
+                    const isSuccess = resultData.data().status === "success";
+                    const successCount = isSuccess
+                      ? resultData.data().successCount + 1
+                      : resultData.data().successCount;
+                    const startTimeMoment = Moment(startDate.current);
+                    const endTimeMoment = Moment(resultData.data().date);
+                    //진행한 날짜 기간
+                    const progressDuration = () => {
+                      const duration = Moment.duration(
+                        endTimeMoment.diff(startTimeMoment)
+                      ).asDays();
+                      if (0 <= duration) {
+                        return duration;
+                      } else {
+                        return 0;
+                      }
+                    };
+                    const failPercentValue = Math.round(
+                      (successCount / (progressDuration() + 1)) * 100
+                    );
 
-                const progressDuration = () => {
-                  const duration = Moment.duration(
-                    endTimeMoment.diff(startTimeMoment)
-                  ).asDays();
-                  if (0 <= duration) {
-                    return duration;
-                  } else {
-                    return 0;
-                  }
-                };
+                    //시간 조작으로 인한 에러방지
+                    const failPercent = () => {
+                      if (100 <= failPercentValue) {
+                        return 100;
+                      } else if (failPercentValue <= 0) {
+                        return 0;
+                      } else {
+                        return failPercentValue;
+                      }
+                    };
+                    //배열에 할당
+                    copyArray.splice(index, 1, {
+                      successPercent: failPercent(),
+                    });
 
-                const failPercentValue = Math.round(
-                  (successCount / (progressDuration() + 1)) * 100
-                );
+                    //result.empty 배열 할당
+                    for (let i = 1; i < noneCount.current + 1; i++) {
+                      const successCount = resultData.data().successCount;
 
-                const failPercent = () => {
-                  if (100 <= failPercentValue) {
-                    return 100;
-                  } else if (failPercentValue <= 0) {
-                    return 0;
-                  } else {
-                    return failPercentValue;
-                  }
-                };
+                      const startTimeMoment = Moment(startDate.current);
+                      const endTime = Moment(resultData.data().date)
+                        .subtract(i, "d")
+                        .format("YYYY-MM-DD");
+                      const endTimeMoment = Moment(endTime);
+                      //진행한 날짜 기간
+                      const progressDuration = () => {
+                        const duration = Moment.duration(
+                          endTimeMoment.diff(startTimeMoment)
+                        ).asDays();
+                        if (0 <= duration) {
+                          return duration;
+                        } else {
+                          return 0;
+                        }
+                      };
+                      const failPercentValue = Math.round(
+                        (successCount / (progressDuration() + 1)) * 100
+                      );
 
+                      //시간 조작으로 인한 에러방지
+                      const failPercent = () => {
+                        if (100 <= failPercentValue) {
+                          return 100;
+                        } else if (failPercentValue <= 0) {
+                          return 0;
+                        } else {
+                          return failPercentValue;
+                        }
+                      };
+
+                      copyArray.splice(index - i, 1, {
+                        successPercent: failPercent(),
+                      });
+                    }
+                  });
+                  noneCount.current = 0;
+                } else if (result.empty) {
+                  noneCount.current = noneCount.current + 1;
+                }
+              } else {
                 //배열에 할당
-                copyArray.splice(dayIndex, 1, {
-                  successPercent: failPercent(),
-                });
-                return [...copyArray];
-              });
-            } else {
-              setTimerArray((prev) => {
-                const dayIndex = Moment(result.data().date).day();
-                const copyArray: any[] = [...prev];
-                //배열에 할당
-                copyArray.splice(dayIndex, 1, {
+                copyArray.splice(index, 1, {
                   successPercent: 0,
                 });
-                return [...copyArray];
-              });
-            }
+              }
+              return [...copyArray];
+            });
           });
-        });
+      });
     } catch {
-      alert("Timer 오류");
+      alert("a");
     }
   }
 
@@ -305,62 +349,6 @@ function TimerResult() {
     }
   }
 
-  // 초기화
-  useEffect(() => {
-    //now 초기화
-    now.current = Moment();
-    //plan 초기화
-    getPlanArray();
-    //week 초기화
-    setWeekArray((prev) => {
-      const copy = [...prev];
-      let removeDay = 0;
-      for (let index = Moment().day(); index >= 0; index--) {
-        copy[index] = Moment().subtract(removeDay, "days").format("YYYY-MM-DD");
-        removeDay++;
-      }
-      let addDay = 0;
-      for (let index = Moment().day(); index < 7; index++) {
-        copy[index] = Moment().add(addDay, "days").format("YYYY-MM-DD");
-        addDay++;
-      }
-      return [...copy];
-    });
-
-    //ment배열 초기화
-    if (resultStatus) {
-      const resultMentArray = (
-        resultMent[resultStatus] || "이대론-가망이 없다"
-      ).split("-");
-      setMentArray(resultMentArray);
-    }
-
-    //상태별 배경 초기화
-    setBackground(() => {
-      if (resultStatus === "extend") {
-        return ExtendBackground;
-      } else if (resultStatus === "fail") {
-        return FailBackground;
-      } else {
-        return SussessBackground;
-      }
-    });
-  }, []);
-
-  useEffect(() => {
-    if (resultStatus !== "fail" && 7 === weekArray.length) {
-      for (let i = 0; i < weekArray.length; i++) {
-        if (resultStatus === "extend") {
-          getExtendPercentArray(i);
-        } else if (resultStatus === "success") {
-          getSuccessPercentArray(i);
-        }
-      }
-    } else if (resultStatus === "fail" && 7 === weekArray.length) {
-      getFailPercentArray();
-    }
-  }, [weekArray]);
-
   // 브라우저 스와이프
   const onMouseUp = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
     if (120 < e.clientX - mouseStartX && resultStatus) {
@@ -405,6 +393,62 @@ function TimerResult() {
       setTochedX(e.changedTouches[0].pageX - tochedStartX);
     }
   };
+
+  useEffect(() => {
+    if (resultStatus !== "fail" && 7 === weekArray.length) {
+      for (let i = 0; i < weekArray.length; i++) {
+        if (resultStatus === "extend") {
+          getExtendPercentArray(i);
+        } else if (resultStatus === "success") {
+          getSuccessPercentArray(i);
+        }
+      }
+    } else if (resultStatus === "fail" && 7 === weekArray.length) {
+      getFailPercentArray();
+    }
+  }, [startDate.current]);
+
+  // 초기화
+  useEffect(() => {
+    //now 초기화
+    now.current = Moment();
+    //plan 초기화
+    getPlanArray();
+    //week 초기화
+    setWeekArray((prev) => {
+      const copy = [...prev];
+      let removeDay = 0;
+      for (let index = Moment().day(); index >= 0; index--) {
+        copy[index] = Moment().subtract(removeDay, "days").format("YYYY-MM-DD");
+        removeDay++;
+      }
+      let addDay = 0;
+      for (let index = Moment().day(); index < 7; index++) {
+        copy[index] = Moment().add(addDay, "days").format("YYYY-MM-DD");
+        addDay++;
+      }
+      return [...copy];
+    });
+
+    //ment배열 초기화
+    if (resultStatus) {
+      const resultMentArray = (
+        resultMent[resultStatus] || "이대론-가망이 없다"
+      ).split("-");
+      setMentArray(resultMentArray);
+    }
+
+    //상태별 배경 초기화
+    setBackground(() => {
+      if (resultStatus === "extend") {
+        return ExtendBackground;
+      } else if (resultStatus === "fail") {
+        return FailBackground;
+      } else {
+        return SussessBackground;
+      }
+    });
+  }, []);
 
   return (
     <Container>

@@ -69,6 +69,7 @@ function Timer() {
     todoId: todoId,
     status: "start",
     usedCount: 0,
+    timerIndex: toDos[index].timerIndex,
   };
 
   //오늘날짜 타이머 체크후 없으면 생성 + timerIndex늘리기

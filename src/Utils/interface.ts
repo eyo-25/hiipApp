@@ -59,6 +59,7 @@ export interface ItimeState {
   status: string;
   usedCount: number;
   successCount: number;
+  timerIndex: number;
 }
 
 export const defaultTimer = {
@@ -82,4 +83,5 @@ export const defaultTimer = {
   status: "start",
   usedCount: 0,
   successCount: 0,
+  timerIndex: 0,
 };

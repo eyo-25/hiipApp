@@ -37,11 +37,11 @@ function TimerGraph({ timerArray, resultStatus, timerIndex }: ITimerGrap) {
             <br />
             {0 <= percentDiff ? (
               <span style={{ color: resultColor[resultStatus] }}>
-                {percentDiff}% 상승
+                {percentDiff ? percentDiff : 0}% 상승
               </span>
             ) : (
               <span style={{ color: resultColor[resultStatus] }}>
-                {Math.abs(percentDiff)}% 하락
+                {Math.abs(percentDiff) ? Math.abs(percentDiff) : 0}% 하락
               </span>
             )}
             하였습니다.
