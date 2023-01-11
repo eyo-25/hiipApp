@@ -1,5 +1,5 @@
 import { useRecoilState } from "recoil";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState, useLayoutEffect } from "react";
 import { useParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import styled from "styled-components";
@@ -12,7 +12,7 @@ import {
   isPauseState,
   timerSplashState,
   timerState,
-  toDoState,
+  timerToDoState,
 } from "../../Recoil/atoms";
 import { authService, dbService } from "../../firebase";
 import TimerSplash from "../../Component/TimerSplash";
@@ -39,38 +39,24 @@ function Timer() {
   const [timerObj, setTimerObj] = useRecoilState(timerState);
   const [isBreakSet, setIsBreakSet] = useRecoilState(isBreakState);
   const [isPause, setIsPause] = useRecoilState(isPauseState);
-  const [toDos, setToDos] = useRecoilState(toDoState);
+  const [toDo, setToDo] = useRecoilState(timerToDoState);
   const params = useParams();
   const todoId = params.todoId;
-  const index = toDos.findIndex((item) => item.id === todoId);
   const Moment = require("moment");
   const timeObj = useRef<any>({});
   const now = Moment().format("YYYY-MM-DD");
-  const defaultSet = toDos[index].defaultSet;
-  const newObj = {
-    date: now,
-    addSet: 0,
-    setFocusSet: defaultSet,
-    setBreakSet: defaultSet - 1 <= 0 ? 0 : defaultSet - 1,
-    focusSet: defaultSet,
-    breakSet: defaultSet - 1 <= 0 ? 0 : defaultSet - 1,
-    successCount: toDos[index].successCount,
-    //테스트 끝나면 분만 적용
-    setFocusMin: 0,
-    setFocusSec: 10,
-    setBreakMin: 0,
-    setBreakSec: 5,
-    min: 0,
-    sec: 10,
-    breakMin: defaultSet - 1 <= 0 ? 0 : 0,
-    breakSec: defaultSet - 1 <= 0 ? 0 : 5,
-    startTime: Moment().format("YYYY-MM-DD HH:mm:ss"),
-    endTime: "",
-    todoId: todoId,
-    status: "start",
-    usedCount: 0,
-    timerIndex: toDos[index].timerIndex,
-  };
+
+  // async function getToDoObj() {
+  //   try {
+  //     await dbService
+  //       .collection("plan")
+  //       .doc(todoId)
+  //       .get()
+  //       .then((result) => {
+  //         setToDo(result.data());
+  //       });
+  //   } catch {}
+  // }
 
   //오늘날짜 타이머 체크후 없으면 생성 + timerIndex늘리기
   async function getTimeObj() {
@@ -90,6 +76,32 @@ function Timer() {
       alert("Timer를 불러오는데 오류가 발생하였습니다. 다시 시도하여 주세요");
     } finally {
       if (Object.keys(timeObj.current).length <= 0) {
+        const defaultSet = toDo.defaultSet;
+        const newObj = {
+          date: now,
+          addSet: 0,
+          setFocusSet: defaultSet,
+          setBreakSet: defaultSet - 1 <= 0 ? 0 : defaultSet - 1,
+          focusSet: defaultSet,
+          breakSet: defaultSet - 1 <= 0 ? 0 : defaultSet - 1,
+          successCount: toDo.successCount,
+          //테스트 끝나면 분만 적용
+          setFocusMin: 0,
+          setFocusSec: 10,
+          setBreakMin: 0,
+          setBreakSec: 5,
+          min: 0,
+          sec: 10,
+          breakMin: defaultSet - 1 <= 0 ? 0 : 0,
+          breakSec: defaultSet - 1 <= 0 ? 0 : 5,
+          startTime: Moment().format("YYYY-MM-DD HH:mm:ss"),
+          endTime: "",
+          todoId: todoId,
+          status: "start",
+          usedCount: 0,
+          timerIndex: toDo.timerIndex,
+        };
+
         const createTimer = () =>
           dbService
             .collection("plan")
@@ -149,10 +161,17 @@ function Timer() {
     });
   }, []);
 
+  // useLayoutEffect(() => {
+  //   //toDo장착
+  //   getToDoObj();
+  // }, []);
+
   //초기화
   useEffect(() => {
     //오늘날짜에 todo 기간이 없으면 home으로 navigate
-    getTimeObj();
+    if (toDo) {
+      getTimeObj();
+    }
     return () => {
       setIsTimerSplash(true);
       setIsBreakSet(false);

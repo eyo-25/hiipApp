@@ -103,6 +103,10 @@ export const createSubTitleState = atom({
   default: "",
 });
 //timer
+export const timerToDoState = atom<any>({
+  key: "timerToDoState",
+  default: {},
+});
 export const timerSplashState = atom<boolean>({
   key: "timerSplashState",
   default: true,
@@ -126,4 +130,32 @@ export const addCountState = atom<number>({
 export const timerState = atom<ItimeState>({
   key: "timerState",
   default: defaultTimer,
+});
+
+export interface IstartTodo {
+  endDate: string;
+  index: number;
+  timerIndex: number;
+  successCount: number;
+  defaultSet: number;
+  memo: string;
+  planSubTitle: string;
+  planTitle: string;
+  startDate: string;
+  status: string;
+  todoId: any;
+  id: string;
+  addSet: number;
+  focusSet: number;
+  timerStatus: string;
+}
+
+//start
+export const startTodoState = atom<IstartTodo[]>({
+  key: "startTodoState",
+  default: [],
+});
+export const endTodoState = atom<any[]>({
+  key: "endTodoState",
+  default: [],
 });

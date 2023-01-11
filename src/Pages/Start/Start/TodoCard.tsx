@@ -10,12 +10,15 @@ import {
   statusName,
 } from "../../../Utils/interface";
 import { useNavigate } from "react-router-dom";
+import { useRecoilState } from "recoil";
+import { timerToDoState } from "../../../Recoil/atoms";
 
 interface ITodoCard {
   todoObj: any;
   index: number;
 }
 function TodoCard({ todoObj, index }: ITodoCard) {
+  const [toDo, setToDo] = useRecoilState(timerToDoState);
   const [timerObj, setTimerObj] = useState<ItimeState>();
   const Moment = require("moment");
   const now = Moment().format("YYYY-MM-DD");
@@ -47,6 +50,7 @@ function TodoCard({ todoObj, index }: ITodoCard) {
   const onStartClick = async () => {
     if (todoObj.startDate <= now && now <= todoObj.endDate) {
       if (todoObj.status === "ready") {
+        setToDo(todoObj);
         await dbService
           .collection("plan")
           .doc(todoObj.id)
@@ -59,6 +63,7 @@ function TodoCard({ todoObj, index }: ITodoCard) {
         ) {
           return;
         } else {
+          setToDo(todoObj);
           navigate(`/timer/${todoObj.id}`);
         }
       }

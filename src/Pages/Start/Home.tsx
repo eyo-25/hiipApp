@@ -1,6 +1,12 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useLayoutEffect } from "react";
 import { useRecoilState } from "recoil";
-import { homeSplashState, projectState, toDoState } from "../../Recoil/atoms";
+import {
+  endTodoState,
+  homeSplashState,
+  projectState,
+  startTodoState,
+  toDoState,
+} from "../../Recoil/atoms";
 import { onSnapshot, query } from "firebase/firestore";
 import { authService, dbService } from "../../firebase";
 import { onAuthStateChanged } from "firebase/auth";
@@ -8,6 +14,10 @@ import HomeSplash from "../../Component/HomeSplash";
 import Start from "./Start/Start";
 
 function Home() {
+  const [startTodos, setStartTodos] = useRecoilState<any[]>(startTodoState);
+  const [endTodos, setEndTodos] = useRecoilState<any[]>(endTodoState);
+  const Moment = require("moment");
+  const now = Moment().format("YYYY-MM-DD");
   const [isHomeSplash, setIsHomeSplash] = useRecoilState(homeSplashState);
   const [project, setProject] = useRecoilState(projectState);
   const [toDos, setToDos] = useRecoilState(toDoState);
@@ -61,17 +71,22 @@ function Home() {
     } else {
       setToDos([]);
     }
-  }, [project, isHomeSplash]);
+    return () => setToDos([]);
+  }, [project]);
 
-  const [startTodos, setStartTodos] = useState([]);
-  const [endTodos, setEndTodos] = useState([]);
-  const [timerArray, setTimerArray] = useState<any[]>([{}, {}, {}, {}, {}]);
-  const Moment = require("moment");
-  const now = Moment().format("YYYY-MM-DD");
+  useEffect(() => {
+    return () => {
+      setStartTodos([]);
+      setEndTodos([]);
+    };
+  }, []);
 
   useEffect(() => {
     if (0 < toDos.length) {
       for (let i = 0; i < toDos.length; i++) {
+        if (now < toDos[i].startDate || toDos[i].endDate < now) {
+          continue;
+        }
         dbService
           .collection("plan")
           .doc(toDos[i].id)
@@ -79,33 +94,64 @@ function Home() {
           .where("date", "==", now)
           .get()
           .then((result) => {
-            result.forEach((resultData) => {
-              setTimerArray((prev) => {
-                const copy = [...prev];
-                let timerObj = {};
-                if (resultData.data()) {
-                  timerObj = {
-                    focusSet: resultData.data().focusSet,
-                    addSet: resultData.data().addSet,
-                    status: resultData.data().status,
-                  };
+            if (!result.empty) {
+              result.forEach((timerResult) => {
+                if (timerResult.data().status === "start") {
+                  setStartTodos((prev) => {
+                    const copy: any[] = [...prev];
+                    const startTodoObj = {
+                      ...toDos[i],
+                      focusSet: timerResult.data().focusSet,
+                      addSet: timerResult.data().addSet,
+                      timerStatus: timerResult.data().status,
+                    };
+                    const index = copy.findIndex(
+                      (item) => item.id === toDos[i].id
+                    );
+                    if (index < 0) {
+                      copy.push(startTodoObj);
+                    }
+                    return [...copy];
+                  });
                 } else {
-                  timerObj = {
-                    focusSet: 0,
-                    addSet: 0,
-                    status: "ready",
-                  };
+                  setEndTodos((prev) => {
+                    const copy: any[] = [...prev];
+                    const endTodoObj = {
+                      ...toDos[i],
+                      focusSet: timerResult.data().focusSet,
+                      addSet: timerResult.data().addSet,
+                      timerStatus: timerResult.data().status,
+                    };
+                    const index = copy.findIndex(
+                      (item) => item.id === toDos[i].id
+                    );
+                    if (index < 0) {
+                      copy.push(endTodoObj);
+                    }
+                    return [...copy];
+                  });
                 }
-                copy.splice(i, 1, timerObj);
+              });
+            } else {
+              setStartTodos((prev) => {
+                const copy: any[] = [...prev];
+                const startTodoObj = {
+                  ...toDos[i],
+                  focusSet: 0,
+                  addSet: 0,
+                  timerStatus: "ready",
+                };
+                const index = copy.findIndex((item) => item.id === toDos[i].id);
+                if (index < 0) {
+                  copy.push(startTodoObj);
+                }
                 return [...copy];
               });
-            });
+            }
           });
       }
     }
   }, [toDos]);
-
-  console.log(timerArray);
 
   if (isHomeSplash) {
     return <HomeSplash />;

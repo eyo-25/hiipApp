@@ -1,7 +1,12 @@
 import { useEffect, useRef } from "react";
 import styled from "styled-components";
 import TodoCard from "./TodoCard";
-import { clickDateState, toDoState } from "../../../Recoil/atoms";
+import {
+  clickDateState,
+  endTodoState,
+  startTodoState,
+  toDoState,
+} from "../../../Recoil/atoms";
 import { useRecoilState } from "recoil";
 import { motion } from "framer-motion";
 import { scrollIntoView } from "seamless-scroll-polyfill";
@@ -24,6 +29,8 @@ const bottomVariants = {
 
 function TodoBord({ isReady }: { isReady: boolean }) {
   const [toDos, setToDos] = useRecoilState(toDoState);
+  const [startTodos, setStartTodos] = useRecoilState<any[]>(startTodoState);
+  const [endTodos, setEndTodos] = useRecoilState<any[]>(endTodoState);
   const [clickDate, setClickDate] = useRecoilState(clickDateState);
   const topRef = useRef<any>(null);
 
@@ -41,7 +48,14 @@ function TodoBord({ isReady }: { isReady: boolean }) {
   return (
     <Wrapper isReady={isReady}>
       <Container ref={topRef}>
-        {toDos?.map((toDo, index) => (
+        {startTodos?.map((toDo, index) => (
+          <CardWrapper key={index}>
+            {toDo.startDate <= clickDate && clickDate <= toDo.endDate && (
+              <TodoCard todoObj={toDo} index={index} />
+            )}
+          </CardWrapper>
+        ))}
+        {endTodos?.map((toDo, index) => (
           <CardWrapper key={index}>
             {toDo.startDate <= clickDate && clickDate <= toDo.endDate && (
               <TodoCard todoObj={toDo} index={index} />

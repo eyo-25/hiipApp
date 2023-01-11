@@ -10,6 +10,7 @@ import {
   loadState,
   timerSplashState,
   timerState,
+  timerToDoState,
   toDoState,
 } from "../../../Recoil/atoms";
 import { AnimatePresence, motion } from "framer-motion";
@@ -95,6 +96,7 @@ function TimerButton({
   breakReset,
   breakStop,
 }: ITimerButton) {
+  const [toDo, setToDo] = useRecoilState(timerToDoState);
   const [isLoad, setIsLoad] = useRecoilState(loadState);
   const [isResultState, setisResultState] = useRecoilState(timerSplashState);
   const [isAdd, setIsAdd] = useRecoilState(isAddState);
@@ -103,17 +105,14 @@ function TimerButton({
   const [isPause, setIsPause] = useRecoilState(isPauseState);
   const [inputToggle, setInputToggle] = useRecoilState(inputFocusState);
   const [addSetCount, setAddSetCount] = useRecoilState(addCountState);
-  const [toDos, setToDos] = useRecoilState(toDoState);
   const breakTotal =
     timerObj.setBreakMin * 60 * 100 + timerObj.setBreakSec * 100;
   const focusTotal =
     timerObj.setFocusMin * 60 * 100 + timerObj.setFocusSec * 100;
-  const Moment = require("moment");
   const countRef = useRef(1);
   const navigate = useNavigate();
   const params = useParams();
   const todoId = params.todoId;
-  const index = toDos.findIndex((item) => item.id === todoId);
   const { usedCount } = useUsedCount(isBreakSet, timerObj);
 
   //파이어베이스 timer 업데이트
@@ -160,7 +159,7 @@ function TimerButton({
           .doc(todoId)
           .update({
             defaultSet: addSetCount + timerObj.setFocusSet,
-            addSet: toDos[index].addSet + addSetCount,
+            addSet: toDo.addSet + addSetCount,
           });
 
       const focusTimeUpdateObj = {

@@ -64,6 +64,7 @@ function Index() {
         }
       });
     }
+    return () => setToDos([]);
   }, [project, setToDos]);
 
   return (

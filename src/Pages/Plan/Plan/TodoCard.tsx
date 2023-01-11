@@ -13,6 +13,7 @@ import {
   toDoState,
   isStatusLoad,
   clickDateState,
+  timerToDoState,
 } from "../../../Recoil/atoms";
 import { Dark_Gray, Dark_Gray2 } from "../../../Styles/Colors";
 import { useMatch, useNavigate } from "react-router-dom";
@@ -46,6 +47,7 @@ interface ITodoCard {
 
 function TodoCard({ todoObj }: ITodoCard) {
   const [toDos, setToDos] = useRecoilState(toDoState);
+  const [toDo, setToDo] = useRecoilState(timerToDoState);
   const [isWeek, setIsWeek] = useRecoilState(isWeekState);
   const [isClicked, setIsClicked] = useState(false);
   const [isTodoEdit, setIsTodoEdit] = useRecoilState(isTodoEditState);
@@ -329,6 +331,7 @@ function TodoCard({ todoObj }: ITodoCard) {
         timeStatus !== "fail" &&
         timeStatus !== "success"
       ) {
+        setToDo(todoObj);
         navigate(`/timer/${todoObj.id}`);
       }
     } else {

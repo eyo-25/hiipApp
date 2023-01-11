@@ -7,6 +7,7 @@ import {
   inputFocusState,
   isBreakState,
   isPauseState,
+  timerToDoState,
   toDoState,
 } from "../../../Recoil/atoms";
 import { IoCloseSharp } from "react-icons/io5";
@@ -32,7 +33,7 @@ interface ITimerInfo {
 }
 
 function TimerInfo({ count }: ITimerInfo) {
-  const [toDos, setToDos] = useRecoilState(toDoState);
+  const [toDo, setToDo] = useRecoilState(timerToDoState);
   const [isBreakSet, setIsBreakSet] = useRecoilState(isBreakState);
   const [isPause, setIsPause] = useRecoilState(isPauseState);
   const [inputToggle, setInputToggle] = useRecoilState(inputFocusState);
@@ -40,7 +41,6 @@ function TimerInfo({ count }: ITimerInfo) {
   const inputRef = useRef<any>(null);
   const params = useParams();
   const todoId = params.todoId;
-  const index = toDos.findIndex((todo) => todo.id === todoId);
 
   const MemoVarients = {
     start: {
@@ -76,14 +76,14 @@ function TimerInfo({ count }: ITimerInfo) {
     }
   }
   const onInputBlur = async () => {
-    if (toDos[index].memo !== memoText) {
+    if (toDo.memo !== memoText) {
       await saveMemoSubmit();
     }
     setInputToggle(false);
   };
 
   useEffect(() => {
-    setMemoText(toDos[index].memo);
+    setMemoText(toDo.memo);
     setInputToggle(false);
     return () => {
       setMemoText("");
