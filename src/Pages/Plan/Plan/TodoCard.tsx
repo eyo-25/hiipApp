@@ -14,6 +14,7 @@ import {
   isStatusLoad,
   clickDateState,
   timerToDoState,
+  loadState,
 } from "../../../Recoil/atoms";
 import { Dark_Gray, Dark_Gray2 } from "../../../Styles/Colors";
 import { useMatch, useNavigate } from "react-router-dom";
@@ -68,6 +69,7 @@ function TodoCard({ todoObj }: ITodoCard) {
   const cardRef = useRef<any>();
   const navigate = useNavigate();
   const [timerIndex, setTimerIndex] = useState(0);
+  const [isLoad, setIsLoad] = useRecoilState(loadState);
 
   useEffect(() => {
     setTimerIndex(timerArray.findIndex((item) => item.date === now));
@@ -321,11 +323,16 @@ function TodoCard({ todoObj }: ITodoCard) {
   const onStartClick = async () => {
     if (todoObj.startDate <= now && now <= todoObj.endDate) {
       if (todoObj.status === "ready") {
+        setToDo(todoObj);
+        setIsLoad(true);
         await dbService
           .collection("plan")
           .doc(todoObj.id)
-          .update({ status: "start" });
-        navigate(`/timer/${todoObj.id}`);
+          .update({ status: "start" })
+          .then(() => {
+            setIsLoad(false);
+            navigate(`/timer/${todoObj.id}`);
+          });
       } else if (
         todoObj.status === "start" &&
         timeStatus !== "fail" &&

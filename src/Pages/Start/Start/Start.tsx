@@ -8,6 +8,8 @@ import {
   clickDateState,
   loadState,
   projectState,
+  startTodoState,
+  timerToDoState,
   toDoState,
 } from "../../../Recoil/atoms";
 import Applayout from "../../../Component/Applayout";
@@ -20,12 +22,14 @@ import { dbService } from "../../../firebase";
 function Start() {
   const [project, setProject] = useRecoilState(projectState);
   const [toDos, setToDos] = useRecoilState(toDoState);
+  const [startTodos, setStartTodos] = useRecoilState(startTodoState);
+  const [toDo, setToDo] = useRecoilState(timerToDoState);
+  const [isLoad, setIsLoad] = useRecoilState(loadState);
   const [isReady, setIsReady] = useState(false);
   const [isFadeout, setIsFadeout] = useState(false);
   const [mouseDownClientY, setMouseDownClientY] = useState(0);
   const [mouseUpClientY, setMouseUpClientY] = useState(0);
   const [clickDate, setClickDate] = useRecoilState(clickDateState);
-  const [timeStatus, setTimeStatus] = useState("");
   const [tochedY, setTochedY] = useState(0);
   const navigate = useNavigate();
   const Moment = require("moment");
@@ -72,40 +76,31 @@ function Start() {
     },
   };
 
-  //첫째 toDo의 오늘상태
-  useEffect(() => {
-    if (0 < toDos.length) {
-      dbService
-        .collection("plan")
-        .doc(toDos[0].id)
-        .collection("timer")
-        .where("date", "==", now)
-        .get()
-        .then((result) => {
-          result.forEach((result) => {
-            setTimeStatus(result.data().status);
-          });
-        });
-    }
-  }, [toDos]);
-
   const onPlayClick = async () => {
+    if (startTodos.length <= 0) return;
+    const index = toDos.findIndex((item) => item.id === startTodos[0].id);
     if (project.length <= 0) {
       navigate("/plan/createProject");
     } else if (0 < toDos.length) {
-      if (toDos[0].startDate <= now && now <= toDos[0].endDate) {
-        if (toDos[0].status === "ready") {
+      if (startTodos[0].startDate <= now && now <= startTodos[0].endDate) {
+        if (startTodos[0].status === "ready") {
+          setToDo(toDos[index]);
+          setIsLoad(true);
           await dbService
             .collection("plan")
-            .doc(toDos[0].id)
-            .update({ status: "start" });
-          navigate(`/timer/${toDos[0].id}`);
+            .doc(startTodos[0].id)
+            .update({ status: "start" })
+            .then(() => {
+              setIsLoad(false);
+              navigate(`/timer/${startTodos[0].id}`);
+            });
         } else if (
-          toDos[0].status === "start" &&
-          timeStatus !== "fail" &&
-          timeStatus !== "success"
+          startTodos[0].status === "start" &&
+          startTodos[0].timerStatus !== "fail" &&
+          startTodos[0].timerStatus !== "success"
         ) {
-          navigate(`/timer/${toDos[0].id}`);
+          setToDo(toDos[index]);
+          navigate(`/timer/${startTodos[0].id}`);
         } else {
           navigate(`/feedback`);
         }
