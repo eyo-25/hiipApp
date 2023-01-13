@@ -146,8 +146,10 @@ export interface IstartTodo {
   todoId: any;
   id: string;
   addSet: number;
-  focusSet: number;
+  timerFocusSet: number;
+  timerSetFocusSet: number;
   timerStatus: string;
+  timerAddSet: number;
 }
 
 //start
@@ -158,4 +160,13 @@ export const startTodoState = atom<IstartTodo[]>({
 export const endTodoState = atom<any[]>({
   key: "endTodoState",
   default: [],
+});
+//feedBack
+export const feedBackTodoState = atom<ITodo[]>({
+  key: "feedBackTodoState",
+  default: [],
+});
+export const feedBackTimerState = atom<{}>({
+  key: "feedBackTimerState",
+  default: {},
 });

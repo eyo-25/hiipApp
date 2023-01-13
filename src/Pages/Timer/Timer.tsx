@@ -46,18 +46,6 @@ function Timer() {
   const timeObj = useRef<any>({});
   const now = Moment().format("YYYY-MM-DD");
 
-  // async function getToDoObj() {
-  //   try {
-  //     await dbService
-  //       .collection("plan")
-  //       .doc(todoId)
-  //       .get()
-  //       .then((result) => {
-  //         setToDo(result.data());
-  //       });
-  //   } catch {}
-  // }
-
   //오늘날짜 타이머 체크후 없으면 생성 + timerIndex늘리기
   async function getTimeObj() {
     try {
@@ -160,11 +148,6 @@ function Timer() {
       }
     });
   }, []);
-
-  // useLayoutEffect(() => {
-  //   //toDo장착
-  //   getToDoObj();
-  // }, []);
 
   //초기화
   useEffect(() => {

@@ -23,7 +23,7 @@ function NavBar() {
   const feedbackMatch = useMatch("/feedback/*");
   const mypageMatch = useMatch("/mypage/*");
   useEffect(() => {
-    if (planMatch !== null) {
+    if (planMatch !== null || feedbackMatch) {
       setIstab(true);
     }
   }, []);

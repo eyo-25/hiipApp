@@ -4,10 +4,8 @@ import TodoCard from "./TodoCard";
 import {
   cardEditState,
   clickDateState,
-  endDateState,
   projectState,
   selectState,
-  startDateState,
   toDoState,
 } from "../../../Recoil/atoms";
 import { useRecoilState } from "recoil";

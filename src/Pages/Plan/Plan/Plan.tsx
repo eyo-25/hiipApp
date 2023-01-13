@@ -14,8 +14,6 @@ import {
   cardEditState,
   toDoState,
   isTodoEditState,
-  startDateState,
-  endDateState,
   isWeekState,
 } from "../../../Recoil/atoms";
 import TodoMemo from "./TodoMemo";

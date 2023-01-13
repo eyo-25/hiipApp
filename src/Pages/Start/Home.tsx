@@ -14,8 +14,8 @@ import HomeSplash from "../../Component/HomeSplash";
 import Start from "./Start/Start";
 
 function Home() {
-  const [startTodos, setStartTodos] = useRecoilState<any[]>(startTodoState);
-  const [endTodos, setEndTodos] = useRecoilState<any[]>(endTodoState);
+  const [startTodos, setStartTodos] = useRecoilState(startTodoState);
+  const [endTodos, setEndTodos] = useRecoilState(endTodoState);
   const Moment = require("moment");
   const now = Moment().format("YYYY-MM-DD");
   const [isHomeSplash, setIsHomeSplash] = useRecoilState(homeSplashState);
@@ -101,9 +101,10 @@ function Home() {
                     const copy: any[] = [...prev];
                     const startTodoObj = {
                       ...toDos[i],
-                      focusSet: timerResult.data().focusSet,
-                      addSet: timerResult.data().addSet,
+                      timerFocusSet: timerResult.data().focusSet,
+                      timerSetFocusSet: timerResult.data().setFocusSet,
                       timerStatus: timerResult.data().status,
+                      timerAddSet: timerResult.data().addSet,
                     };
                     const index = copy.findIndex(
                       (item) => item.id === toDos[i].id
@@ -118,9 +119,10 @@ function Home() {
                     const copy: any[] = [...prev];
                     const endTodoObj = {
                       ...toDos[i],
-                      focusSet: timerResult.data().focusSet,
-                      addSet: timerResult.data().addSet,
+                      timerFocusSet: timerResult.data().focusSet,
+                      timerSetFocusSet: timerResult.data().setFocusSet,
                       timerStatus: timerResult.data().status,
+                      timerAddSet: timerResult.data().addSet,
                     };
                     const index = copy.findIndex(
                       (item) => item.id === toDos[i].id
@@ -137,9 +139,11 @@ function Home() {
                 const copy: any[] = [...prev];
                 const startTodoObj = {
                   ...toDos[i],
+                  timerFocusSet: 0,
+                  timerSetFocusSet: 0,
                   focusSet: 0,
-                  addSet: 0,
                   timerStatus: "ready",
+                  timerAddSet: 0,
                 };
                 const index = copy.findIndex((item) => item.id === toDos[i].id);
                 if (index < 0) {

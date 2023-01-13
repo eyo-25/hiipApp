@@ -11,7 +11,6 @@ import { dbService } from "../../firebase";
 import TimerGraph from "./TimerGraph";
 import { resultColor, resultMent } from "../../Utils/interface";
 import { isMobile } from "react-device-detect";
-import { async } from "@firebase/util";
 
 function TimerResult() {
   const [mouseStartX, setMouseStartX] = useState(0);
@@ -42,7 +41,6 @@ function TimerResult() {
   const navigate = useNavigate();
   const now = useRef<string>();
   const startDate = useRef<string>("");
-  const resultPercent = useRef<number>();
 
   const btnVarients = {
     normal: {
@@ -70,7 +68,7 @@ function TimerResult() {
           setPlanPercent(() => {
             const startDate = Moment(result.data().startDate);
             const endDate = Moment(result.data().endDate);
-            const totalDate = endDate.diff(startDate, "days");
+            const totalDate = endDate.diff(startDate, "days") + 1;
             const timerIndex = result.data().timerIndex;
             return Math.round((timerIndex / totalDate) * 100);
           });
@@ -475,12 +473,14 @@ function TimerResult() {
           </ResultInfoBox>
           <ResultInfoBox>
             <NewBox>+18</NewBox>
-            <h4>{nowTimer && nowTimer.setFocusSet}SET</h4>
+            <h4>
+              {nowTimer ? nowTimer.setFocusSet - nowTimer.focusSet : 0}SET
+            </h4>
             <p>진행세트</p>
           </ResultInfoBox>
           <ResultInfoBox>
             <NewBox>+18</NewBox>
-            <h4>{nowTimer && nowTimer.addSet}SET</h4>
+            <h4>{nowTimer ? nowTimer.addSet : 0}SET</h4>
             <p>추가세트</p>
           </ResultInfoBox>
         </ResultInfoContainer>

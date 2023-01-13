@@ -1,6 +1,9 @@
 import { motion } from "framer-motion";
+import { useRecoilState } from "recoil";
 import styled from "styled-components";
+import { endTodoState, startTodoState } from "../../../Recoil/atoms";
 import { DdayBox, fadeinVariants } from "./ProjectInfo";
+import { useEffect, useState } from "react";
 
 interface IDetailInfo {
   onBackClick: () => void;
@@ -8,6 +11,57 @@ interface IDetailInfo {
 }
 
 function DetailInfo({ onBackClick, projectDday }: IDetailInfo) {
+  const [startTodos, setStartTodos] = useRecoilState(startTodoState);
+  const [endTodos, setEndTodos] = useRecoilState(endTodoState);
+  const [detailObj, setDetailObj] = useState<any>({
+    planPercent: 0,
+    addSet: 0,
+    successPercent: 0,
+  });
+
+  const Moment = require("moment");
+  useEffect(() => {
+    if (0 < startTodos.length) {
+      setDetailObj(() => {
+        const startDate = Moment(startTodos[0].startDate);
+        const endDate = Moment(startTodos[0].endDate);
+        const totalDiff = endDate.diff(startDate, "days") + 1;
+        const timerIndex = startTodos[0].timerIndex;
+        return {
+          progressSet:
+            startTodos[0].timerSetFocusSet - startTodos[0].timerFocusSet,
+          planPercent: Math.round((timerIndex / totalDiff) * 100),
+          addSet: startTodos[0].timerAddSet,
+          successPercent: Math.round(
+            (startTodos[0].successCount / totalDiff) * 100
+          ),
+        };
+      });
+    } else if (0 < endTodos.length) {
+      setDetailObj(() => {
+        const startDate = Moment(endTodos[0].startDate);
+        const endDate = Moment(endTodos[0].endDate);
+        const totalDiff = endDate.diff(startDate, "days") + 1;
+        const timerIndex = endTodos[0].timerIndex;
+        return {
+          planPercent: Math.round((timerIndex / totalDiff) * 100),
+          addSet: endTodos[0].timerAddSet,
+          successPercent: Math.round(
+            (endTodos[0].successCount / totalDiff) * 100
+          ),
+        };
+      });
+    } else {
+      setDetailObj(() => {
+        return {
+          planPercent: 0,
+          addSet: 0,
+          successPercent: 0,
+        };
+      });
+    }
+  }, []);
+
   return (
     <>
       <DdayBox
@@ -27,28 +81,28 @@ function DetailInfo({ onBackClick, projectDday }: IDetailInfo) {
       >
         <DetailItems>
           <DetailItem>
-            <p>4</p>
+            <p>{detailObj.progressSet}</p>
             <span>SET</span>
           </DetailItem>
-          <DetailText>전날 밀림</DetailText>
+          <DetailText>진행 세트</DetailText>
         </DetailItems>
         <DetailItems>
           <DetailItem>
-            <p>100</p>
+            <p>{detailObj.successPercent}</p>
             <span>%</span>
           </DetailItem>
           <DetailText>계획 성공</DetailText>
         </DetailItems>
         <DetailItems>
           <DetailItem>
-            <p>4</p>
+            <p>{detailObj.addSet}</p>
             <span>SET</span>
           </DetailItem>
           <DetailText>오늘 추가됨</DetailText>
         </DetailItems>
         <DetailItems>
           <DetailItem>
-            <p>100</p>
+            <p>{detailObj.planPercent}</p>
             <span>%</span>
           </DetailItem>
           <DetailText>계획 진행</DetailText>

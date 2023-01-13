@@ -69,7 +69,7 @@ const TabContainer = styled(motion.div)`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 4vh;
+  height: calc(var(--vh, 1vh) * 4);
   max-width: 414px;
   background-color: white;
   border-top: 1px solid ${Dark_Gray};
