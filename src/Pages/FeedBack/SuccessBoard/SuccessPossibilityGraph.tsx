@@ -47,9 +47,7 @@ const Wrapper = styled.div`
   justify-content: center;
   height: 100%;
   width: 100%;
-  background-color: white;
-  padding-top: 10%;
-  padding-bottom: 13%;
+  padding-top: 5%;
 `;
 const GraphBox = styled.div`
   position: relative;
@@ -65,8 +63,8 @@ const Line = styled.div`
   height: 20%;
   width: 100%;
   border-top: 0.5px solid ${Dark_Gray4};
-  &:last-child {
-    border-bottom: 0.5px solid ${Dark_Gray4};
+  &:first-child {
+    border-top: none;
   }
 `;
 const BarContainer = styled.div`

@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import Applayout from "../../Component/Applayout";
-import CoachEvaluation from "./CoachEvaluation";
-import { useEffect, useState } from "react";
+import CoachEvaluation from "./CoachBoard/CoachBoard";
+import { useEffect, useState, useRef } from "react";
 import { authService, dbService } from "../../firebase";
 import {
   feedBackTimerState,
@@ -11,8 +11,10 @@ import {
 import { useRecoilState } from "recoil";
 import { onSnapshot, query } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
-import SuccessPossibility from "./SuccessPossibility/SuccessPossibility";
-import SuccessPercent from "./SuccessPercent";
+import FocusLimit from "./MyBoard/MyFocusLimit";
+import { scrollIntoView } from "seamless-scroll-polyfill";
+import SuccessBord from "./SuccessBoard/SuccessBoard";
+import MyBoard from "./MyBoard/MyBoard";
 
 function FeedBack() {
   const [project, setProject] = useRecoilState(projectState);
@@ -72,14 +74,15 @@ function FeedBack() {
     }
   }, [feedBackTodo]);
 
+  const topRef = useRef<any>(null);
+
   return (
     <Applayout>
       <FeedBackContainer>
         <Container>
           <CoachEvaluation />
-          <SuccessPossibility />
-          <SuccessPercent />
-          <Box4></Box4>
+          <SuccessBord />
+          <MyBoard />
         </Container>
       </FeedBackContainer>
     </Applayout>
@@ -122,10 +125,4 @@ const Container = styled.div`
     font-weight: 800;
     font-size: 5vh;
   }
-`;
-const Box4 = styled.div`
-  display: flex;
-  height: calc(var(--vh, 1vh) * 45);
-  width: 100%;
-  background-color: aquamarine;
 `;

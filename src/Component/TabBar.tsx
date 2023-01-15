@@ -46,19 +46,38 @@ function TabBar() {
   };
   const planMatch = useMatch("/plan/*");
   const intervalMatch = useMatch("/plan/intervalSetting/*");
+  const feedBackMatch = useMatch("/feedback/*");
   return (
-    <TabContainer variants={tabVariants} initial="normal" animate="animate">
-      <Tab variants={fadeinVariants} initial="normal" animate="animate">
-        <Tabs onClick={() => onTabClick("/plan")}>
-          <TabsTitle isActive={planMatch !== null && intervalMatch === null}>
-            프로젝트
-          </TabsTitle>
-        </Tabs>
-        <Tabs onClick={onIntervalClick}>
-          <TabsTitle isActive={intervalMatch !== null}>인터벌</TabsTitle>
-        </Tabs>
-      </Tab>
-    </TabContainer>
+    <>
+      {(planMatch || intervalMatch) && (
+        <TabContainer variants={tabVariants} initial="normal" animate="animate">
+          <Tab variants={fadeinVariants} initial="normal" animate="animate">
+            <Tabs onClick={() => onTabClick("/plan")}>
+              <TabsTitle
+                isActive={planMatch !== null && intervalMatch === null}
+              >
+                프로젝트
+              </TabsTitle>
+            </Tabs>
+            <Tabs onClick={onIntervalClick}>
+              <TabsTitle isActive={intervalMatch !== null}>인터벌</TabsTitle>
+            </Tabs>
+          </Tab>
+        </TabContainer>
+      )}
+      {feedBackMatch && (
+        <TabContainer>
+          <Tab>
+            <Tabs>
+              <TabsTitle isActive={feedBackMatch !== null}>코치</TabsTitle>
+            </Tabs>
+            <Tabs>
+              <TabsTitle isActive={intervalMatch !== null}>랭크</TabsTitle>
+            </Tabs>
+          </Tab>
+        </TabContainer>
+      )}
+    </>
   );
 }
 
@@ -85,10 +104,7 @@ const Tabs = styled.li`
   display: flex;
   align-items: flex-end;
   justify-content: flex-start;
-  width: 25%;
-  @media screen and (max-height: 800px) {
-    width: 22%;
-  }
+  margin-right: 2vh;
 `;
 const TabsTitle = styled.h4<{ isActive: boolean }>`
   font-weight: 600;

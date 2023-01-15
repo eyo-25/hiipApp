@@ -1,8 +1,8 @@
 import styled from "styled-components";
 import { IoChevronDownSharp } from "react-icons/io5";
-import MadBackground from "../../Assets/image/coachResult_Mad.png";
+import MadBackground from "../../../Assets/image/coachResult_Mad.png";
 
-function CoachEvaluation() {
+function CoachBoard() {
   return (
     <Container>
       <ContentWrapper>
@@ -32,7 +32,7 @@ function CoachEvaluation() {
   );
 }
 
-export default CoachEvaluation;
+export default CoachBoard;
 
 const Container = styled.div`
   display: flex;
