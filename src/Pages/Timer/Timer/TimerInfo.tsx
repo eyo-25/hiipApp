@@ -8,7 +8,6 @@ import {
   isBreakState,
   isPauseState,
   timerToDoState,
-  toDoState,
 } from "../../../Recoil/atoms";
 import { IoCloseSharp } from "react-icons/io5";
 import { dbService } from "../../../firebase";

@@ -51,6 +51,7 @@ const ContentContaner = styled.div`
   border-radius: 1vh;
   background-color: white;
   padding: 3vh;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.07);
 `;
 const BadgeBox = styled.div`
   display: flex;

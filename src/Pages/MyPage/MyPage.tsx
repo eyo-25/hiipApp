@@ -38,7 +38,7 @@ function MyPage({ userObj }: any) {
     "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS_qBTDzBVonLHd5Ejk0i-61YlcHI54KTgOMhIRea9jwACihT9hxQaj2P87_XAv87DEkAY&usqp=CAU";
   return (
     <Applayout>
-      <Header />
+      <Header title={"My Page"} />
       <Wrapper>
         <Container>
           <ProfileBox>

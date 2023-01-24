@@ -1,12 +1,19 @@
 import styled from "styled-components";
 import { useState } from "react";
 import SuccessPossibilityGraph from "./SuccessPossibilityGraph";
+import { feedBackTimerState } from "../../../Recoil/atoms";
+import { useRecoilState } from "recoil";
 
 function SuccessPossibility() {
   const [clickedName, setClickedName] = useState("day");
+  const [timerArray, setTimerArray] = useRecoilState<any[]>(feedBackTimerState);
+  const Moment = require("moment");
+  const nowDay = Moment().day();
+
   const onMenuClicked = (name: string) => {
     setClickedName(name);
   };
+
   return (
     <Wrapper>
       <Container>
@@ -42,7 +49,9 @@ function SuccessPossibility() {
             완료 가능성
           </h3>
           <ScoreBox>
-            <h2>26.5</h2>
+            <h2>
+              {timerArray.length === 7 ? timerArray[nowDay].successPercent : 0}
+            </h2>
             <span>%</span>
           </ScoreBox>
         </ScoreInfoContainer>

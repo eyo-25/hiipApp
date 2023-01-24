@@ -1,39 +1,48 @@
 import styled from "styled-components";
 import Applayout from "../../Component/Applayout";
-import CoachEvaluation from "./CoachBoard/CoachBoard";
-import { useEffect, useState, useRef } from "react";
+import { useEffect } from "react";
 import { authService, dbService } from "../../firebase";
-import {
-  feedBackTimerState,
-  feedBackTodoState,
-  projectState,
-} from "../../Recoil/atoms";
+import { feedBackTodoState, ITodo, projectState } from "../../Recoil/atoms";
 import { useRecoilState } from "recoil";
 import { onSnapshot, query } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
-import FocusLimit from "./MyBoard/MyFocusLimit";
-import { scrollIntoView } from "seamless-scroll-polyfill";
-import SuccessBord from "./SuccessBoard/SuccessBoard";
-import MyBoard from "./MyBoard/MyBoard";
+import FeedBackBorad from "./FeedBackBorad";
+import { useParams } from "react-router-dom";
+import FeedBackDefault from "./FeedBackDefault";
 
 function FeedBack() {
   const [project, setProject] = useRecoilState(projectState);
   const [feedBackTodo, setFeedBackTodo] = useRecoilState(feedBackTodoState);
-  const [feedBackTimerObj, setFeedBackTimerObj] =
-    useRecoilState(feedBackTimerState);
-  const Moment = require("moment");
-  const now = Moment().format("YYYY-MM-DD");
-  // 초기화
+  const params = useParams();
+  const todoId = params.todoId;
+
+  //프로젝트 변경 감지
+  useEffect(() => {
+    const uid = JSON.parse(localStorage.getItem("user") as any).uid;
+    const q = query(dbService.collection("project").where("uid", "==", uid));
+    const addId = onSnapshot(q, (querySnapshot) => {
+      const newArray = querySnapshot.docs.map((doc: any) => {
+        return {
+          id: doc.id,
+          ...doc.data(),
+        };
+      });
+      setProject(newArray);
+    });
+    onAuthStateChanged(authService, (user) => {
+      if (user == null) {
+        addId();
+      }
+    });
+  }, []);
+
   //투두 변경 감지
   useEffect(() => {
-    if (project.length > 0) {
-      const projectIndex = project.findIndex(
-        (item: any) => item.select === "true"
-      );
+    if (0 < project.length && !todoId) {
       const q = query(
         dbService
           .collection("plan")
-          .where("projectId", "==", project[projectIndex].id)
+          .where("projectId", "==", project[0].id)
           .orderBy("index", "desc")
           .limit(1)
       );
@@ -51,39 +60,28 @@ function FeedBack() {
           addId();
         }
       });
-    } else {
-      setFeedBackTodo([]);
     }
-    return () => setFeedBackTodo([]);
-  }, [project]);
-  useEffect(() => {
-    if (0 < feedBackTodo.length && feedBackTodo[0].status !== "ready") {
+    if (todoId) {
       dbService
         .collection("plan")
-        .doc(feedBackTodo[0].id)
-        .collection("timer")
-        .where("date", "==", now)
+        .doc(todoId)
         .get()
-        .then((result) => {
-          if (!result.empty) {
-            result.forEach((resultData) => {
-              setFeedBackTimerObj(resultData.data());
-            });
-          }
+        .then((result: any) => {
+          result.forEach((resultData: any) => {
+            const newObj = {
+              id: todoId,
+              ...resultData.data(),
+            };
+            setFeedBackTodo(newObj);
+          });
         });
     }
-  }, [feedBackTodo]);
-
-  const topRef = useRef<any>(null);
+  }, [project]);
 
   return (
     <Applayout>
       <FeedBackContainer>
-        <Container>
-          <CoachEvaluation />
-          <SuccessBord />
-          <MyBoard />
-        </Container>
+        {0 < feedBackTodo.length ? <FeedBackBorad /> : <FeedBackDefault />}
       </FeedBackContainer>
     </Applayout>
   );
@@ -98,31 +96,10 @@ const FeedBackContainer = styled.div`
   overflow-y: scroll;
   overflow-x: hidden;
   align-items: flex-start;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
   &::-webkit-scrollbar {
+    display: none;
     width: 0;
-  }
-`;
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  margin: 0 auto;
-  padding-bottom: calc(var(--vh, 1vh) * 18);
-  h2 {
-    font-family: "Roboto";
-    font-weight: 800;
-    font-size: 8vh;
-  }
-  h3 {
-    font-size: 2.5vh;
-    font-weight: 600;
-    line-height: 1.2;
-  }
-  span {
-    font-family: "Roboto";
-    font-weight: 800;
-    font-size: 5vh;
   }
 `;

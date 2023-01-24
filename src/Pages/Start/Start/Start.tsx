@@ -77,7 +77,6 @@ function Start() {
   };
 
   const onPlayClick = async () => {
-    if (startTodos.length <= 0) return;
     const index = toDos.findIndex((item) => item.id === startTodos[0].id);
     if (project.length <= 0) {
       navigate("/plan/createProject");

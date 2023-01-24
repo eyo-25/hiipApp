@@ -4,7 +4,7 @@ import { useRecoilState } from "recoil";
 import styled from "styled-components";
 import { projectState } from "../Recoil/atoms";
 
-function Header() {
+function Header({ title }: { title: string }) {
   const [project, setProject] = useRecoilState(projectState);
   const [projectTitle, setProjectTitle] = useState("");
   const [projectDday, setProjectDday] = useState("");
@@ -27,7 +27,7 @@ function Header() {
 
   return (
     <Container>
-      {planMatch && (
+      {planMatch ? (
         <HeaderBox>
           <Dday>D {projectDday}</Dday>
           <ProjectTitle>{projectTitle}</ProjectTitle>
@@ -36,6 +36,8 @@ function Header() {
             <HamLine />
           </HamMenu>
         </HeaderBox>
+      ) : (
+        <Wrapper>{title}</Wrapper>
       )}
     </Container>
   );
@@ -45,10 +47,19 @@ export default Header;
 
 const Container = styled.div`
   display: flex;
+  justify-content: center;
   align-items: flex-end;
   width: 100%;
   height: 7vh;
   background-color: white;
+`;
+const Wrapper = styled.div`
+  display: flex;
+  align-items: center;
+  width: 88%;
+  height: 100%;
+  font-family: "Roboto";
+  font-size: 2.9vh;
 `;
 const HeaderBox = styled.div`
   position: relative;

@@ -111,7 +111,7 @@ function Plan() {
 
   return (
     <>
-      <Header />
+      <Header title={"Plan"} />
       <ContentContainer>
         <CalendarBox
           variants={calendarVariants}

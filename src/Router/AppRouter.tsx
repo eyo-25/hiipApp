@@ -46,6 +46,7 @@ export default function AppRouter({ isLoggedIn, userObj }: AppRouterProps) {
           <Route path={"/plan/intervalSetting/:purpose"} element={<Plan />} />
         </Route>
         <Route path={"/feedback"} element={<FeedBack />}></Route>
+        <Route path={"/feedback/:todoId"} element={<FeedBack />}></Route>
         <Route path={"/mypage"} element={<MyPage userObj={userObj} />}>
           <Route
             path={"/mypage/editprofile"}

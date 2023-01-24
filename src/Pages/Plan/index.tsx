@@ -2,7 +2,7 @@ import { useMatch } from "react-router-dom";
 import { useEffect } from "react";
 import { useRecoilState } from "recoil";
 import Applayout from "../../Component/Applayout";
-import { projectState, toDoState } from "../../Recoil/atoms";
+import { isWeekState, projectState, toDoState } from "../../Recoil/atoms";
 import Plan from "./Plan/Plan";
 import CreateProject from "./Project/CreateProject";
 import IntervalSetting from "./Project/IntervalSetting";
@@ -16,6 +16,13 @@ function Index() {
   const createMatch = useMatch("/plan/createProject");
   const intervalMatch = useMatch("/plan/intervalSetting/*");
   const isMatch = createMatch !== null || intervalMatch !== null;
+  const [isWeek, setIsWeek] = useRecoilState(isWeekState);
+
+  useEffect(() => {
+    if (0 < toDos.length) {
+      setIsWeek(false);
+    }
+  }, [toDos]);
 
   //프로젝트 변경 감지
   useEffect(() => {
@@ -64,7 +71,6 @@ function Index() {
         }
       });
     }
-    return () => setToDos([]);
   }, [project, setToDos]);
 
   return (

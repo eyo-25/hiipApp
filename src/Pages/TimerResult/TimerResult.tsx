@@ -351,7 +351,7 @@ function TimerResult() {
   const onMouseUp = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
     if (120 < e.clientX - mouseStartX && resultStatus) {
       updateStatusSubmit(resultStatus);
-      navigate(`/feedback`);
+      navigate(`/feedback/${todoId}`);
     }
     setIsPush(false);
     setDistanceX(0);
@@ -380,7 +380,7 @@ function TimerResult() {
   const onTouchEnd = () => {
     if (180 < tochedX && resultStatus) {
       updateStatusSubmit(resultStatus);
-      navigate(`/feedback`);
+      navigate(`/feedback/${todoId}`);
     }
     setIsPush(false);
     setTochedStartX(0);

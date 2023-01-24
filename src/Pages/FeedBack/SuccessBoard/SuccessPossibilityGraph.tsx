@@ -1,10 +1,16 @@
 import styled from "styled-components";
 
 import { useEffect, useState } from "react";
-import { Dark_Gray, Dark_Gray4 } from "../../../Styles/Colors";
+import { Blue, Dark_Gray, Dark_Gray4 } from "../../../Styles/Colors";
+import { feedBackTimerState } from "../../../Recoil/atoms";
+import { useRecoilState } from "recoil";
 
 function SuccessPossibilityGraph() {
   const calendarDays = ["일", "월", "화", "수", "목", "금", "토"];
+  const [timerArray, setTimerArray] = useRecoilState<any[]>(feedBackTimerState);
+  const Moment = require("moment");
+  const todayDay = Moment().day();
+
   return (
     <Wrapper>
       <GraphBox>
@@ -18,15 +24,13 @@ function SuccessPossibilityGraph() {
         <BarContainer>
           {calendarDays.map((days, index) => (
             <BarBox key={days}>
-              {/* <Bar
+              <Bar
                 height={
-                  timerArray[index].successPercent
-                    ? timerArray[index].successPercent
-                    : 0
+                  7 === timerArray.length ? timerArray[index].successPercent : 0
                 }
-                color={resultStatus ? resultColor[resultStatus] : "Black"}
+                color={Dark_Gray}
                 today={todayDay === index}
-              ></Bar> */}
+              ></Bar>
             </BarBox>
           ))}
         </BarContainer>
@@ -87,7 +91,7 @@ const BarBox = styled.div`
 const Bar = styled.div<{ height: number; today: boolean; color: string }>`
   height: ${(props) => props.height}%;
   width: 50%;
-  background-color: ${(props) => (props.today ? props.color : Dark_Gray)};
+  background-color: ${(props) => (props.today ? Blue : Dark_Gray)};
 `;
 const DayContainer = styled.div`
   display: grid;

@@ -36,6 +36,10 @@ const CalendarBoard = () => {
   const [clickDate, setClickDate] = useRecoilState(clickDateState);
   const [isWeek, setIsWeek] = useRecoilState(isWeekState);
 
+  useEffect(() => {
+    onTodayClick();
+  }, []);
+
   const onPrevClick = () => {
     if (isWeek) {
       const prevDay = 7 + Moment(clickDate).day();
@@ -68,10 +72,6 @@ const CalendarBoard = () => {
   const onTodayClick = () => {
     setClickDate(Moment().format("YYYY-MM-DD"));
   };
-
-  useEffect(() => {
-    onTodayClick();
-  }, []);
 
   //클릭한 날짜 변경시 첫번째 todo의 일정이 나타나도록 설정
   useEffect(() => {

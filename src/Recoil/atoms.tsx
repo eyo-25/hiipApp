@@ -166,7 +166,15 @@ export const feedBackTodoState = atom<ITodo[]>({
   key: "feedBackTodoState",
   default: [],
 });
-export const feedBackTimerState = atom<{}>({
+export const feedBackTimerState = atom<any[]>({
   key: "feedBackTimerState",
-  default: {},
+  default: [
+    { successPercent: 0 },
+    { successPercent: 0 },
+    { successPercent: 0 },
+    { successPercent: 0 },
+    { successPercent: 0 },
+    { successPercent: 0 },
+    { successPercent: 0 },
+  ],
 });

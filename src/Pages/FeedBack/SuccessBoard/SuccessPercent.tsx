@@ -1,7 +1,25 @@
 import styled from "styled-components";
 import { useEffect, useState } from "react";
+import { feedBackTimerState, feedBackTodoState } from "../../../Recoil/atoms";
+import { useRecoilState } from "recoil";
 
 function SuccessPercent() {
+  const [feedBackTodo, setFeedBackTodo] = useRecoilState(feedBackTodoState);
+  const [successPercent, setSuccessPercent] = useState(0);
+  const Moment = require("moment");
+  const now = Moment();
+
+  useEffect(() => {
+    const duration = Math.round(
+      Moment.duration(now.diff(Moment(feedBackTodo[0].startDate))).asDays()
+    );
+    const percent = (feedBackTodo[0].successCount / duration) * 100;
+    setSuccessPercent(percent);
+    return () => {
+      setSuccessPercent(0);
+    };
+  }, []);
+
   return (
     <Wrapper>
       <ContentContainer>
@@ -10,7 +28,7 @@ function SuccessPercent() {
         </TitleContainer>
         <PercentContainer>
           <PercentBox>
-            <h2>62.5</h2>
+            <h2>{successPercent}</h2>
             <span>%</span>
           </PercentBox>
         </PercentContainer>

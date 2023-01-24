@@ -1,13 +1,16 @@
 import styled from "styled-components";
 import { IoChevronDownSharp } from "react-icons/io5";
 import MadBackground from "../../../Assets/image/coachResult_Mad.png";
+import { feedBackTodoState, projectState } from "../../../Recoil/atoms";
+import { useRecoilState } from "recoil";
 
 function CoachBoard() {
+  const [feedBackTodo, setFeedBackTodo] = useRecoilState(feedBackTodoState);
   return (
     <Container>
       <ContentWrapper>
         <TextBox>
-          <p>영어공부</p>
+          <p>{feedBackTodo[0].planTitle}</p>
           <h4>
             플랜에 대한 <br />
             코치 평가
