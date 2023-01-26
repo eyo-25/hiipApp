@@ -10,6 +10,7 @@ import TimerBoard from "./Timer/TimerBoard";
 import {
   isBreakState,
   isPauseState,
+  projectState,
   timerSplashState,
   timerState,
   timerToDoState,
@@ -35,6 +36,7 @@ const bottomVariants = {
 };
 
 function Timer() {
+  const [project, setProject] = useRecoilState(projectState);
   const [isTimerSplash, setIsTimerSplash] = useRecoilState(timerSplashState);
   const [timerObj, setTimerObj] = useRecoilState(timerState);
   const [isBreakSet, setIsBreakSet] = useRecoilState(isBreakState);
@@ -74,14 +76,14 @@ function Timer() {
           breakSet: defaultSet - 1 <= 0 ? 0 : defaultSet - 1,
           successCount: toDo.successCount,
           //테스트 끝나면 분만 적용
-          setFocusMin: 0,
-          setFocusSec: 10,
-          setBreakMin: 0,
-          setBreakSec: 5,
-          min: 0,
-          sec: 10,
-          breakMin: defaultSet - 1 <= 0 ? 0 : 0,
-          breakSec: defaultSet - 1 <= 0 ? 0 : 5,
+          setFocusMin: project[0].focusMin,
+          setFocusSec: 0,
+          setBreakMin: project[0].breakMin,
+          setBreakSec: 0,
+          min: project[0].focusMin,
+          sec: 0,
+          breakMin: defaultSet - 1 <= 0 ? 0 : project[0].breakMin,
+          breakSec: defaultSet - 1 <= 0 ? 0 : 0,
           startTime: Moment().format("YYYY-MM-DD HH:mm:ss"),
           endTime: "",
           todoId: todoId,
@@ -151,6 +153,23 @@ function Timer() {
 
   //초기화
   useEffect(() => {
+    const uid = JSON.parse(localStorage.getItem("user") as any).uid;
+    const q = query(dbService.collection("project").where("uid", "==", uid));
+    const addId = onSnapshot(q, (querySnapshot) => {
+      const newArray = querySnapshot.docs.map((doc: any) => {
+        return {
+          id: doc.id,
+          ...doc.data(),
+        };
+      });
+      setProject(newArray);
+    });
+    onAuthStateChanged(authService, (user) => {
+      if (user == null) {
+        addId();
+      }
+    });
+
     //오늘날짜에 todo 기간이 없으면 home으로 navigate
     if (toDo) {
       getTimeObj();

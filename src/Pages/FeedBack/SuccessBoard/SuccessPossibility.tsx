@@ -1,18 +1,32 @@
 import styled from "styled-components";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import SuccessPossibilityGraph from "./SuccessPossibilityGraph";
-import { feedBackTimerState } from "../../../Recoil/atoms";
+import { feedBackTimerState, feedBackTodoState } from "../../../Recoil/atoms";
 import { useRecoilState } from "recoil";
 
 function SuccessPossibility() {
+  const [feedBackTodo, setFeedBackTodo] = useRecoilState(feedBackTodoState);
+  const [successPercent, setSuccessPercent] = useState(0);
   const [clickedName, setClickedName] = useState("day");
   const [timerArray, setTimerArray] = useRecoilState<any[]>(feedBackTimerState);
   const Moment = require("moment");
   const nowDay = Moment().day();
+  const now = Moment();
 
   const onMenuClicked = (name: string) => {
     setClickedName(name);
   };
+
+  useEffect(() => {
+    const duration = Math.round(
+      Moment.duration(now.diff(Moment(feedBackTodo[0].startDate))).asDays()
+    );
+    const percent = (feedBackTodo[0].successCount / duration) * 100;
+    setSuccessPercent(percent);
+    return () => {
+      setSuccessPercent(0);
+    };
+  }, []);
 
   return (
     <Wrapper>
@@ -49,9 +63,7 @@ function SuccessPossibility() {
             완료 가능성
           </h3>
           <ScoreBox>
-            <h2>
-              {timerArray.length === 7 ? timerArray[nowDay].successPercent : 0}
-            </h2>
+            <h2>{successPercent.toFixed(1)}</h2>
             <span>%</span>
           </ScoreBox>
         </ScoreInfoContainer>
@@ -76,7 +88,7 @@ const Container = styled.div`
   flex-direction: column;
   justify-content: center;
   height: 100%;
-  width: 90%;
+  width: 85%;
 `;
 const MenuContainer = styled.div`
   display: grid;
@@ -108,6 +120,7 @@ const ScoreBox = styled.div`
   display: flex;
   align-items: flex-end;
   margin-top: 1.8vh;
+  letter-spacing: -0.3vh;
 `;
 const GraphContainer = styled.div`
   display: flex;

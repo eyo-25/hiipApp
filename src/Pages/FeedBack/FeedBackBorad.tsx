@@ -6,7 +6,6 @@ import MyBoard from "./MyBoard/MyBoard";
 import SuccessBoard from "./SuccessBoard/SuccessBoard";
 import { useEffect, useState, useRef } from "react";
 import { dbService } from "../../firebase";
-import { IoEllipse } from "react-icons/io5";
 
 function FeedBackBorad() {
   const [feedBackTodo, setFeedBackTodo] = useRecoilState(feedBackTodoState);

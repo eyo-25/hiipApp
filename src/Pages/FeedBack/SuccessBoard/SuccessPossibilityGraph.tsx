@@ -24,13 +24,13 @@ function SuccessPossibilityGraph() {
         <BarContainer>
           {calendarDays.map((days, index) => (
             <BarBox key={days}>
-              <Bar
-                height={
-                  7 === timerArray.length ? timerArray[index].successPercent : 0
-                }
-                color={Dark_Gray}
-                today={todayDay === index}
-              ></Bar>
+              {7 === timerArray.length && (
+                <Bar
+                  height={timerArray[index].successPercent}
+                  color={Dark_Gray}
+                  today={todayDay === index}
+                ></Bar>
+              )}
             </BarBox>
           ))}
         </BarContainer>

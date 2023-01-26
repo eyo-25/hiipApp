@@ -5,30 +5,28 @@ import { useRecoilState } from "recoil";
 
 function SuccessPercent() {
   const [feedBackTodo, setFeedBackTodo] = useRecoilState(feedBackTodoState);
-  const [successPercent, setSuccessPercent] = useState(0);
+  const [processPercent, setProcessPercent] = useState(0);
   const Moment = require("moment");
-  const now = Moment();
+  const now = Moment().format("YYYY-MM-DD");
+  const nowMoment = Moment(now);
+  const startMoment = Moment(feedBackTodo[0].startDate);
+  const endMoment = Moment(feedBackTodo[0].endDate);
+  const duration = Moment.duration(endMoment.diff(startMoment)).asDays() + 1;
+  const nowDuration = Moment.duration(endMoment.diff(nowMoment)).asDays();
 
   useEffect(() => {
-    const duration = Math.round(
-      Moment.duration(now.diff(Moment(feedBackTodo[0].startDate))).asDays()
-    );
-    const percent = (feedBackTodo[0].successCount / duration) * 100;
-    setSuccessPercent(percent);
-    return () => {
-      setSuccessPercent(0);
-    };
+    setProcessPercent((feedBackTodo[0].timerIndex / duration) * 100);
   }, []);
 
   return (
     <Wrapper>
       <ContentContainer>
         <TitleContainer>
-          <h3>성공률</h3>
+          <h3>진행률</h3>
         </TitleContainer>
         <PercentContainer>
           <PercentBox>
-            <h2>{successPercent}</h2>
+            <h2>{processPercent.toFixed(1)}</h2>
             <span>%</span>
           </PercentBox>
         </PercentContainer>

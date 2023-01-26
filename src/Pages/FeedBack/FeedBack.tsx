@@ -36,6 +36,8 @@ function FeedBack() {
     });
   }, []);
 
+  console.log(feedBackTodo);
+
   //투두 변경 감지
   useEffect(() => {
     if (0 < project.length && !todoId) {
@@ -44,7 +46,6 @@ function FeedBack() {
           .collection("plan")
           .where("projectId", "==", project[0].id)
           .orderBy("index", "desc")
-          .limit(1)
       );
       const addId = onSnapshot(q, (querySnapshot) => {
         const newArray = querySnapshot.docs.map((doc: any) => {
